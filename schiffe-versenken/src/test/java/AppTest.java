@@ -1,5 +1,3 @@
-package hsaa.sose26;
-
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;

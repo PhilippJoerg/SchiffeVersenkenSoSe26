@@ -1,5 +1,3 @@
-package hsaa.sose26;
-
 /**
  * Hello world!
  *
