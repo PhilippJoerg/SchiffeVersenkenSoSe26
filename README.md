@@ -13,10 +13,10 @@ Dieses Projekt ist im Rahmen des Programmierpraktikums im Sommersemester 2026 en
 * **Kommunikation:** Java Sockets
 * **Build-Struktur:** Standard Java-Projektstruktur
 
-## Wichtige Daten:
+## Wichtige Termine:
 * **Zwischenpräsentation:** 20 Mai 2026
 * **Abschlusspräsentation:** 1 Juli 2026
-* **Entgültige Abgabe Programmcode:** 06 Juli 2026 9Uhr
+* **Entgültige Abgabe Programmcode:** 06 Juli 2026, 9Uhr
 
 ---
 *Erstellt für das Programmierpraktikum @ SoSe 2026*
