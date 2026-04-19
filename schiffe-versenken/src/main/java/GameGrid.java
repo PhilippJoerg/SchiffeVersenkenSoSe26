@@ -77,6 +77,7 @@ public class GameGrid {
         return true;
     }
 
+    // Funktion zum manuellen Setzen eines Schiffs
     public boolean placeShip(int x, int y) {
         if (field[x][y].isShip()) {
             return false;
@@ -86,6 +87,7 @@ public class GameGrid {
         }
     }
 
+    // Funktion zum Schuss auf ein Feld
     public boolean shoot(int x, int y) {
         if (field[x][y].shootField())
             return true;
@@ -93,6 +95,7 @@ public class GameGrid {
             return false;
     }
 
+    // Funktion zur ausgabe des Spielfelds in der Console
     public void showGameGridInConsole() {
         System.out.println("\nSpielfeld: " + name); // Leerzeile + Name
         System.out.println("  0123456789"); // Beschriftung
@@ -112,6 +115,7 @@ public class GameGrid {
         }
     }
 
+    // Gibt den Namen des Spielenden für dieses Spielfeld zurück
     public String getName() {
         return name;
     }

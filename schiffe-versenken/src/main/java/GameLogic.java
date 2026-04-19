@@ -2,8 +2,9 @@ import java.util.Scanner;
 
 /*
 * TODO: 
-* Erkennen das ein Schiff versenkt wurde (alle Felder eines Schiffes getroffen wurden)
-* Besseres Trefferfeedback (Weiterer zustand: Feld beschossen aber kein Treffer/ und Treffer)
+* Erkennen das ein Schiff versenkt wurde (alle Felder eines Schiffes getroffen wurden) (Treffer versenkt!)
+* Besseres Trefferfeedback (Weiterer zustand: Feld beschossen aber kein Treffer/ und Treffer) (Wasser getroffen)
+* Siegesbedingung und gameplayloop anpassen.
 */
 
 /**
