@@ -1,37 +1,42 @@
 package ui;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.Map;
 
 public class ShipPlacementController {
-
     // Größe des Spielfelds: 10x10
     private static final int GRID_SIZE = 10;
 
     // Referenz auf das Hauptfenster für Status und Board-Updates
     private final MainFrame frame;
+
     // Eigenes Board für die Schiffplatzierung
     private final CellState[][] ownBoard;
-    // Reihenfolge, in der die Schiffe gesetzt werden
-    private final List<ShipType> placementOrder;
 
-    // Index des aktuell zu platzierenden Schiffs
-    private int currentShipIndex;
+    // Restanzahl je Schiffstyp
+    private final EnumMap<ShipType, Integer> remainingShips;
+
     // Aktuelle Ausrichtung des Schiffs
     private ShipOrientation currentOrientation;
 
     public ShipPlacementController(MainFrame frame) {
         this.frame = frame;
         this.ownBoard = createEmptyBoard();
-        this.placementOrder = createPlacementOrder();
-        this.currentShipIndex = 0;
+        this.remainingShips = createRemainingShips();
         this.currentOrientation = ShipOrientation.HORIZONTAL;
 
         // Startzustand ins GUI laden
         frame.setOwnBoard(ownBoard);
-        updateStatus();
-        // Klicks auf das eigene Feld führen zur Platzierung
+        frame.setShipPaletteRemainingCounts(remainingShips);
+        frame.setShipPaletteOrientation(currentOrientation);
+
+        // Klicks auf das eigene Feld führen weiterhin zur Platzierung des nächsten verfügbaren Schiffs
         frame.setOwnBoardClickListener(this::placeCurrentShip);
+
+        // Drag-and-Drop auf das eigene Feld aktivieren
+        frame.setOwnBoardTransferHandler(new BoardDropListener(frame.getOwnBoard(), this));
+
+        updateStatus();
     }
 
     // Wechselt zwischen waagrecht und senkrecht
@@ -42,40 +47,74 @@ public class ShipPlacementController {
             currentOrientation = ShipOrientation.HORIZONTAL;
         }
 
+        frame.setShipPaletteOrientation(currentOrientation);
         updateStatus();
     }
 
     // Prüft, ob alle Schiffe bereits gesetzt wurden
     public boolean isPlacementFinished() {
-        return currentShipIndex >= placementOrder.size();
+        for (Integer remaining : remainingShips.values()) {
+            if (remaining > 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
-    // Versucht das aktuelle Schiff an der geklickten Position zu platzieren
+    // Wird vom Drag-and-Drop-Handler aufgerufen
+    public boolean placeShipFromDrag(ShipType shipType, int col, int row, ShipOrientation orientation) {
+        return placeShip(shipType, col, row, orientation);
+    }
+
+    // Versucht das nächste verfügbare Schiff an der geklickten Position zu platzieren
     private void placeCurrentShip(int col, int row) {
         if (isPlacementFinished()) {
             frame.setStatus("Alle Schiffe sind bereits platziert.");
             return;
         }
 
-        ShipType shipType = placementOrder.get(currentShipIndex);
+        ShipType shipType = getNextShipType();
+
+        if (shipType == null) {
+            frame.setStatus("Alle Schiffe sind bereits platziert.");
+            return;
+        }
+
+        placeShip(shipType, col, row, currentOrientation);
+    }
+
+    // Zentrale Platzierungslogik für Klick und Drag-and-Drop
+    private boolean placeShip(ShipType shipType, int col, int row, ShipOrientation orientation) {
+        if (shipType == null) {
+            return false;
+        }
+
+        if (getRemainingCount(shipType) <= 0) {
+            frame.setStatus(shipType.getDisplayName() + " ist nicht mehr verfügbar.");
+            return false;
+        }
 
         // Prüft, ob das Schiff dort gültig platziert werden kann
-        if (!canPlaceShip(shipType, col, row, currentOrientation)) {
+        if (!canPlaceShip(shipType, col, row, orientation)) {
             frame.setStatus("Ungültige Position für " + shipType.getDisplayName() + ".");
-            return;
+            return false;
         }
 
         // Trägt das Schiff ins Board ein
-        applyShip(shipType, col, row, currentOrientation);
-        currentShipIndex++;
+        applyShip(shipType, col, row, orientation);
+        decrementRemaining(shipType);
+
         frame.setOwnBoard(ownBoard);
+        frame.setShipPaletteRemainingCounts(remainingShips);
 
         if (isPlacementFinished()) {
             frame.setStatus("Alle Schiffe platziert.");
-            return;
+            return true;
         }
 
         updateStatus();
+        return true;
     }
 
     // Prüft, ob das Schiff innerhalb des Boards liegt und keine Felder belegt sind
@@ -123,17 +162,17 @@ public class ShipPlacementController {
         return col >= 0 && col < GRID_SIZE && row >= 0 && row < GRID_SIZE;
     }
 
-    // Aktualisiert den Statustext mit aktuellem Schiff und Ausrichtung
+    // Aktualisiert den Statustext mit nächstem Schiff und Ausrichtung
     private void updateStatus() {
         if (isPlacementFinished()) {
             frame.setStatus("Alle Schiffe platziert.");
             return;
         }
 
-        ShipType shipType = placementOrder.get(currentShipIndex);
+        ShipType shipType = getNextShipType();
+
         frame.setStatus(
-                "Platziere: " + shipType.getDisplayName()
-                        + " (" + shipType.getSize() + ")"
+                "Platziere: " + shipType.getDisplayName() + " (" + shipType.getSize() + ")"
                         + " - Ausrichtung: " + orientationText()
         );
     }
@@ -143,23 +182,34 @@ public class ShipPlacementController {
         return currentOrientation == ShipOrientation.HORIZONTAL ? "waagrecht" : "senkrecht";
     }
 
-    // Erstellt die Reihenfolge aller zu platzierenden Schiffe
-    private List<ShipType> createPlacementOrder() {
-        List<ShipType> result = new ArrayList<>();
+    // Gibt den nächsten noch verfügbaren Schiffstyp zurück
+    private ShipType getNextShipType() {
+        for (ShipType type : ShipType.values()) {
+            if (getRemainingCount(type) > 0) {
+                return type;
+            }
+        }
 
-        addShips(result, ShipType.BATTLESHIP);
-        addShips(result, ShipType.CRUISER);
-        addShips(result, ShipType.DESTROYER);
-        addShips(result, ShipType.SUBMARINE);
-
-        return result;
+        return null;
     }
 
-    // Fügt einen Schiffstyp entsprechend seiner Anzahl mehrfach hinzu
-    private void addShips(List<ShipType> list, ShipType type) {
-        for (int i = 0; i < type.getAmount(); i++) {
-            list.add(type);
+    private int getRemainingCount(ShipType shipType) {
+        return remainingShips.getOrDefault(shipType, 0);
+    }
+
+    private void decrementRemaining(ShipType shipType) {
+        remainingShips.put(shipType, getRemainingCount(shipType) - 1);
+    }
+
+    // Erstellt die Restanzahl aller Schiffstypen aus dem Enum
+    private EnumMap<ShipType, Integer> createRemainingShips() {
+        EnumMap<ShipType, Integer> result = new EnumMap<>(ShipType.class);
+
+        for (ShipType type : ShipType.values()) {
+            result.put(type, type.getAmount());
         }
+
+        return result;
     }
 
     // Erstellt ein leeres Board nur mit EMPTY-Feldern
@@ -173,5 +223,9 @@ public class ShipPlacementController {
         }
 
         return board;
+    }
+
+    public Map<ShipType, Integer> getRemainingShips() {
+        return new EnumMap<>(remainingShips);
     }
 }
