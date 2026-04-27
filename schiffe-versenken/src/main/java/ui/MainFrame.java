@@ -3,32 +3,41 @@ package ui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
-
+import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.TransferHandler;
 
 public class MainFrame extends JFrame {
+    // Linke Drag-and-Drop-Palette für verfügbare Schiffe
+    private final ShipPalettePanel shipPalettePanel;
 
-    // Eigenes Spielfeld links
+    // Eigenes Spielfeld
     private final BoardPanel ownBoard;
-    // Gegnerisches Spielfeld rechts
+
+    // Gegnerisches Spielfeld
     private final BoardPanel enemyBoard;
+
     // Statusanzeige unten im Fenster
     private final JLabel statusLabel;
+
     // Button zum Drehen der Schiffe
     private final JButton rotateButton;
+
     // Button zum Schießen auf das Gegnerfeld
     private final JButton shootButton;
 
     public MainFrame() {
         super("Schiffe versenken");
 
+        shipPalettePanel = new ShipPalettePanel();
         ownBoard = new BoardPanel(false);
         enemyBoard = new BoardPanel(true);
+
         statusLabel = new JLabel("Bereit.");
         rotateButton = new JButton("Drehen");
         shootButton = new JButton("Schießen");
@@ -39,7 +48,7 @@ public class MainFrame extends JFrame {
         // Mittlerer Bereich für beide Spielfelder
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
 
-        // Linker Bereich: eigenes Feld + Drehen-Button
+        // Linker Board-Bereich: eigenes Feld + Drehen-Button
         JPanel ownBoardPanel = new JPanel();
         ownBoardPanel.setLayout(new BoxLayout(ownBoardPanel, BoxLayout.Y_AXIS));
         ownBoardPanel.add(ownBoard);
@@ -48,7 +57,7 @@ public class MainFrame extends JFrame {
         rotatePanel.add(rotateButton);
         ownBoardPanel.add(rotatePanel);
 
-        // Rechter Bereich: Gegnerfeld + Schießen-Button
+        // Rechter Board-Bereich: Gegnerfeld + Schießen-Button
         JPanel enemyBoardPanel = new JPanel();
         enemyBoardPanel.setLayout(new BoxLayout(enemyBoardPanel, BoxLayout.Y_AXIS));
         enemyBoardPanel.add(enemyBoard);
@@ -57,7 +66,7 @@ public class MainFrame extends JFrame {
         shootPanel.add(shootButton);
         enemyBoardPanel.add(shootPanel);
 
-        // Beide Bereiche nebeneinander ins Zentrum setzen
+        // Beide Boards nebeneinander ins Zentrum setzen
         centerPanel.add(ownBoardPanel);
         centerPanel.add(enemyBoardPanel);
 
@@ -65,6 +74,7 @@ public class MainFrame extends JFrame {
         statusLabel.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         statusLabel.setFont(statusLabel.getFont().deriveFont(Font.PLAIN, 14f));
 
+        add(shipPalettePanel, BorderLayout.WEST);
         add(centerPanel, BorderLayout.CENTER);
         add(statusLabel, BorderLayout.SOUTH);
 
@@ -99,6 +109,11 @@ public class MainFrame extends JFrame {
         enemyBoard.setBoardClickListener(listener);
     }
 
+    // Verknüpft Drag-and-Drop mit dem eigenen Feld
+    public void setOwnBoardTransferHandler(TransferHandler transferHandler) {
+        ownBoard.setTransferHandler(transferHandler);
+    }
+
     // Setzt die Aktion für den Drehen-Button
     public void setRotateAction(Runnable action) {
         rotateButton.addActionListener(e -> action.run());
@@ -119,11 +134,25 @@ public class MainFrame extends JFrame {
         shootButton.setEnabled(enabled);
     }
 
+    // Aktualisiert die Restanzahl in der linken Schiffspalette
+    public void setShipPaletteRemainingCounts(Map<ShipType, Integer> remainingCounts) {
+        shipPalettePanel.setRemainingCounts(remainingCounts);
+    }
+
+    // Synchronisiert die Ausrichtung der Drag-and-Drop-Schiffe mit dem Drehen-Button
+    public void setShipPaletteOrientation(ShipOrientation orientation) {
+        shipPalettePanel.setOrientation(orientation);
+    }
+
     public BoardPanel getOwnBoard() {
         return ownBoard;
     }
 
     public BoardPanel getEnemyBoard() {
         return enemyBoard;
+    }
+
+    public ShipPalettePanel getShipPalettePanel() {
+        return shipPalettePanel;
     }
 }

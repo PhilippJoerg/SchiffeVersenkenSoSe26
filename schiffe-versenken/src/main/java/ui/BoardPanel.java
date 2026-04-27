@@ -13,18 +13,21 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 
 public class BoardPanel extends JPanel {
-
     // Größe des Spielfelds: 10x10
     public static final int GRID_SIZE = 10;
+
     // Größe einer einzelnen Zelle in Pixeln
     public static final int CELL_SIZE = 32;
+
     // Platz für Beschriftung links und oben
     public static final int LABEL_SPACE = 28;
 
     // Merkt, ob dieses Panel das gegnerische Feld ist
     private final boolean enemyBoard;
+
     // Enthält den aktuellen Zustand aller Felder
     private final CellState[][] cells;
+
     // Listener für Klicks auf das Spielfeld
     private BoardClickListener clickListener;
 
@@ -33,6 +36,7 @@ public class BoardPanel extends JPanel {
         this.cells = createEmptyBoard();
 
         setBackground(Color.WHITE);
+
         // Gesamtgröße des Panels inklusive Beschriftung
         setPreferredSize(new Dimension(
                 LABEL_SPACE + GRID_SIZE * CELL_SIZE + 1,
@@ -44,6 +48,7 @@ public class BoardPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 Point cell = cellAt(e.getPoint());
+
                 if (cell != null && clickListener != null) {
                     clickListener.onCellClicked(cell.x, cell.y);
                 }
@@ -76,6 +81,7 @@ public class BoardPanel extends JPanel {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g.create();
+
         // Sorgt für glattere Darstellung
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -97,6 +103,7 @@ public class BoardPanel extends JPanel {
             String label = String.valueOf((char) ('A' + col));
             int x = LABEL_SPACE + col * CELL_SIZE + (CELL_SIZE - fm.stringWidth(label)) / 2;
             int y = LABEL_SPACE - 8;
+
             g2.drawString(label, x, y);
         }
 
@@ -104,6 +111,7 @@ public class BoardPanel extends JPanel {
             String label = String.valueOf(row + 1);
             int x = LABEL_SPACE - 8 - fm.stringWidth(label);
             int y = LABEL_SPACE + row * CELL_SIZE + (CELL_SIZE + fm.getAscent()) / 2 - 3;
+
             g2.drawString(label, x, y);
         }
     }
@@ -180,7 +188,7 @@ public class BoardPanel extends JPanel {
     }
 
     // Wandelt eine Pixelposition der Maus in Spielfeldkoordinaten um
-    private Point cellAt(Point point) {
+    public Point cellAt(Point point) {
         int x = point.x - LABEL_SPACE;
         int y = point.y - LABEL_SPACE;
 
