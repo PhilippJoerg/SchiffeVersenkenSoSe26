@@ -1,16 +1,19 @@
 import javax.swing.SwingUtilities;
 
-import ui.MainFrame;
-import ui.ShipPlacementController;
+import controller.GameController;
+import controller.ShipPlacementController;
+import models.GameModel;
+import view.MainFrame;
 
-public class App {
+public class AppStartup {
 
     private static ShipPlacementController placementController;
+    private static GameController gameController;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             MainFrame frame = new MainFrame();
-            placementController = new ShipPlacementController(frame);
+            placementController = new ShipPlacementController(frame, () -> startGame(frame));
 
             frame.setRotateAction(() -> placementController.rotateCurrentShip());
 
@@ -20,5 +23,10 @@ public class App {
 
             frame.setVisible(true);
         });
+    }
+
+    private static void startGame(MainFrame frame) {
+        GameModel gameModel = new GameModel(placementController.getOwnBoard());
+        gameController = new GameController(frame, gameModel);
     }
 }

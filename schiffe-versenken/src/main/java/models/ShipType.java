@@ -1,4 +1,4 @@
-package ui;
+package models;
 
 public enum ShipType {
     BATTLESHIP("Schlachtschiff", 1, 5),

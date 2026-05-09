@@ -1,4 +1,4 @@
-package ui;
+package view;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -11,6 +11,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
+
+import models.ShipOrientation;
+import models.ShipType;
 
 public class MainFrame extends JFrame {
     // Linke Drag-and-Drop-Palette für verfügbare Schiffe

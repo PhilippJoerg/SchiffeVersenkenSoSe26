@@ -1,12 +1,4 @@
-<<<<<<< HEAD:schiffe-versenken/src/main/java/ui/ShipTransferable.java
-package ui;
-=======
-<<<<<<< HEAD:schiffe-versenken/src/main/java/view/ShipTransferable.java
 package view;
-=======
-package ui;
->>>>>>> 4f43638 (added drag n drop for ships):schiffe-versenken/src/main/java/ui/ShipTransferable.java
->>>>>>> 44456cf (added drag n drop for ships):schiffe-versenken/src/main/java/view/ShipTransferable.java
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

@@ -1,4 +1,4 @@
-package ui;
+package view;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -120,7 +120,7 @@ public class BoardPanel extends JPanel {
     private void drawCells(Graphics2D g2) {
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                CellState state = cells[row][col];
+                CellState state = cells[col][row];
 
                 int x = LABEL_SPACE + col * CELL_SIZE;
                 int y = LABEL_SPACE + row * CELL_SIZE;
@@ -135,10 +135,10 @@ public class BoardPanel extends JPanel {
         switch (state) {
             case SHIP:
                 // Schiffe nur auf dem eigenen Feld sichtbar machen
-                if (!enemyBoard) {
+                //if (!enemyBoard) {
                     g2.setColor(new Color(160, 160, 160));
                     g2.fillRect(x + 1, y + 1, CELL_SIZE - 1, CELL_SIZE - 1);
-                }
+                //}
                 break;
 
             case MISS:
@@ -154,6 +154,8 @@ public class BoardPanel extends JPanel {
 
             case HIT:
                 // Treffer als roter Punkt
+                g2.setColor(new Color(160, 160, 160));
+                g2.fillRect(x + 1, y + 1, CELL_SIZE - 1, CELL_SIZE - 1);
                 g2.setColor(Color.RED);
                 g2.fillOval(
                         x + CELL_SIZE / 2 - 5,
@@ -212,7 +214,7 @@ public class BoardPanel extends JPanel {
 
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
-                board[row][col] = CellState.EMPTY;
+                board[col][row] = CellState.EMPTY;
             }
         }
 

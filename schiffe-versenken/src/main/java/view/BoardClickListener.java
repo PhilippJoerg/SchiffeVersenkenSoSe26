@@ -1,4 +1,4 @@
-package ui;
+package view;
 
 @FunctionalInterface
 public interface BoardClickListener {

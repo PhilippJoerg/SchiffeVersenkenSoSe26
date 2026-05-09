@@ -1,4 +1,4 @@
-package ui;
+package view;
 
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -7,6 +7,8 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
 import javax.swing.TransferHandler;
+
+import controller.ShipPlacementController;
 
 public class BoardDropListener extends TransferHandler {
     private final BoardPanel boardPanel;

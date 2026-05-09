@@ -1,12 +1,4 @@
-<<<<<<< HEAD:schiffe-versenken/src/main/java/ui/ShipPalettePanel.java
-package ui;
-=======
-<<<<<<< HEAD:schiffe-versenken/src/main/java/view/ShipPalettePanel.java
 package view;
-=======
-package ui;
->>>>>>> 4f43638 (added drag n drop for ships):schiffe-versenken/src/main/java/ui/ShipPalettePanel.java
->>>>>>> 44456cf (added drag n drop for ships):schiffe-versenken/src/main/java/view/ShipPalettePanel.java
 
 import java.awt.Color;
 import java.awt.Component;
@@ -28,15 +20,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 
-<<<<<<< HEAD:schiffe-versenken/src/main/java/ui/ShipPalettePanel.java
-=======
-<<<<<<< HEAD:schiffe-versenken/src/main/java/view/ShipPalettePanel.java
 import models.ShipOrientation;
 import models.ShipType;
 
-=======
->>>>>>> 4f43638 (added drag n drop for ships):schiffe-versenken/src/main/java/ui/ShipPalettePanel.java
->>>>>>> 44456cf (added drag n drop for ships):schiffe-versenken/src/main/java/view/ShipPalettePanel.java
 public class ShipPalettePanel extends JPanel {
     private final EnumMap<ShipType, Integer> remainingCounts;
     private final EnumMap<ShipType, JLabel> labels;
