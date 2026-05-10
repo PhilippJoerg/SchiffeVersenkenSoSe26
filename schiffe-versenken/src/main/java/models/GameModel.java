@@ -3,7 +3,6 @@ package models;
 import java.util.Random;
 
 import controller.ShootController;
-import models.CellState;
 
 public class GameModel {
     private final CellState[][] ownBoard;

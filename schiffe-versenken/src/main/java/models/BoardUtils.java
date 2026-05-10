@@ -1,7 +1,5 @@
 package models;
 
-import models.CellState;
-
 public class BoardUtils {
     public static final int GRID_SIZE = 10;
 

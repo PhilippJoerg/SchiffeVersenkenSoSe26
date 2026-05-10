@@ -3,8 +3,6 @@ package models;
 import java.util.EnumMap;
 import java.util.Map;
 
-import models.CellState;
-
 public class ShipPlacementModel {
 
     private final CellState[][] ownBoard;
