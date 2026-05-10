@@ -2,6 +2,7 @@ import javax.swing.SwingUtilities;
 
 import controller.GameController;
 import controller.ShipPlacementController;
+import models.GameDifficulty;
 import models.GameModel;
 import view.MainFrame;
 
@@ -26,7 +27,7 @@ public class AppStartup {
     }
 
     private static void startGame(MainFrame frame) {
-        GameModel gameModel = new GameModel(placementController.getOwnBoard());
+        GameModel gameModel = new GameModel(placementController.getOwnBoard(), GameDifficulty.EASY);
         gameController = new GameController(frame, gameModel);
     }
 }
