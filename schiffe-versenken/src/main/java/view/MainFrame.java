@@ -1,9 +1,11 @@
 package view;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.util.Map;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -17,6 +19,14 @@ import models.ShipOrientation;
 import models.ShipType;
 
 public class MainFrame extends JFrame {
+
+    private static final String START_SCREEN = "START_SCREEN";
+    private static final String GAME_SCREEN = "GAME_SCREEN";
+
+    private final CardLayout screenLayout;
+    private final JPanel screenPanel;
+    private final StartScreenPanel startScreenPanel;
+
     // Linke Drag-and-Drop-Palette für verfügbare Schiffe
     private final ShipPalettePanel shipPalettePanel;
 
@@ -41,13 +51,32 @@ public class MainFrame extends JFrame {
         shipPalettePanel = new ShipPalettePanel();
         ownBoard = new BoardPanel(false);
         enemyBoard = new BoardPanel(true);
-
         statusLabel = new JLabel("Bereit.");
         rotateButton = new JButton("Drehen");
         shootButton = new JButton("Schießen");
 
-        // Hauptlayout des Fensters
-        setLayout(new BorderLayout(12, 12));
+        startScreenPanel = new StartScreenPanel();
+
+        JPanel gamePanel = createGamePanel();
+
+        screenLayout = new CardLayout();
+        screenPanel = new JPanel(screenLayout);
+
+        screenPanel.add(startScreenPanel, START_SCREEN);
+        screenPanel.add(gamePanel, GAME_SCREEN);
+
+        setContentPane(screenPanel);
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        pack();
+        setLocationRelativeTo(null);
+        setResizable(true);
+
+        showStartScreen();
+    }
+
+    private JPanel createGamePanel() {
+        JPanel rootPanel = new JPanel(new BorderLayout(12, 12));
 
         // Mittlerer Bereich für beide Spielfelder
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
@@ -78,14 +107,27 @@ public class MainFrame extends JFrame {
         statusLabel.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         statusLabel.setFont(statusLabel.getFont().deriveFont(Font.PLAIN, 14f));
 
-        add(shipPalettePanel, BorderLayout.WEST);
-        add(centerPanel, BorderLayout.CENTER);
-        add(statusLabel, BorderLayout.SOUTH);
+        rootPanel.add(shipPalettePanel, BorderLayout.WEST);
+        rootPanel.add(centerPanel, BorderLayout.CENTER);
+        rootPanel.add(statusLabel, BorderLayout.SOUTH);
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        pack();
-        setLocationRelativeTo(null);
-        setResizable(true);
+        return rootPanel;
+    }
+
+    public void showStartScreen() {
+        screenLayout.show(screenPanel, START_SCREEN);
+    }
+
+    public void showGameScreen() {
+        screenLayout.show(screenPanel, GAME_SCREEN);
+    }
+
+    public void setStartAction(Runnable action) {
+        startScreenPanel.setStartAction(action);
+    }
+
+    public String getStartScreenText() {
+        return startScreenPanel.getTextFieldValue();
     }
 
     // Setzt den Text der Statusleiste
