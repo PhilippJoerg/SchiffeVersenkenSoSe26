@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import models.BoardUtils;
+import models.CellState;
 import models.GameDifficulty;
 import models.GameModel;
-import view.CellState;
 
 public class ShootController {
     private final GameModel gameModel;

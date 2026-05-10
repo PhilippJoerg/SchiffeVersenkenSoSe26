@@ -1,4 +1,4 @@
-package view;
+package models;
 
 public enum CellState {
     EMPTY,

@@ -2,8 +2,8 @@ package controller;
 
 import javax.swing.Timer;
 
+import models.CellState;
 import models.GameModel;
-import view.CellState;
 import view.MainFrame;
 
 public class GameController {

@@ -3,7 +3,7 @@ package models;
 import java.util.EnumMap;
 import java.util.Map;
 
-import view.CellState;
+import models.CellState;
 
 public class ShipPlacementModel {
 

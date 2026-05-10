@@ -1,6 +1,6 @@
 package models;
 
-import view.CellState;
+import models.CellState;
 
 public class BoardUtils {
     public static final int GRID_SIZE = 10;
@@ -13,10 +13,6 @@ public class BoardUtils {
             }
         }
         return board;
-    }
-
-    public static boolean[][] createEmptyBooleanBoard() {
-        return new boolean[GRID_SIZE][GRID_SIZE];
     }
 
     public static boolean isInsideBoard(int col, int row) {

@@ -1,11 +1,9 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import controller.ShootController;
-import view.CellState;
+import models.CellState;
 
 public class GameModel {
     private final CellState[][] ownBoard;

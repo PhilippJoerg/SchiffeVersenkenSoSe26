@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
+import models.CellState;
 import models.ShipOrientation;
 import models.ShipType;
 

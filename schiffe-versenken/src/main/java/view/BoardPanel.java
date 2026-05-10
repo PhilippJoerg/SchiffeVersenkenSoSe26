@@ -12,6 +12,8 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
+import models.CellState;
+
 public class BoardPanel extends JPanel {
     // Größe des Spielfelds: 10x10
     public static final int GRID_SIZE = 10;
@@ -40,8 +42,7 @@ public class BoardPanel extends JPanel {
         // Gesamtgröße des Panels inklusive Beschriftung
         setPreferredSize(new Dimension(
                 LABEL_SPACE + GRID_SIZE * CELL_SIZE + 1,
-                LABEL_SPACE + GRID_SIZE * CELL_SIZE + 1
-        ));
+                LABEL_SPACE + GRID_SIZE * CELL_SIZE + 1));
 
         // Reagiert auf Mausklicks und wandelt Pixel in Feldkoordinaten um
         addMouseListener(new MouseAdapter() {
@@ -135,10 +136,10 @@ public class BoardPanel extends JPanel {
         switch (state) {
             case SHIP:
                 // Schiffe nur auf dem eigenen Feld sichtbar machen
-                //if (!enemyBoard) {
+                if (!enemyBoard) {
                     g2.setColor(new Color(160, 160, 160));
                     g2.fillRect(x + 1, y + 1, CELL_SIZE - 1, CELL_SIZE - 1);
-                //}
+                }
                 break;
 
             case MISS:
@@ -148,21 +149,35 @@ public class BoardPanel extends JPanel {
                         x + CELL_SIZE / 2 - 4,
                         y + CELL_SIZE / 2 - 4,
                         8,
-                        8
-                );
+                        8);
                 break;
 
             case HIT:
                 // Treffer als roter Punkt
-                g2.setColor(new Color(160, 160, 160));
-                g2.fillRect(x + 1, y + 1, CELL_SIZE - 1, CELL_SIZE - 1);
+                if (!enemyBoard) {
+                    g2.setColor(new Color(160, 160, 160));
+                    g2.fillRect(x + 1, y + 1, CELL_SIZE - 1, CELL_SIZE - 1);
+                    g2.setColor(Color.RED);
+                    g2.fillOval(
+                            x + CELL_SIZE / 2 - 5,
+                            y + CELL_SIZE / 2 - 5,
+                            10,
+                            10);
+                } else {
+                    g2.setColor(Color.RED);
+                    g2.fillOval(
+                            x + CELL_SIZE / 2 - 5,
+                            y + CELL_SIZE / 2 - 5,
+                            10,
+                            10);
+                }
+
                 g2.setColor(Color.RED);
                 g2.fillOval(
                         x + CELL_SIZE / 2 - 5,
                         y + CELL_SIZE / 2 - 5,
                         10,
-                        10
-                );
+                        10);
                 break;
 
             case EMPTY:
@@ -170,6 +185,7 @@ public class BoardPanel extends JPanel {
                 // Leere Felder werden nicht extra gefüllt
                 break;
         }
+
     }
 
     // Zeichnet das Raster des Spielfelds

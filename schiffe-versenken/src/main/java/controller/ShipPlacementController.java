@@ -2,11 +2,11 @@ package controller;
 
 import java.util.Map;
 
+import models.CellState;
 import models.ShipOrientation;
 import models.ShipPlacementModel;
 import models.ShipType;
 import view.BoardDropListener;
-import view.CellState;
 import view.MainFrame;
 
 public class ShipPlacementController {
