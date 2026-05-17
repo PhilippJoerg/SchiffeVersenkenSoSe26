@@ -58,7 +58,7 @@ public class GameController {
                 return;
             }
             try {
-                com.fireShot(row, col);
+                com.sendShot(col, row);
                 pendingShotCol = col;
                 pendingShotRow = row;
                 frame.setStatus("Schuss gesendet: " + (char) ('A' + col) + (row + 1) + " — warte auf Antwort...");
