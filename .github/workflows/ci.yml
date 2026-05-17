@@ -13,8 +13,8 @@ on:
   push:
     branches:
       - "**"
-    branches-ignore:
-      - "main"
+      - "!main"  # Ausnahme: Nicht bei einem Push auf den main-Branch, da dort Trigger 2 greift
+
 
   # Trigger 2: Nur bei einem Pull Request, der in den main-Branch will
   pull_request:
