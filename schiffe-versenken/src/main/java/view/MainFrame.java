@@ -2,12 +2,14 @@ package view;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -22,6 +24,8 @@ public class MainFrame extends JFrame {
 
     private static final String START_SCREEN = "START_SCREEN";
     private static final String GAME_SCREEN = "GAME_SCREEN";
+
+    private static final Dimension MINIMUM_WINDOW_SIZE = new Dimension(950, 650);
 
     private final CardLayout screenLayout;
     private final JPanel screenPanel;
@@ -51,59 +55,57 @@ public class MainFrame extends JFrame {
         shipPalettePanel = new ShipPalettePanel();
         ownBoard = new BoardPanel(false);
         enemyBoard = new BoardPanel(true);
+
         statusLabel = new JLabel("Bereit.");
         rotateButton = new JButton("Drehen");
         shootButton = new JButton("Schießen");
 
         startScreenPanel = new StartScreenPanel();
-
         JPanel gamePanel = createGamePanel();
 
         screenLayout = new CardLayout();
         screenPanel = new JPanel(screenLayout);
-
         screenPanel.add(startScreenPanel, START_SCREEN);
         screenPanel.add(gamePanel, GAME_SCREEN);
 
         setContentPane(screenPanel);
-
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        pack();
-        setLocationRelativeTo(null);
         setResizable(true);
 
+        pack();
+
+        setMinimumSize(MINIMUM_WINDOW_SIZE);
+        if (getWidth() < MINIMUM_WINDOW_SIZE.width || getHeight() < MINIMUM_WINDOW_SIZE.height) {
+            setSize(MINIMUM_WINDOW_SIZE);
+        }
+
+        setLocationRelativeTo(null);
         showStartScreen();
     }
 
     private JPanel createGamePanel() {
-        JPanel rootPanel = new JPanel(new BorderLayout(12, 12));
+        JPanel rootPanel = new JPanel(new BorderLayout(16, 16));
+        rootPanel.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
 
-        // Mittlerer Bereich für beide Spielfelder
-        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        JPanel centerPanel = new JPanel(new GridBagLayout());
 
-        // Linker Board-Bereich: eigenes Feld + Drehen-Button
-        JPanel ownBoardPanel = new JPanel();
-        ownBoardPanel.setLayout(new BoxLayout(ownBoardPanel, BoxLayout.Y_AXIS));
-        ownBoardPanel.add(ownBoard);
+        JPanel ownBoardPanel = createBoardPanel("Eigenes Feld", ownBoard, rotateButton);
+        JPanel enemyBoardPanel = createBoardPanel("Gegnerfeld", enemyBoard, shootButton);
 
-        JPanel rotatePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 8));
-        rotatePanel.add(rotateButton);
-        ownBoardPanel.add(rotatePanel);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
 
-        // Rechter Board-Bereich: Gegnerfeld + Schießen-Button
-        JPanel enemyBoardPanel = new JPanel();
-        enemyBoardPanel.setLayout(new BoxLayout(enemyBoardPanel, BoxLayout.Y_AXIS));
-        enemyBoardPanel.add(enemyBoard);
+        gbc.gridx = 0;
+        gbc.insets.set(0, 0, 0, 8);
+        centerPanel.add(ownBoardPanel, gbc);
 
-        JPanel shootPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 8));
-        shootPanel.add(shootButton);
-        enemyBoardPanel.add(shootPanel);
+        gbc.gridx = 1;
+        gbc.insets.set(0, 8, 0, 0);
+        centerPanel.add(enemyBoardPanel, gbc);
 
-        // Beide Boards nebeneinander ins Zentrum setzen
-        centerPanel.add(ownBoardPanel);
-        centerPanel.add(enemyBoardPanel);
-
-        // Statusleiste unten optisch etwas absetzen
         statusLabel.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         statusLabel.setFont(statusLabel.getFont().deriveFont(Font.PLAIN, 14f));
 
@@ -112,6 +114,23 @@ public class MainFrame extends JFrame {
         rootPanel.add(statusLabel, BorderLayout.SOUTH);
 
         return rootPanel;
+    }
+
+    private JPanel createBoardPanel(String title, BoardPanel boardPanel, JButton actionButton) {
+        JPanel panel = new JPanel(new BorderLayout(8, 8));
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+
+        JLabel titleLabel = new JLabel(title, JLabel.CENTER);
+        titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, 16f));
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        buttonPanel.add(actionButton);
+
+        panel.add(titleLabel, BorderLayout.NORTH);
+        panel.add(boardPanel, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+        return panel;
     }
 
     public void showStartScreen() {
