@@ -74,6 +74,32 @@ public class ShootController {
         }
     }
 
+    /**
+     * Evaluate a shot coming from the network (opponent).
+     * Returns: 0 = miss, 1 = hit, 2 = sunk (game over).
+     */
+    public int evaluateIncomingShot(int col, int row) {
+        if (gameModel.isGameOver() || !BoardUtils.isInsideBoard(col, row)) {
+            return 0; // treat invalid as miss
+        }
+
+        int result = 0;
+        CellState[][] ownBoard = gameModel.getOwnBoard();
+        if (ownBoard[col][row] == CellState.SHIP) {
+            ownBoard[col][row] = CellState.HIT;
+            result = 1;
+            if (checkComputerWin()) {
+                gameModel.setGameOver(true);
+                gameModel.setPlayerWon(false);
+                result = 2;
+            }
+        } else {
+            ownBoard[col][row] = CellState.MISS;
+            result = 0;
+        }
+        return result;
+    }
+
     private int[] shootProbabilityDensity() {
         // TODO Auto-generated method stub
         // 2. Mittel: Hunt-and-Target mit Parität (Checkerboard Strategy)

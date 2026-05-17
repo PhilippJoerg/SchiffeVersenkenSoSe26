@@ -7,14 +7,14 @@ import models.ShipOrientation;
 import models.ShipPlacementModel;
 import models.ShipType;
 import view.BoardDropListener;
-import view.MainFrame;
+import view.PlacementView;
 
 public class ShipPlacementController {
-    private final MainFrame frame;
+    private final PlacementView frame;
     private final ShipPlacementModel model;
     private final Runnable onFinished;
 
-    public ShipPlacementController(MainFrame frame, Runnable onFinished) {
+    public ShipPlacementController(PlacementView frame, Runnable onFinished) {
         this.frame = frame;
         this.model = new ShipPlacementModel();
         this.onFinished = onFinished;

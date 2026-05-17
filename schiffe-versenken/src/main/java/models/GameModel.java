@@ -67,6 +67,11 @@ public class GameModel {
         return shootController.shoot(col, row);
     }
 
+    /* Evaluate an incoming shot from the network opponent. Returns 0=miss,1=hit,2=sunk */
+    public int evaluateIncomingShot(int col, int row) {
+        return shootController.evaluateIncomingShot(col, row);
+    }
+
     public boolean isGameOver() {
         return gameOver;
     }

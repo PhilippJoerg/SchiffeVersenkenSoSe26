@@ -16,7 +16,7 @@ import models.CellState;
 import models.ShipOrientation;
 import models.ShipType;
 
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements view.GameView, view.PlacementView, view.ConnectionView {
     // Linke Drag-and-Drop-Palette für verfügbare Schiffe
     private final ShipPalettePanel shipPalettePanel;
 
@@ -25,6 +25,12 @@ public class MainFrame extends JFrame {
 
     // Gegnerisches Spielfeld
     private final BoardPanel enemyBoard;
+
+    // Verbindungssatus oben im Fenster
+    private final JLabel connectionLabel;
+
+    // Host-IP-Anzeige oben im Fenster
+    private final JLabel localIpLabel;
 
     // Statusanzeige unten im Fenster
     private final JLabel statusLabel;
@@ -43,6 +49,8 @@ public class MainFrame extends JFrame {
         enemyBoard = new BoardPanel(true);
 
         statusLabel = new JLabel("Bereit.");
+        connectionLabel = new JLabel("Nicht verbunden");
+        localIpLabel = new JLabel("");
         rotateButton = new JButton("Drehen");
         shootButton = new JButton("Schießen");
 
@@ -78,6 +86,11 @@ public class MainFrame extends JFrame {
         statusLabel.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         statusLabel.setFont(statusLabel.getFont().deriveFont(Font.PLAIN, 14f));
 
+        JPanel topInfoPanel = new JPanel(new BorderLayout(12, 0));
+        topInfoPanel.add(connectionLabel, BorderLayout.WEST);
+        topInfoPanel.add(localIpLabel, BorderLayout.EAST);
+
+        add(topInfoPanel, BorderLayout.NORTH);
         add(shipPalettePanel, BorderLayout.WEST);
         add(centerPanel, BorderLayout.CENTER);
         add(statusLabel, BorderLayout.SOUTH);
@@ -91,6 +104,14 @@ public class MainFrame extends JFrame {
     // Setzt den Text der Statusleiste
     public void setStatus(String text) {
         statusLabel.setText(text);
+    }
+
+    public void setConnectionStatus(String text) {
+        connectionLabel.setText(text);
+    }
+
+    public void setLocalIpAddress(String text) {
+        localIpLabel.setText(text);
     }
 
     // Aktualisiert das eigene Spielfeld
