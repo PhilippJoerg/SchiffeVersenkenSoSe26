@@ -13,6 +13,9 @@ on:
   push:
     branches:
       - "**"
+    branches-ignore:
+      - "main"
+
   # Trigger 2: Nur bei einem Pull Request, der in den main-Branch will
   pull_request:
     branches:
