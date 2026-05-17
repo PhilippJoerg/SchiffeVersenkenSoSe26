@@ -9,4 +9,5 @@ public interface GameView {
     void setEnemyBoardClickListener(BoardClickListener listener);
     void setShootButtonEnabled(boolean enabled);
     void setRotateButtonEnabled(boolean enabled);
+    void setAutoPlaceButtonEnabled(boolean enabled);
 }

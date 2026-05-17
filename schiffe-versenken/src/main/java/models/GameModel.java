@@ -1,7 +1,5 @@
 package models;
 
-import java.util.Random;
-
 import controller.ShootController;
 
 public class GameModel {
@@ -21,22 +19,7 @@ public class GameModel {
     }
 
     private void placeEnemyShips() {
-        Random random = new Random();
-        for (ShipType shipType : ShipType.values()) {
-            for (int i = 0; i < shipType.getAmount(); i++) {
-                boolean placed = false;
-                while (!placed) {
-                    int col = random.nextInt(BoardUtils.GRID_SIZE);
-                    int row = random.nextInt(BoardUtils.GRID_SIZE);
-                    ShipOrientation orientation = random.nextBoolean() ? ShipOrientation.HORIZONTAL
-                            : ShipOrientation.VERTICAL;
-                    if (BoardUtils.canPlaceShip(enemyBoard, shipType, col, row, orientation)) {
-                        BoardUtils.placeShip(enemyBoard, shipType, col, row, orientation);
-                        placed = true;
-                    }
-                }
-            }
-        }
+        BoardUtils.placeRandomShips(enemyBoard);
     }
 
     public CellState[][] getOwnBoard() {

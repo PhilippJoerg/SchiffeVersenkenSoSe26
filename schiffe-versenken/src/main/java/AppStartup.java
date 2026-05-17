@@ -38,6 +38,12 @@ public class AppStartup {
                 }
             });
 
+            frame.setAutoPlaceAction(() -> {
+                if (placementController != null) {
+                    placementController.autoPlaceShips();
+                }
+            });
+
             frame.setVisible(true);
 
             if (opponentType == OpponentType.COMPUTER) {

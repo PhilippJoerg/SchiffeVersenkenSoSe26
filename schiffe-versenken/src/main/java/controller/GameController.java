@@ -1,5 +1,6 @@
 package controller;
 
+import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
 import models.CellState;
@@ -46,6 +47,7 @@ public class GameController {
         frame.setEnemyBoardClickListener(this::handleShoot);
         frame.setShootButtonEnabled(false); // not needed, since clicking on board
         frame.setRotateButtonEnabled(false); // disable rotate during game
+        frame.setAutoPlaceButtonEnabled(false); // disable auto-placement during game
     }
 
     private void handleShoot(int col, int row) {
@@ -80,6 +82,7 @@ public class GameController {
         if (result == CellState.HIT) {
             if (model.isGameOver()) {
                 frame.setStatus("Du hast gewonnen!");
+                showEndScreen("Spiel beendet", "Du hast gewonnen!");
             } else {
                 frame.setStatus("Treffer! Schieße weiter.");
             }
@@ -114,6 +117,7 @@ public class GameController {
             if (hit) {
                 if (model.isGameOver()) {
                     frame.setStatus("Computer hat bei " + coord + " getroffen und gewonnen!");
+                    showEndScreen("Spiel beendet", "Computer hat gewonnen!");
                     stopComputerTurn();
                 } else {
                     frame.setStatus("Computer hat bei " + coord + " getroffen. Computer denkt...");
@@ -133,6 +137,10 @@ public class GameController {
             computerTimer.stop();
             computerTimer = null;
         }
+    }
+
+    private void showEndScreen(String title, String message) {
+        JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void setupNetworkHandlers() {
@@ -156,6 +164,7 @@ public class GameController {
                         frame.setStatus("Gegner hat bei " + (char) ('A' + col) + (row + 1) + " getroffen.");
                     } else if (answer == 2) {
                         frame.setStatus("Gegner hat dich versenkt. Spielende.");
+                        showEndScreen("Spiel beendet", "Gegner hat gewonnen!");
                     }
                 } catch (Exception e) {
                     frame.setStatus("Fehler beim Senden der Antwort: " + e.getMessage());
@@ -183,6 +192,7 @@ public class GameController {
                         model.getEnemyBoard()[pendingShotCol][pendingShotRow] = CellState.HIT;
                         frame.setEnemyBoard(model.getEnemyBoard());
                         frame.setStatus("Treffer. Alle gegnerischen Schiffe versenkt. Du hast gewonnen!");
+                        showEndScreen("Spiel beendet", "Du hast gewonnen!");
                     }
                     pendingShotCol = -1;
                     pendingShotRow = -1;
