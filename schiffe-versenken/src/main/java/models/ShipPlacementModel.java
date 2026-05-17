@@ -59,6 +59,15 @@ public class ShipPlacementModel {
         return placeShip(shipType, col, row, currentOrientation);
     }
 
+    public void autoPlaceShips() {
+        resetBoard();
+        BoardUtils.placeRandomShips(ownBoard);
+        for (ShipType shipType : ShipType.values()) {
+            remainingShips.put(shipType, 0);
+        }
+        currentOrientation = ShipOrientation.HORIZONTAL;
+    }
+
     public boolean placeShip(ShipType shipType, int col, int row, ShipOrientation orientation) {
         if (shipType == null) {
             return false;
@@ -96,6 +105,17 @@ public class ShipPlacementModel {
 
     private void decrementRemaining(ShipType shipType) {
         remainingShips.put(shipType, getRemainingCount(shipType) - 1);
+    }
+
+    private void resetBoard() {
+        for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {
+            for (int row = 0; row < BoardUtils.GRID_SIZE; row++) {
+                ownBoard[col][row] = CellState.EMPTY;
+            }
+        }
+        for (ShipType type : ShipType.values()) {
+            remainingShips.put(type, type.getAmount());
+        }
     }
 
     private EnumMap<ShipType, Integer> createRemainingShips() {

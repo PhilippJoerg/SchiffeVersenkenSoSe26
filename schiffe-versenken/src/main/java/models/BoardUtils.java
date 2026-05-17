@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Random;
+
 public class BoardUtils {
     public static final int GRID_SIZE = 10;
 
@@ -45,6 +47,25 @@ public class BoardUtils {
                 row += i;
             }
             board[col][row] = CellState.SHIP;
+        }
+    }
+
+    public static void placeRandomShips(CellState[][] board) {
+        Random random = new Random();
+        for (ShipType shipType : ShipType.values()) {
+            for (int i = 0; i < shipType.getAmount(); i++) {
+                boolean placed = false;
+                while (!placed) {
+                    int col = random.nextInt(GRID_SIZE);
+                    int row = random.nextInt(GRID_SIZE);
+                    ShipOrientation orientation = random.nextBoolean() ? ShipOrientation.HORIZONTAL
+                            : ShipOrientation.VERTICAL;
+                    if (canPlaceShip(board, shipType, col, row, orientation)) {
+                        placeShip(board, shipType, col, row, orientation);
+                        placed = true;
+                    }
+                }
+            }
         }
     }
 

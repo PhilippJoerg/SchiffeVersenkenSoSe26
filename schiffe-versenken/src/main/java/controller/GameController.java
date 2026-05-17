@@ -46,6 +46,7 @@ public class GameController {
         frame.setEnemyBoardClickListener(this::handleShoot);
         frame.setShootButtonEnabled(false); // not needed, since clicking on board
         frame.setRotateButtonEnabled(false); // disable rotate during game
+        frame.setAutoPlaceButtonEnabled(false); // disable auto-placement during game
     }
 
     private void handleShoot(int col, int row) {

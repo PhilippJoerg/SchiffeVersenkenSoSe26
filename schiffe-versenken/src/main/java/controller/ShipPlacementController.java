@@ -37,6 +37,19 @@ public class ShipPlacementController {
         updateStatus();
     }
 
+    public void autoPlaceShips() {
+        if (model.isPlacementFinished()) {
+            frame.setStatus("Alle Schiffe sind bereits platziert.");
+            return;
+        }
+        model.autoPlaceShips();
+        refreshView();
+        frame.setStatus("Schiffe automatisch platziert.");
+        if (model.isPlacementFinished()) {
+            onFinished.run();
+        }
+    }
+
     // Prüft, ob alle Schiffe bereits gesetzt wurden
     public boolean isPlacementFinished() {
         return model.isPlacementFinished();
@@ -92,6 +105,7 @@ public class ShipPlacementController {
     private void refreshView() {
         frame.setOwnBoard(model.getOwnBoard());
         frame.setShipPaletteRemainingCounts(model.getRemainingShips());
+        frame.setShipPaletteOrientation(model.getCurrentOrientation());
     }
 
     // Aktualisiert den Statustext mit nächstem Schiff und Ausrichtung
