@@ -1,3 +1,7 @@
+/*
+ * Datei: models/BoardUtils.java
+ * Hilfsfunktionen für das Spielfeld: Erzeugung, Platzierungsprüfungen und Zufallsplatzierung.
+ */
 package models;
 
 import java.util.Random;
@@ -5,6 +9,9 @@ import java.util.Random;
 public class BoardUtils {
     public static final int GRID_SIZE = 10;
 
+    /**
+     * Erzeugt ein leeres 10x10-Spielfeld mit dem Zustand EMPTY.
+     */
     public static CellState[][] createEmptyCellBoard() {
         CellState[][] board = new CellState[GRID_SIZE][GRID_SIZE];
         for (int row = 0; row < GRID_SIZE; row++) {
@@ -15,10 +22,16 @@ public class BoardUtils {
         return board;
     }
 
+    /**
+     * Prüft, ob ein Feld innerhalb des gültigen Spielfeldbereichs liegt.
+     */
     public static boolean isInsideBoard(int col, int row) {
         return col >= 0 && col < GRID_SIZE && row >= 0 && row < GRID_SIZE;
     }
 
+    /**
+     * Prüft, ob ein Schiff an der angegebenen Position und Ausrichtung platziert werden kann.
+     */
     public static boolean canPlaceShip(CellState[][] board, ShipType shipType, int startCol, int startRow,
             ShipOrientation orientation) {
         for (int i = 0; i < shipType.getSize(); i++) {
@@ -36,6 +49,9 @@ public class BoardUtils {
         return true;
     }
 
+    /**
+     * Platziert ein Schiff auf dem Board an der angegebenen Position.
+     */
     public static void placeShip(CellState[][] board, ShipType shipType, int startCol, int startRow,
             ShipOrientation orientation) {
         for (int i = 0; i < shipType.getSize(); i++) {
@@ -50,6 +66,9 @@ public class BoardUtils {
         }
     }
 
+    /**
+     * Platziert alle Schiffe zufällig auf dem Board.
+     */
     public static void placeRandomShips(CellState[][] board) {
         Random random = new Random();
         for (ShipType shipType : ShipType.values()) {
@@ -69,6 +88,9 @@ public class BoardUtils {
         }
     }
 
+    /**
+     * Prüft, ob ein Feld und seine Nachbarfelder frei von Schiffen sind.
+     */
     public static boolean isCellFree(CellState[][] board, int x, int y) {
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {

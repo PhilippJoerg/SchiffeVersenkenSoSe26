@@ -1,3 +1,7 @@
+/*
+ * Datei: models/ShipType.java
+ * Definition der Schiffstypen mit Anzeige-Name, Anzahl und Größe.
+ */
 package models;
 
 public enum ShipType {
@@ -10,21 +14,33 @@ public enum ShipType {
     private final int amount;
     private final int size;
 
+    /**
+     * Erzeugt einen Schiffstyp mit Anzeige-Name, Anzahl und Größe.
+     */
     ShipType(String displayName, int amount, int size) {
         this.displayName = displayName;
         this.amount = amount;
         this.size = size;
     }
 
+    /**
+     * Liefert den deutschen Anzeigenamen des Schiffstyps.
+     */
     public String getDisplayName() {
         return displayName;
     }
 
+    /**
+     * Gibt die Anzahl der Schiffe dieses Typs im Spiel an.
+     */
     public int getAmount() {
         return amount;
     }
 
+    /**
+     * Liefert die Schiffslänge in Feldern.
+     */
     public int getSize() {
         return size;
     }
-}
+} 

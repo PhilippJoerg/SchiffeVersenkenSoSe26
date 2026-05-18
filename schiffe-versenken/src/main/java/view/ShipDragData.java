@@ -1,3 +1,8 @@
+/*
+ * Datei: view/ShipDragData.java
+ * Einfache Serializable-Klasse, die beim Drag-and-Drop die Informationen über Schiffstyp
+ * und Ausrichtung transportiert.
+ */
 package view;
 
 import java.awt.datatransfer.DataFlavor;

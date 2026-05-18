@@ -1,3 +1,8 @@
+/*
+ * Datei: view/MainFrame.java
+ * Hauptfenster der Anwendung: setzt die Views zusammen (Schiffspalette, Boards, Statusleisten)
+ * und bietet Methoden zur Interaktion für Controller.
+ */
 package view;
 
 import java.awt.BorderLayout;

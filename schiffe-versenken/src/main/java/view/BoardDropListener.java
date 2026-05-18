@@ -1,3 +1,8 @@
+/*
+ * Datei: view/BoardDropListener.java
+ * TransferHandler für Drag-and-Drop von Schiffen auf das Board. Wandelt Drop-Koordinaten in
+ * Spielfeldkoordinaten um und delegiert die Platzierung an `ShipPlacementController`.
+ */
 package view;
 
 import java.awt.Point;
@@ -59,4 +64,4 @@ public class BoardDropListener extends TransferHandler {
             return false;
         }
     }
-}
+} 

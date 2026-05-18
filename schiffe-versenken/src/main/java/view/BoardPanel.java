@@ -1,3 +1,8 @@
+/*
+ * Datei: view/BoardPanel.java
+ * Swing-Panel zur Darstellung eines 10x10-Spielfelds inklusive Beschriftung, Zelleninhalt
+ * und Klick-/Zeichenlogik.
+ */
 package view;
 
 import java.awt.Color;
