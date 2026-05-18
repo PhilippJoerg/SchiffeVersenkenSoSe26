@@ -118,7 +118,7 @@ public class ShootController {
      * Platzhalter für eine schwere KI-Strategie auf Basis von Wahrscheinlichkeitsdichte.
      */
     private int[] shootProbabilityDensity() {
-        // TODO Auto-generated method stub
+        // TODO: implement shootProbabilityDensity()
         // 2. Mittel: Hunt-and-Target mit Parität (Checkerboard Strategy)
         // Dieser Algorithmus kombiniert ein systematisches Suchmuster mit einer gezielten Verfolgung bei Treffern. 
         // - Suchphase (Hunt): Das Spielfeld wird wie ein Schachbrett betrachtet. Da das kleinste Schiff meist zwei Felder lang ist, reicht es aus, 
@@ -133,7 +133,7 @@ public class ShootController {
      * Platzhalter für eine mittlere KI-Strategie mit Schachbrett- und Jagd-Modus.
      */
     private int[] shootCheckerboardAndHunt() {
-        // TODO Auto-generated method stub
+        // TODO: implement shootCheckerboardAndHunt()
         // 3. Schwer: Wahrscheinlichkeitsdichte-Algorithmus (Probability Density Function)
         // Dies ist die stärkste Strategie, die oft von Computer-KIs genutzt wird. 
         // - Vorgehensweise: Der Algorithmus berechnet für jedes Feld auf dem Gitter, wie viele Möglichkeiten es gibt, die noch übrigen Schiffe dort zu 
