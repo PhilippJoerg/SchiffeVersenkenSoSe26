@@ -48,12 +48,6 @@
         <version>3.5.2</version>
       </plugin>
 
-      <plugin>
-      <!-- Damit Maven JUnit 5 Tests auch ausführt -->
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-surefire-plugin</artifactId>
-      <version>3.2.5</version>
-    </plugin>
     </plugins>
   </build>
 </project>
