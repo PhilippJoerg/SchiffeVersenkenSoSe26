@@ -1,7 +1,8 @@
 package view;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
+import org.junit.jupiter.api.Assumptions;
+import java.awt.GraphicsEnvironment;
 import org.junit.jupiter.api.Test;
 
 import models.BoardUtils;
@@ -10,6 +11,10 @@ class MainFrameTest {
 
     @Test
     void testSettersAndActionsDoNotThrow() {
+        Assumptions.assumeFalse(
+                GraphicsEnvironment.isHeadless(),
+                "Skipping GUI test: no display available (headless environment)");
+
         MainFrame frame = new MainFrame();
         frame.setStatus("Test Status");
         frame.setConnectionStatus("Connected");
