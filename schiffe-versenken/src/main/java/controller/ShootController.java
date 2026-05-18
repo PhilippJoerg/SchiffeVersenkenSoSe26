@@ -1,5 +1,10 @@
 package controller;
 
+/*
+ * Datei: controller/ShootController.java
+ * Kapselt die Schuss-Logik für den Computergegner: verschiedene Schwierigkeitsstufen
+ * und Auswertung eingehender Schüsse aus dem Netzwerk.
+ */
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -28,6 +33,9 @@ public class ShootController {
         }
     }
 
+    /**
+     * Wertet einen Schuss auf das gegnerische Board aus und markiert Treffer oder Fehlschuss.
+     */
     public boolean shoot(int col, int row) {
         CellState[][] enemyBoard = gameModel.getEnemyBoard();
         if (gameModel.isGameOver() || !BoardUtils.isInsideBoard(col, row)
@@ -46,6 +54,9 @@ public class ShootController {
         return true;
     }
 
+    /**
+     * Überprüft, ob alle Schiffe auf dem gegnerischen Board versenkt wurden.
+     */
     private boolean checkWin() {
         CellState[][] enemyBoard = gameModel.getEnemyBoard();
         for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {
@@ -58,6 +69,9 @@ public class ShootController {
         return true;
     }
 
+    /**
+     * Bestimmt den nächsten Schuss des Computers abhängig von der Schwierigkeit.
+     */
     public int[] computerShoot() {
         switch (difficulty) {
             case GameDifficulty.EASY:
@@ -75,8 +89,8 @@ public class ShootController {
     }
 
     /**
-     * Evaluate a shot coming from the network (opponent).
-     * Returns: 0 = miss, 1 = hit, 2 = sunk (game over).
+     * Wertet einen eingehenden Schuss vom Netzwerkgegner aus und liefert das Ergebnis zurück.
+     * 0 = Wasser, 1 = Treffer, 2 = Versenkt
      */
     public int evaluateIncomingShot(int col, int row) {
         if (gameModel.isGameOver() || !BoardUtils.isInsideBoard(col, row)) {
@@ -100,8 +114,11 @@ public class ShootController {
         return result;
     }
 
+    /**
+     * Platzhalter für eine schwere KI-Strategie auf Basis von Wahrscheinlichkeitsdichte.
+     */
     private int[] shootProbabilityDensity() {
-        // TODO Auto-generated method stub
+        // TODO: implement shootProbabilityDensity()
         // 2. Mittel: Hunt-and-Target mit Parität (Checkerboard Strategy)
         // Dieser Algorithmus kombiniert ein systematisches Suchmuster mit einer gezielten Verfolgung bei Treffern. 
         // - Suchphase (Hunt): Das Spielfeld wird wie ein Schachbrett betrachtet. Da das kleinste Schiff meist zwei Felder lang ist, reicht es aus, 
@@ -112,8 +129,11 @@ public class ShootController {
         throw new UnsupportedOperationException("Unimplemented method 'shootProbabilityDensity'");
     }
 
+    /**
+     * Platzhalter für eine mittlere KI-Strategie mit Schachbrett- und Jagd-Modus.
+     */
     private int[] shootCheckerboardAndHunt() {
-        // TODO Auto-generated method stub
+        // TODO: implement shootCheckerboardAndHunt()
         // 3. Schwer: Wahrscheinlichkeitsdichte-Algorithmus (Probability Density Function)
         // Dies ist die stärkste Strategie, die oft von Computer-KIs genutzt wird. 
         // - Vorgehensweise: Der Algorithmus berechnet für jedes Feld auf dem Gitter, wie viele Möglichkeiten es gibt, die noch übrigen Schiffe dort zu 
@@ -124,6 +144,9 @@ public class ShootController {
         throw new UnsupportedOperationException("Unimplemented method 'shootCheckerboardAndHunt'");
     }
 
+    /**
+     * Führt einen zufälligen Schuss des Computers aus und markiert das Ergebnis.
+     */
     private int[] shootRandom() {
         if (availableCells.isEmpty()) {
             return null; // no empty cells, but shouldn't happen
@@ -149,6 +172,10 @@ public class ShootController {
         return new int[] { col, row, result };
     }
 
+    /**
+     * Überprüft, ob alle eigenen Schiffe vom Computer getroffen wurden.
+     * TODO: remove dupicate and refactor checkWin()
+     */
     private boolean checkComputerWin() {
         CellState[][] ownBoard = gameModel.getOwnBoard();
         for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {

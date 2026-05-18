@@ -1,3 +1,7 @@
+/*
+ * Datei: models/CellState.java
+ * Repräsentiert den Zustand einer Zelle auf dem Spielfeld.
+ */
 package models;
 
 public enum CellState {
@@ -5,4 +9,4 @@ public enum CellState {
     SHIP,
     MISS,
     HIT
-}
+} 

@@ -1,3 +1,7 @@
+/*
+ * Datei: view/GameView.java
+ * Interface für die Spielsicht: Status, eigene/feindliche Boards und Steuerungszustände.
+ */
 package view;
 
 import models.CellState;
@@ -10,4 +14,4 @@ public interface GameView {
     void setShootButtonEnabled(boolean enabled);
     void setRotateButtonEnabled(boolean enabled);
     void setAutoPlaceButtonEnabled(boolean enabled);
-}
+} 

@@ -1,3 +1,7 @@
+/*
+ * Datei: view/ShipTransferable.java
+ * Transferable-Implementierung für Drag-and-Drop: liefert `ShipDragData` als Transfer-Daten.
+ */
 package view;
 
 import java.awt.datatransfer.DataFlavor;

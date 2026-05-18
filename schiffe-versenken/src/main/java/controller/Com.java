@@ -1,3 +1,8 @@
+/*
+ * Datei: controller/Com.java
+ * Kommunikation und Protokoll-Handling: Senden/Empfangen von Nachrichten zwischen Host und Client.
+ * Enthält Hilfsfunktionen zum Aufbau von Server-/Client-Verbindungen und einen Listener-Callback.
+ */
 package controller;
 
 import java.io.BufferedReader;
@@ -83,39 +88,66 @@ public class Com {
     private Listener listener;
     private Socket socket;
 
+    /**
+     * Erzeugt ein Com-Objekt mit einem Listener für eingehende Netzwerkereignisse.
+     */
     public Com(Listener listener) {
         this.listener = listener;
     }
 
+    /**
+     * Setzt den Listener für eingehende Nachrichten.
+     */
     public void setListener(Listener listener) {
         this.listener = listener;
     }
 
+    /**
+     * Sendet eine rohe Textnachricht über den verbundenen Socket.
+     */
     private void sendRaw(String msg) throws IOException {
         out.write(msg + "\n");
         out.flush();
     }
 
+    /**
+     * Sendet einen Schussbefehl an den Gegner.
+     */
     public void sendShot(int col, int row) throws IOException {
         sendRaw("shot " + col + " " + row);
     }
 
+    /**
+     * Sendet die Antwort auf einen Schuss (0 = Wasser / 1 = Treffer/ 2 = Treffer-versenkt ).
+     */
     public void sendAnswer(int answer) throws IOException {
         sendRaw("answer " + answer);
     }
 
+    /**
+     * Sendet eine Pass-Nachricht, wenn der Gegner an der Reihe ist.
+     */
     public void sendPass() throws IOException {
         sendRaw("pass");
     }
 
+    /**
+     * Sendet ein Zufallszahl-Token für den Startspielervergleich.
+     */
     public void sendCoin(int coin) throws IOException {
         sendRaw("COIN " + coin);
     }
 
+    /**
+     * Sendet die Größe des Spielfeldes an den Gegner.
+     */
     public void sendSize(int size) throws IOException {
         sendRaw("size " + size);
     }
 
+    /**
+     * Sendet die Schiffslängen zur Synchronisation des Handshake-Protokolls.
+     */
     public void sendShips(int... lengths) throws IOException {
         StringBuilder builder = new StringBuilder("ships");
         for (int length : lengths) {
@@ -124,26 +156,44 @@ public class Com {
         sendRaw(builder.toString());
     }
 
+    /**
+     * Signalisiert dem Gegner, dass die Schiffplatzierung abgeschlossen ist.
+     */
     public void sendDone() throws IOException {
         sendRaw("done");
     }
 
+    /**
+     * Signalisiert dem Gegner, dass beide Parteien bereit sind.
+     */
     public void sendReady() throws IOException {
         sendRaw("ready");
     }
 
+    /**
+     * Bestätigt eine vorherige Nachricht mit OK.
+     */
     public void sendOk() throws IOException {
         sendRaw("ok");
     }
 
+    /**
+     * Sendet einen Save-Befehl mit einer gespeicherten Spiel-ID.
+     */
     public void sendSave(long id) throws IOException {
         sendRaw("save " + id);
     }
 
+    /**
+     * Sendet einen Load-Befehl für eine gespeicherte Spiel-ID.
+     */
     public void sendLoad(long id) throws IOException {
         sendRaw("load " + id);
     }
 
+    /**
+     * Ermittelt verfügbare lokale IPv4-Adressen zur Anzeige im Verbindungsdialog.
+     */
     public static String getLocalIpAddresses() {
         try {
             List<String> addresses = new ArrayList<>();
@@ -164,7 +214,9 @@ public class Com {
         }
     }
 
-    /** Start a server and accept one client. This call blocks until a client connects. */
+    /**
+     * Startet einen Server-Socket und wartet auf die Verbindung eines Clients.
+     */
     public void connectAsServer(int port) throws IOException {
         // print local IPs to console for convenience
         System.out.print("My IP address(es):");
@@ -188,6 +240,9 @@ public class Com {
             listener.onConnected();
     }
 
+    /**
+     * Verbindet als Client zu einem entfernten Host.
+     */
     public void connectAsClient(String host, int port) throws IOException {
         socket = new Socket(host, port);
         setupStreamsAndReader();
@@ -195,6 +250,9 @@ public class Com {
             listener.onConnected();
     }
 
+    /**
+     * Initialisiert die Ein- und Ausgabeströme und startet den Hintergrundleser.
+     */
     private void setupStreamsAndReader() throws IOException {
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new OutputStreamWriter(socket.getOutputStream());
@@ -221,6 +279,9 @@ public class Com {
         reader.start();
     }
 
+    /**
+     * Verarbeitet eine eingehende Protokollzeile und ruft entsprechende Listener-Methoden auf.
+     */
     private void handleLine(String line) {
         if (line.isEmpty())
             return;
@@ -313,6 +374,9 @@ public class Com {
         }
     }
 
+    /**
+     * Schließt die Netzwerkverbindung und den zugehörigen Socket.
+     */
     public void close() {
         try {
             if (socket != null)
@@ -322,7 +386,7 @@ public class Com {
     }
 
     /**
-     * Original-style convenience: send a save request with generated id and track waiting state.
+     * Sendet eine Save-Anfrage und wechselt in den entsprechenden Wartezustand.
      */
     public void saveGame() throws IOException {
         previousState = currentState;
@@ -332,7 +396,7 @@ public class Com {
     }
 
     /**
-     * Original-style convenience: fire a shot if it's our turn according to internal state.
+     * Sendet einen Schuss, wenn der interne Zustand anzeigt, dass der Zug erlaubt ist.
      */
     public void fireShot(int row, int col) throws IOException {
         if (currentState != State.MY_TURN) {

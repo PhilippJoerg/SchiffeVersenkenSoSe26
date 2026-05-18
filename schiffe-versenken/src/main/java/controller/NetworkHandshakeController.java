@@ -1,5 +1,10 @@
 package controller;
 
+/*
+ * Datei: controller/NetworkHandshakeController.java
+ * Verantwortlich für den Verbindungsaufbau und das Handshake-Protokoll zwischen Host und Client.
+ * Nutzt `Com` um Nachrichten auszutauschen und ruft den Callback auf, sobald der Handshake abgeschlossen ist.
+ */
 import javax.swing.SwingUtilities;
 import models.ShipType;
 import view.ConnectionView;
@@ -11,6 +16,9 @@ public class NetworkHandshakeController {
         void onError(String message, Exception e);
     }
 
+    /**
+     * Startet einen Host, akzeptiert einen Client und führt den Handshake aus.
+     */
     public static void startHost(ConnectionView frame, int port, ReadyCallback callback) {
         frame.setConnectionStatus("Host gestartet — warte auf Client-Verbindung...");
         frame.setLocalIpAddress(getLocalIpText("Host-IP: "));
@@ -77,6 +85,9 @@ public class NetworkHandshakeController {
         }, "Net-Host").start();
     }
 
+    /**
+     * Verbindet als Client zu einem Host und führt den Handshake aus.
+     */
     public static void startClient(ConnectionView frame, String host, int port, ReadyCallback callback) {
         frame.setConnectionStatus("Verbinde mit Host " + host + "...");
         frame.setLocalIpAddress(getLocalIpText("Deine IP: "));
@@ -148,10 +159,16 @@ public class NetworkHandshakeController {
         }, "Net-Client").start();
     }
 
+    /**
+     * Benachrichtigt den Callback bei einem Handshake-Fehler im Event-Thread.
+     */
     private static void notifyError(String message, Exception e, ReadyCallback callback) {
         SwingUtilities.invokeLater(() -> callback.onError(message, e));
     }
 
+    /**
+     * Erzeugt die Schiffslängen für den Handshake aus der Schiffstyp-Definition.
+     */
     private static int[] getShipLengths() {
         java.util.List<Integer> lengths = new java.util.ArrayList<>();
         for (ShipType type : ShipType.values()) {
@@ -162,6 +179,9 @@ public class NetworkHandshakeController {
         return lengths.stream().mapToInt(Integer::intValue).toArray();
     }
 
+    /**
+     * Formatiert die lokale IP-Adresse für die Anzeige im Verbindungsdialog.
+     */
     private static String getLocalIpText(String prefix) {
         String localIp = Com.getLocalIpAddresses();
         return localIp.isEmpty() ? "Lokale IP nicht verfügbar" : prefix + localIp;

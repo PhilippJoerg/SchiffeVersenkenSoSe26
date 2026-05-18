@@ -1,5 +1,9 @@
 package controller;
 
+/*
+ * Datei: controller/GameController.java
+ * Steuert den Spielablauf: Verarbeitung von Schüssen, Computergegner-Loop und Netzwerkinteraktion.
+ */
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 
@@ -20,12 +24,15 @@ public class GameController {
     private int pendingShotCol = -1;
     private int pendingShotRow = -1;
 
+    /**
+     * Erstellt einen lokalen Spiel-Controller für ein Einzelspiel.
+     */
     public GameController(GameView frame, GameModel model) {
         this(frame, model, null, false);
     }
 
     /**
-     * Multiplayer constructor: provide a connected `Com` instance and initial turn flag.
+     * Erstellt einen Spiel-Controller für ein Netzwerkspiel mit Verbindungsobjekt und Startreihenfolge.
      */
     public GameController(GameView frame, GameModel model, Com com, boolean iStart) {
         this.frame = frame;
@@ -50,6 +57,9 @@ public class GameController {
         frame.setAutoPlaceButtonEnabled(false); // disable auto-placement during game
     }
 
+    /**
+     * Verarbeitet einen Schuss auf das Gegnerfeld und aktualisiert den Spielstatus.
+     */
     private void handleShoot(int col, int row) {
         if (model.isGameOver() || computerTurn) {
             return;
@@ -95,6 +105,9 @@ public class GameController {
         }
     }
 
+    /**
+     * Startet die Schusschleife für den Computergegner, damit dieser schießt bis er nicht getroffen hat.
+     */
     private void startComputerShootLoop() {
         computerTurn = true;
         computerTimer = new Timer(1000, e -> {
@@ -131,6 +144,9 @@ public class GameController {
         computerTimer.start();
     }
 
+    /**
+     * Beendet den Zug des Computers und stoppt den zugehörigen Timer.
+     */
     private void stopComputerTurn() {
         computerTurn = false;
         if (computerTimer != null) {
@@ -139,10 +155,16 @@ public class GameController {
         }
     }
 
+    /**
+     * Zeigt das Endbildschirm-Dialogfenster mit Titel und Nachricht an.
+     */
     private void showEndScreen(String title, String message) {
         JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Richtet die Netzwerkereignisse für den Spielverlauf (Schuss, Antwort, Pass) ein.
+     */
     private void setupNetworkHandlers() {
         com.setListener(new Com.Listener() {
             @Override

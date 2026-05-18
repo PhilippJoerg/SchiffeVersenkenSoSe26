@@ -1,3 +1,8 @@
+/*
+ * Datei: view/ShipPalettePanel.java
+ * Panel auf der linken Seite, das verfügbare Schiffstypen und ihre verbleibenden Anzahlen
+ * anzeigt und die aktuelle Ausrichtung für Drag-and-Drop hält.
+ */
 package view;
 
 import java.awt.Color;

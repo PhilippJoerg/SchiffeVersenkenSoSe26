@@ -1,3 +1,10 @@
+/*
+ * Datei: view/PlacementView.java
+ * Interface für die Platzierungsansicht: stellt Methoden bereit, um das eigene Board,
+ * die Ausrichtung der Schiffe und die verbleibenden Mengen in der Palette zu setzen.
+ * Zusätzlich können TransferHandler und Klick-Listener für Drag-and-Drop/Interaktion
+ * bereitgestellt werden.
+ */
 package view;
 
 import java.util.Map;

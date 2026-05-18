@@ -1,3 +1,8 @@
+/*
+ * Datei: AppStartup.java
+ * Startklasse: Initialisiert die Benutzeroberfläche, fragt Gegner und Schwierigkeit ab
+ * und startet das Spiel entweder lokal oder im Netzwerk.
+ */
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.util.Arrays;
@@ -27,6 +32,9 @@ public class AppStartup {
     private static ShipPlacementController placementController;
     private static GameController gameController;
 
+    /**
+     * Programmstartpunkt: erzeugt das Hauptfenster und startet den Spielauswahl-Dialog.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             MainFrame frame = new MainFrame();
@@ -55,6 +63,9 @@ public class AppStartup {
         });
     }
 
+    /**
+     * Zeigt einen Dialog zur Auswahl des Spielgegners an (Computer / Host / Join).
+     */
     private static void askOpponent(MainFrame frame) {
         JDialog dialog = new JDialog(frame, "Startbildschirm", true);
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -96,11 +107,17 @@ public class AppStartup {
         dialog.setVisible(true);
     }
 
+    /**
+     * Initialisiert die Schiffplatzierung und zeigt den Status für den aktuellen Spielmodus an.
+     */
     private static void startPlacement(MainFrame frame, Com com, boolean networkMode, boolean iStart) {
         placementController = new ShipPlacementController(frame, () -> startGame(frame, com, networkMode, iStart));
         frame.setStatus(networkMode ? "Verbindung hergestellt. Platziere deine Schiffe." : "Platziere deine Schiffe.");
     }
 
+    /**
+     * Baut die Netzwerkverbindung auf und startet Host- oder Client-Handshake.
+     */
     private static void startNetworkConnection(MainFrame frame) {
         final int port = 50000;
 
@@ -149,6 +166,9 @@ public class AppStartup {
         }
     }
 
+    /**
+     * Fragt die gewünschte Schwierigkeitsstufe für das Spiel gegen den Computer ab.
+     */
     private static GameDifficulty askDifficulty(MainFrame frame) {
         GameDifficulty[] options = GameDifficulty.values();
         String[] labels = Arrays.stream(options)
@@ -170,6 +190,9 @@ public class AppStartup {
         return GameDifficulty.EASY;
     }
 
+    /**
+     * Startet das eigentliche Spiel und erstellt den passenden GameController.
+     */
     private static void startGame(MainFrame frame, Com com, boolean networkMode, boolean iStart) {
         GameModel gameModel = new GameModel(placementController.getOwnBoard(), networkMode ? GameDifficulty.EASY : difficulty);
 
