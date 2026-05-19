@@ -66,22 +66,25 @@ public class BoardUtils {
         }
     }
 
-    /**
-     * Platziert alle Schiffe zufällig auf dem Board.
-     */
     public static void placeRandomShips(CellState[][] board) {
         Random random = new Random();
+        // Alle Schiffstypen (z. B. U-Boot, Kreuzer, ...) der Reihe nach durchgehen
         for (ShipType shipType : ShipType.values()) {
+            // Jeden Typ so oft platzieren, wie es die Spielregeln vorgeben (z. B. 2× Zerstörer)
             for (int i = 0; i < shipType.getAmount(); i++) {
                 boolean placed = false;
+                // Solange würfeln, bis eine regelkonforme Position gefunden wurde
                 while (!placed) {
                     int col = random.nextInt(GRID_SIZE);
                     int row = random.nextInt(GRID_SIZE);
-                    ShipOrientation orientation = random.nextBoolean() ? ShipOrientation.HORIZONTAL
+                    // Zufällig horizontal oder vertikal ausrichten
+                    ShipOrientation orientation = random.nextBoolean()
+                            ? ShipOrientation.HORIZONTAL
                             : ShipOrientation.VERTICAL;
+                    // Prüfen ob das Schiff an dieser Stelle passt (kein Rand-Überschreitung, kein Überlappen)
                     if (canPlaceShip(board, shipType, col, row, orientation)) {
                         placeShip(board, shipType, col, row, orientation);
-                        placed = true;
+                        placed = true; // Schleife beenden, nächstes Schiff platzieren
                     }
                 }
             }

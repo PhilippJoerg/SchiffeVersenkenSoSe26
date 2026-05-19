@@ -61,47 +61,60 @@ public class GameController {
      * Verarbeitet einen Schuss auf das Gegnerfeld und aktualisiert den Spielstatus.
      */
     private void handleShoot(int col, int row) {
+        // Schuss ignorieren, wenn das Spiel bereits vorbei ist oder der Computer gerade am Zug ist
         if (model.isGameOver() || computerTurn) {
             return;
         }
+        // --- Netzwerkmodus ---
         if (networkMode) {
+            // Im Netzwerkspiel nur schießen, wenn man selbst an der Reihe ist
             if (!myTurnNetwork) {
                 frame.setStatus("Nicht dein Zug (Netzwerk).");
                 return;
             }
             try {
+                // Schuss-Koordinaten an den Gegner übertragen
                 com.sendShot(col, row);
+                // Koordinaten zwischenspeichern, um die eingehende Antwort
+                // dem richtigen Feld zuordnen zu können
                 pendingShotCol = col;
                 pendingShotRow = row;
+                // Spieler über den gesendeten Schuss informieren und auf Rückmeldung vertrösten
                 frame.setStatus("Schuss gesendet: " + (char) ('A' + col) + (row + 1) + " — warte auf Antwort...");
             } catch (Exception e) {
+                // Netzwerkfehler anzeigen; der Spielzug gilt als nicht ausgeführt
                 frame.setStatus("Fehler beim Senden des Schusses: " + e.getMessage());
             }
+            // Weitere lokale Verarbeitung erst nach Empfang der Server-Antwort (asynchron)
             return;
         }
-
+        // --- Lokalmodus ---
+        // Schuss im Modell registrieren; false = Feld bereits beschossen oder ungültige Koordinaten
         boolean shot = model.shoot(col, row);
         if (!shot) {
             frame.setStatus("Ungültiger Schuss.");
             return;
         }
-
+        // Gegnerfeld in der UI nach dem Schuss neu zeichnen
         frame.setEnemyBoard(model.getEnemyBoard());
+        // Ergebnis des Schusses aus dem aktualisierten Spielfeld lesen
         CellState result = model.getEnemyBoard()[col][row];
-
+        // Treffer: Schiff getroffen
         if (result == CellState.HIT) {
             if (model.isGameOver()) {
+                // Letztes Schiff versenkt → Spieler hat gewonnen
                 frame.setStatus("Du hast gewonnen!");
                 showEndScreen("Spiel beendet", "Du hast gewonnen!");
             } else {
+                // Schiff getroffen, aber noch nicht alle versenkt → Spieler darf weiter schießen
                 frame.setStatus("Treffer! Schieße weiter.");
             }
             return;
         }
-
+        // Daneben: kein Schiff getroffen → Zug geht an den Computer
         if (result == CellState.MISS) {
             frame.setStatus("Daneben. Computer denkt...");
-            startComputerShootLoop();
+            startComputerShootLoop(); // Computerlogik asynchron starten
         }
     }
 
@@ -181,7 +194,8 @@ public class GameController {
                     if (answer == 0) {
                         // Opponent missed; wait for pass before taking the turn.
                         myTurnNetwork = false;
-                        frame.setStatus("Gegner hat bei " + (char) ('A' + col) + (row + 1) + " daneben. Warte auf pass.");
+                        frame.setStatus(
+                                "Gegner hat bei " + (char) ('A' + col) + (row + 1) + " daneben. Warte auf pass.");
                     } else if (answer == 1) {
                         frame.setStatus("Gegner hat bei " + (char) ('A' + col) + (row + 1) + " getroffen.");
                     } else if (answer == 2) {
