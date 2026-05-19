@@ -16,18 +16,20 @@ import models.CellState;
 
 public class BoardPanel extends JPanel {
 
-    // Größe des Spielfelds: 10x10
+    // Spielfeldgröße: 10x10
     public static final int GRID_SIZE = 10;
 
-    // Beibehalten als bevorzugte Zellgröße, damit bestehender Code nicht bricht
+    // Standardgröße einer Zelle
     public static final int CELL_SIZE = 32;
 
-    // Platz für Beschriftung links und oben
+    // Platz für Beschriftung oben und links
     public static final int LABEL_SPACE = 28;
 
+    // Grenzen für skalierende Zellgröße
     private static final int MIN_CELL_SIZE = 26;
     private static final int MAX_CELL_SIZE = 56;
 
+    // Farben der Spielfeld-Elemente
     private static final Color BACKGROUND_COLOR = new Color(238, 238, 238);
     private static final Color WATER_COLOR = new Color(185, 220, 240);
     private static final Color GRID_COLOR = new Color(90, 135, 165);
@@ -36,13 +38,13 @@ public class BoardPanel extends JPanel {
     private static final Color MISS_COLOR = new Color(55, 70, 85);
     private static final Color HIT_COLOR = new Color(205, 45, 45);
 
-    // Merkt, ob dieses Panel das gegnerische Feld ist
+    // true, wenn dieses Board das Gegnerfeld ist
     private final boolean enemyBoard;
 
-    // Enthält den aktuellen Zustand aller Felder
+    // Zustand aller Felder: cells[col][row]
     private final CellState[][] cells;
 
-    // Listener für Klicks auf das Spielfeld
+    // Reaktion auf Klicks ins Spielfeld
     private BoardClickListener clickListener;
 
     public BoardPanel(boolean enemyBoard) {
@@ -52,21 +54,24 @@ public class BoardPanel extends JPanel {
         setOpaque(true);
         setBackground(BACKGROUND_COLOR);
 
+        // Kleinste erlaubte Panelgröße
         setMinimumSize(new Dimension(
                 LABEL_SPACE + GRID_SIZE * MIN_CELL_SIZE + 1,
                 LABEL_SPACE + GRID_SIZE * MIN_CELL_SIZE + 1
         ));
 
+        // Startgröße für das Layout
         setPreferredSize(new Dimension(
                 LABEL_SPACE + GRID_SIZE * CELL_SIZE + 1,
                 LABEL_SPACE + GRID_SIZE * CELL_SIZE + 1
         ));
 
-        // Reagiert auf Mausklicks und wandelt Pixel in Feldkoordinaten um
+        // Wandelt Mausklicks in Spielfeldkoordinaten um
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 Point cell = cellAt(e.getPoint());
+
                 if (cell != null && clickListener != null) {
                     clickListener.onCellClicked(cell.x, cell.y);
                 }
@@ -74,12 +79,16 @@ public class BoardPanel extends JPanel {
         });
     }
 
-    // Setzt die Aktion, die bei einem Klick aufgerufen wird
+    // Setzt die Klick-Aktion für gültige Felder
     public void setBoardClickListener(BoardClickListener clickListener) {
         this.clickListener = clickListener;
     }
 
-    // Übernimmt einen neuen Board-Zustand und zeichnet das Panel neu
+    /*
+     * Aktualisiert das Board.
+     * Das Array wird kopiert, damit spätere Änderungen am übergebenen Array
+     * das Panel nicht unkontrolliert verändern.
+     */
     public void setCells(CellState[][] newCells) {
         validateBoard(newCells);
 
@@ -90,17 +99,23 @@ public class BoardPanel extends JPanel {
         repaint();
     }
 
+    // Gibt zurück, ob es das Gegnerfeld ist
     public boolean isEnemyBoard() {
         return enemyBoard;
     }
 
+    /*
+     * Zeichnet das komplette Panel neu.
+     * Wird automatisch von Swing aufgerufen, z. B. nach repaint()
+     * oder beim Ändern der Fenstergröße.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g.create();
 
-        // Sorgt für glattere Darstellung
+        // Glättet Rundungen und Kreise
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         BoardGeometry geometry = calculateGeometry();
@@ -119,6 +134,7 @@ public class BoardPanel extends JPanel {
 
         for (int col = 0; col < GRID_SIZE; col++) {
             String label = String.valueOf((char) ('A' + col));
+
             int x = geometry.startX + col * geometry.cellSize
                     + (geometry.cellSize - fm.stringWidth(label)) / 2;
             int y = geometry.startY - 8;
@@ -128,6 +144,7 @@ public class BoardPanel extends JPanel {
 
         for (int row = 0; row < GRID_SIZE; row++) {
             String label = String.valueOf(row + 1);
+
             int x = geometry.startX - 8 - fm.stringWidth(label);
             int y = geometry.startY + row * geometry.cellSize
                     + (geometry.cellSize + fm.getAscent()) / 2 - 3;
@@ -136,7 +153,7 @@ public class BoardPanel extends JPanel {
         }
     }
 
-    // Geht alle Felder durch und zeichnet ihren Inhalt
+    // Zeichnet alle Zellen inklusive Inhalt
     private void drawCells(Graphics2D g2, BoardGeometry geometry) {
         for (int row = 0; row < GRID_SIZE; row++) {
             for (int col = 0; col < GRID_SIZE; col++) {
@@ -153,11 +170,13 @@ public class BoardPanel extends JPanel {
         }
     }
 
-    // Zeichnet je nach Zustand Schiff, Treffer oder Fehlschuss
+    /*
+     * Zeichnet den Inhalt einer Zelle.
+     * Gegnerische Schiffe werden nicht angezeigt.
+     */
     private void drawCellContent(Graphics2D g2, int x, int y, int cellSize, CellState state) {
         switch (state) {
             case SHIP:
-                // Schiffe nur auf dem eigenen Feld sichtbar machen
                 if (!enemyBoard) {
                     drawShip(g2, x, y, cellSize);
                 }
@@ -171,16 +190,18 @@ public class BoardPanel extends JPanel {
                 if (!enemyBoard) {
                     drawShip(g2, x, y, cellSize);
                 }
+
                 drawCenteredCircle(g2, x, y, cellSize, HIT_COLOR, Math.max(9, cellSize / 4));
                 break;
 
             case EMPTY:
             default:
-                // Leere Felder werden nur als Wasserfläche gezeichnet
+                
                 break;
         }
     }
 
+    // Zeichnet ein Schiff als abgerundetes Rechteck
     private void drawShip(Graphics2D g2, int x, int y, int cellSize) {
         int padding = Math.max(2, cellSize / 10);
         int arc = Math.max(8, cellSize / 3);
@@ -196,6 +217,7 @@ public class BoardPanel extends JPanel {
         g2.drawRoundRect(shipX, shipY, shipSize, shipSize, arc, arc);
     }
 
+    // Zeichnet einen mittigen Kreis für Treffer oder Fehlschuss
     private void drawCenteredCircle(Graphics2D g2, int x, int y, int cellSize, Color color, int size) {
         int circleX = x + (cellSize - size) / 2;
         int circleY = y + (cellSize - size) / 2;
@@ -204,7 +226,7 @@ public class BoardPanel extends JPanel {
         g2.fillOval(circleX, circleY, size, size);
     }
 
-    // Zeichnet das Raster des Spielfelds
+    // Zeichnet das Raster über die Zellen
     private void drawGrid(Graphics2D g2, BoardGeometry geometry) {
         g2.setColor(GRID_COLOR);
 
@@ -212,6 +234,7 @@ public class BoardPanel extends JPanel {
             int x = geometry.startX + i * geometry.cellSize;
             int y = geometry.startY + i * geometry.cellSize;
 
+            // Horizontale Linie
             g2.drawLine(
                     geometry.startX,
                     y,
@@ -219,6 +242,7 @@ public class BoardPanel extends JPanel {
                     y
             );
 
+            // Vertikale Linie
             g2.drawLine(
                     x,
                     geometry.startY,
@@ -228,7 +252,10 @@ public class BoardPanel extends JPanel {
         }
     }
 
-    // Wandelt eine Pixelposition der Maus in Spielfeldkoordinaten um
+    /*
+     * Wandelt eine Pixelposition in Board-Koordinaten um.
+     * Gibt null zurück, wenn der Punkt außerhalb des Spielfelds liegt.
+     */
     public Point cellAt(Point point) {
         BoardGeometry geometry = calculateGeometry();
 
@@ -249,6 +276,10 @@ public class BoardPanel extends JPanel {
         return new Point(col, row);
     }
 
+    /*
+     * Berechnet Position und Größe des Boards.
+     * Die Zellgröße passt sich an das Panel an, bleibt aber begrenzt.
+     */
     private BoardGeometry calculateGeometry() {
         int availableWidth = Math.max(1, getWidth() - LABEL_SPACE - 1);
         int availableHeight = Math.max(1, getHeight() - LABEL_SPACE - 1);
@@ -264,7 +295,7 @@ public class BoardPanel extends JPanel {
         return new BoardGeometry(startX, startY, cellSize, boardSize);
     }
 
-    // Erzeugt ein leeres 10x10-Board
+    // Erstellt ein leeres Board
     private CellState[][] createEmptyBoard() {
         CellState[][] board = new CellState[GRID_SIZE][GRID_SIZE];
 
@@ -277,7 +308,7 @@ public class BoardPanel extends JPanel {
         return board;
     }
 
-    // Prüft, ob das übergebene Board die richtige Größe hat
+    // Prüft, ob das Board 10x10 groß ist
     private void validateBoard(CellState[][] board) {
         if (board == null || board.length != GRID_SIZE) {
             throw new IllegalArgumentException("Board must have 10 rows.");
@@ -290,6 +321,7 @@ public class BoardPanel extends JPanel {
         }
     }
 
+    // Bündelt die berechneten Zeichenwerte des Boards
     private static final class BoardGeometry {
         private final int startX;
         private final int startY;
