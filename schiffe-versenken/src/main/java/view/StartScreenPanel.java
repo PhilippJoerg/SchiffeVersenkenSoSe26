@@ -5,19 +5,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -25,36 +20,23 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import models.GameDifficulty;
+
 public class StartScreenPanel extends JPanel {
 
-    private static final String BACKGROUND_IMAGE_PATH = "/images/startscreen-background.png";
-
     private static final int DEFAULT_BOARD_SIZE = 10;
-
-    private static final String[] SHIP_NAMES = {
-            "Träger",
-            "Schlachtschiff",
-            "Kreuzer",
-            "U-Boot",
-            "Zerstörer"
-    };
-
-    private static final int[] SHIP_SIZES = {
-            5,
-            4,
-            3,
-            3,
-            2
-    };
+    private static final String[] SHIP_NAMES = {"Träger", "Schlachtschiff", "Kreuzer", "U-Boot", "Zerstörer"};
+    private static final int[] SHIP_SIZES = {5, 4, 3, 3, 2};
 
     private final JTextField nameTextField;
     private final JButton startButton;
     private final JButton settingsButton;
 
-    private final BufferedImage backgroundImage;
+    private String opponentSelection = "COMPUTER"; // COMPUTER, HOST, JOIN
+    private GameDifficulty selectedDifficulty = GameDifficulty.EASY;
+    private String hostIpAddress = "";
 
     private int boardSize = DEFAULT_BOARD_SIZE;
-
     private int carrierCount = 1;
     private int battleshipCount = 1;
     private int cruiserCount = 2;
@@ -62,8 +44,7 @@ public class StartScreenPanel extends JPanel {
     private int destroyerCount = 2;
 
     public StartScreenPanel() {
-        backgroundImage = loadBackgroundImage();
-
+        setOpaque(false);
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
 
@@ -106,59 +87,118 @@ public class StartScreenPanel extends JPanel {
         add(centerPanel, BorderLayout.CENTER);
     }
 
-    private BufferedImage loadBackgroundImage() {
-        try {
-            java.net.URL imageUrl = getClass().getResource(BACKGROUND_IMAGE_PATH);
-
-            if (imageUrl == null) {
-                System.err.println("Hintergrundbild nicht gefunden: " + BACKGROUND_IMAGE_PATH);
-                return null;
-            }
-
-            return ImageIO.read(imageUrl);
-        } catch (IOException e) {
-            System.err.println("Hintergrundbild konnte nicht gelesen werden: " + BACKGROUND_IMAGE_PATH + " - " + e.getMessage());
-            return null;
-        }
-    }
-
     private void showSettingsDialog() {
+        String[] temporaryOpponentSelection = {opponentSelection};
+        GameDifficulty[] temporaryDifficulty = {selectedDifficulty};
         int[] temporaryBoardSize = {boardSize};
-
-        int[] temporaryShipCounts = {
-                carrierCount,
-                battleshipCount,
-                cruiserCount,
-                submarineCount,
-                destroyerCount
-        };
+        int[] temporaryShipCounts = {carrierCount, battleshipCount, cruiserCount, submarineCount, destroyerCount};
+        String[] temporaryHostIp = {hostIpAddress};
 
         JPanel settingsPanel = new JPanel(new BorderLayout(24, 0));
         settingsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        JPanel opponentPanel = createOpponentPanel(temporaryOpponentSelection);
+        JPanel difficultyPanel = createDifficultyPanel(temporaryDifficulty);
+        JPanel hostIpPanel = createHostIpPanel(temporaryHostIp);
         JPanel boardSizePanel = createBoardSizePanel(temporaryBoardSize);
         JPanel shipSettingsPanel = createShipSettingsPanel(temporaryShipCounts);
 
+        JPanel topPanel = new JPanel(new BorderLayout(8, 8));
+        topPanel.add(opponentPanel, BorderLayout.WEST);
+        topPanel.add(difficultyPanel, BorderLayout.EAST);
+        topPanel.add(hostIpPanel, BorderLayout.SOUTH);
+
+        settingsPanel.add(topPanel, BorderLayout.NORTH);
         settingsPanel.add(boardSizePanel, BorderLayout.WEST);
         settingsPanel.add(shipSettingsPanel, BorderLayout.CENTER);
 
-        int result = JOptionPane.showConfirmDialog(
-                this,
-                settingsPanel,
-                "Einstellungen",
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE
-        );
-
+        int result = JOptionPane.showConfirmDialog(this, settingsPanel, "Einstellungen", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
+            opponentSelection = temporaryOpponentSelection[0];
+            selectedDifficulty = temporaryDifficulty[0];
             boardSize = temporaryBoardSize[0];
-
             carrierCount = temporaryShipCounts[0];
             battleshipCount = temporaryShipCounts[1];
             cruiserCount = temporaryShipCounts[2];
             submarineCount = temporaryShipCounts[3];
             destroyerCount = temporaryShipCounts[4];
+            hostIpAddress = temporaryHostIp[0].trim();
         }
+    }
+
+    private JPanel createHostIpPanel(String[] temporaryHostIp) {
+        JPanel panel = new JPanel(new BorderLayout(8, 8));
+        panel.setBorder(BorderFactory.createTitledBorder("Host-IP für Beitreten"));
+
+        JTextField hostIpField = new JTextField(temporaryHostIp[0]);
+        hostIpField.setColumns(16);
+        hostIpField.setToolTipText("IP-Adresse des Hosts für den Beitritt eingeben");
+        hostIpField.addActionListener(e -> temporaryHostIp[0] = hostIpField.getText().trim());
+        hostIpField.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                temporaryHostIp[0] = hostIpField.getText().trim();
+            }
+        });
+
+        panel.add(hostIpField, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private JPanel createOpponentPanel(String[] temporaryOpponentSelection) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Gegner"));
+
+        JRadioButton computerBtn = new JRadioButton("Computer");
+        JRadioButton hostBtn = new JRadioButton("Host (Netzwerk)");
+        JRadioButton joinBtn = new JRadioButton("Beitreten (Netzwerk)");
+
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(computerBtn);
+        bg.add(hostBtn);
+        bg.add(joinBtn);
+
+        switch (temporaryOpponentSelection[0]) {
+            case "HOST" -> hostBtn.setSelected(true);
+            case "JOIN" -> joinBtn.setSelected(true);
+            default -> computerBtn.setSelected(true);
+        }
+
+        computerBtn.addActionListener(e -> temporaryOpponentSelection[0] = "COMPUTER");
+        hostBtn.addActionListener(e -> temporaryOpponentSelection[0] = "HOST");
+        joinBtn.addActionListener(e -> temporaryOpponentSelection[0] = "JOIN");
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(2, 4, 2, 4);
+
+        gbc.gridy = 0;
+        panel.add(computerBtn, gbc);
+        gbc.gridy = 1;
+        panel.add(hostBtn, gbc);
+        gbc.gridy = 2;
+        panel.add(joinBtn, gbc);
+
+        return panel;
+    }
+
+    private JPanel createDifficultyPanel(GameDifficulty[] temporaryDifficulty) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Schwierigkeit"));
+
+        GameDifficulty[] options = GameDifficulty.values();
+        JComboBox<GameDifficulty> combo = new JComboBox<>(options);
+        combo.setSelectedItem(temporaryDifficulty[0]);
+        combo.addActionListener(e -> temporaryDifficulty[0] = (GameDifficulty) combo.getSelectedItem());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(2, 4, 2, 4);
+        panel.add(combo, gbc);
+
+        return panel;
     }
 
     private JPanel createBoardSizePanel(int[] temporaryBoardSize) {
@@ -191,10 +231,8 @@ public class StartScreenPanel extends JPanel {
 
         gbc.gridy = 0;
         panel.add(size8Button, gbc);
-
         gbc.gridy = 1;
         panel.add(size10Button, gbc);
-
         gbc.gridy = 2;
         panel.add(size12Button, gbc);
 
@@ -210,29 +248,13 @@ public class StartScreenPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         for (int i = 0; i < SHIP_NAMES.length; i++) {
-            addShipRow(
-                    panel,
-                    gbc,
-                    i,
-                    SHIP_NAMES[i],
-                    SHIP_SIZES[i],
-                    temporaryShipCounts,
-                    i
-            );
+            addShipRow(panel, gbc, i, SHIP_NAMES[i], SHIP_SIZES[i], temporaryShipCounts, i);
         }
 
         return panel;
     }
 
-    private void addShipRow(
-            JPanel panel,
-            GridBagConstraints gbc,
-            int row,
-            String shipName,
-            int shipSize,
-            int[] temporaryShipCounts,
-            int shipIndex
-    ) {
+    private void addShipRow(JPanel panel, GridBagConstraints gbc, int row, String shipName, int shipSize, int[] temporaryShipCounts, int shipIndex) {
         JLabel nameLabel = new JLabel(shipName);
         JLabel sizeLabel = new JLabel("Größe " + shipSize);
         JLabel countLabel = new JLabel(String.valueOf(temporaryShipCounts[shipIndex]), SwingConstants.CENTER);
@@ -263,50 +285,18 @@ public class StartScreenPanel extends JPanel {
 
         gbc.gridx = 0;
         panel.add(nameLabel, gbc);
-
         gbc.gridx = 1;
         panel.add(sizeLabel, gbc);
-
         gbc.gridx = 2;
         panel.add(counterPanel, gbc);
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    public String getOpponentSelection() {
+        return opponentSelection;
+    }
 
-        if (backgroundImage == null) {
-            return;
-        }
-
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(
-                RenderingHints.KEY_INTERPOLATION,
-                RenderingHints.VALUE_INTERPOLATION_BILINEAR
-        );
-
-        int panelWidth = getWidth();
-        int panelHeight = getHeight();
-
-        double imageRatio = (double) backgroundImage.getWidth() / backgroundImage.getHeight();
-        double panelRatio = (double) panelWidth / panelHeight;
-
-        int drawWidth;
-        int drawHeight;
-
-        if (panelRatio > imageRatio) {
-            drawWidth = panelWidth;
-            drawHeight = (int) (panelWidth / imageRatio);
-        } else {
-            drawHeight = panelHeight;
-            drawWidth = (int) (panelHeight * imageRatio);
-        }
-
-        int x = (panelWidth - drawWidth) / 2;
-        int y = (panelHeight - drawHeight) / 2;
-
-        g2.drawImage(backgroundImage, x, y, drawWidth, drawHeight, this);
-        g2.dispose();
+    public GameDifficulty getSelectedDifficulty() {
+        return selectedDifficulty;
     }
 
     public String getPlayerName() {
@@ -319,6 +309,10 @@ public class StartScreenPanel extends JPanel {
 
     public int getBoardSize() {
         return boardSize;
+    }
+
+    public String getHostIpAddress() {
+        return hostIpAddress == null ? "" : hostIpAddress.trim();
     }
 
     public int getCarrierCount() {

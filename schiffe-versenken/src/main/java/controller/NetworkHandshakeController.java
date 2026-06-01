@@ -22,6 +22,7 @@ public class NetworkHandshakeController {
     public static void startHost(ConnectionView frame, int port, ReadyCallback callback) {
         frame.setConnectionStatus("Host gestartet — warte auf Client-Verbindung...");
         frame.setLocalIpAddress(getLocalIpText("Host-IP: "));
+        frame.setLoading(true);
 
         final int[] handshakeStage = new int[] {0};
         final boolean[] iStart = new boolean[] {false};
@@ -39,7 +40,7 @@ public class NetworkHandshakeController {
                     handshakeStage[0] = 1;
                     SwingUtilities.invokeLater(() -> frame.setConnectionStatus("Client verbunden. Protokoll wird ausgehandelt..."));
                 } catch (Exception e) {
-                    notifyError("Fehler beim Starten des Hosts", e, callback);
+                    notifyError(frame, "Fehler beim Starten des Hosts", e, callback);
                 }
             }
 
@@ -55,7 +56,7 @@ public class NetworkHandshakeController {
                         handshakeStage[0] = 3;
                     }
                 } catch (Exception e) {
-                    notifyError("Fehler im Handshake", e, callback);
+                    notifyError(frame, "Fehler im Handshake", e, callback);
                 }
             }
 
@@ -63,6 +64,7 @@ public class NetworkHandshakeController {
             public void onReady() {
                 if (handshakeStage[0] == 3) {
                     SwingUtilities.invokeLater(() -> {
+                        frame.setLoading(false);
                         frame.setConnectionStatus("Handschlag abgeschlossen. Platziere deine Schiffe.");
                         callback.onReady(comRef[0], iStart[0]);
                     });
@@ -71,7 +73,10 @@ public class NetworkHandshakeController {
 
             @Override
             public void onDisconnected() {
-                SwingUtilities.invokeLater(() -> frame.setConnectionStatus("Client getrennt."));
+                SwingUtilities.invokeLater(() -> {
+                    frame.setLoading(false);
+                    frame.setConnectionStatus("Client getrennt.");
+                });
             }
         });
         comRef[0] = com;
@@ -80,7 +85,7 @@ public class NetworkHandshakeController {
             try {
                 com.connectAsServer(port);
             } catch (Exception e) {
-                notifyError("Fehler beim Starten des Hosts", e, callback);
+                notifyError(frame, "Fehler beim Starten des Hosts", e, callback);
             }
         }, "Net-Host").start();
     }
@@ -113,7 +118,7 @@ public class NetworkHandshakeController {
                 try {
                     comRef[0].sendDone();
                 } catch (Exception e) {
-                    notifyError("Fehler im Handshake", e, callback);
+                    notifyError(frame, "Fehler im Handshake", e, callback);
                 }
             }
 
@@ -122,7 +127,7 @@ public class NetworkHandshakeController {
                 try {
                     comRef[0].sendDone();
                 } catch (Exception e) {
-                    notifyError("Fehler im Handshake", e, callback);
+                    notifyError(frame, "Fehler im Handshake", e, callback);
                 }
             }
 
@@ -134,7 +139,7 @@ public class NetworkHandshakeController {
                 try {
                     comRef[0].sendReady();
                 } catch (Exception e) {
-                    notifyError("Fehler im Handshake", e, callback);
+                    notifyError(frame, "Fehler im Handshake", e, callback);
                     return;
                 }
                 SwingUtilities.invokeLater(() -> {
@@ -154,7 +159,7 @@ public class NetworkHandshakeController {
             try {
                 com.connectAsClient(host, port);
             } catch (Exception e) {
-                notifyError("Fehler beim Verbinden", e, callback);
+                notifyError(frame, "Fehler beim Verbinden", e, callback);
             }
         }, "Net-Client").start();
     }
@@ -162,8 +167,11 @@ public class NetworkHandshakeController {
     /**
      * Benachrichtigt den Callback bei einem Handshake-Fehler im Event-Thread.
      */
-    private static void notifyError(String message, Exception e, ReadyCallback callback) {
-        SwingUtilities.invokeLater(() -> callback.onError(message, e));
+    private static void notifyError(ConnectionView frame, String message, Exception e, ReadyCallback callback) {
+        SwingUtilities.invokeLater(() -> {
+            frame.setLoading(false);
+            callback.onError(message, e);
+        });
     }
 
     /**

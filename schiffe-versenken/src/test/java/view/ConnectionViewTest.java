@@ -16,6 +16,10 @@ class ConnectionViewTest {
             @Override
             public void setLocalIpAddress(String text) {
             }
+
+            @Override
+            public void setLoading(boolean loading) {
+            }
         };
 
         assertNotNull(view);

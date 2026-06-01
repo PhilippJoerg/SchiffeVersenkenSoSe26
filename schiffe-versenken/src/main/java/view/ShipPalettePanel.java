@@ -35,8 +35,8 @@ public class ShipPalettePanel extends JPanel {
     private static final Dimension SHIP_CARD_SIZE = new Dimension(175, 62);
 
     // Farben der Karten
-    private static final Color CARD_BACKGROUND = new Color(232, 236, 240);
-    private static final Color CARD_BORDER = new Color(80, 90, 100);
+    private static final Color CARD_BACKGROUND = new Color(232, 236, 240, 180);
+    private static final Color CARD_BORDER = new Color(80, 90, 100, 200);
 
     // Speichert, wie viele Schiffe pro Typ noch verfügbar sind
     private final EnumMap<ShipType, Integer> remainingCounts;
@@ -57,7 +57,10 @@ public class ShipPalettePanel extends JPanel {
 
         // Vertikale Anordnung der Palette
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBorder(BorderFactory.createTitledBorder("Schiffe ziehen"));
+        var titleBorder = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.WHITE), "Schiffe ziehen");
+        titleBorder.setTitleColor(Color.WHITE);
+        setBorder(titleBorder);
+        setOpaque(false);
 
         setMinimumSize(new Dimension(185, 320));
         setPreferredSize(PANEL_SIZE);
@@ -66,9 +69,11 @@ public class ShipPalettePanel extends JPanel {
         JLabel hintLabel = new JLabel("Drag & Drop");
         hintLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         hintLabel.setFont(hintLabel.getFont().deriveFont(Font.BOLD, 14f));
+        hintLabel.setForeground(Color.WHITE);
 
         orientationLabel = new JLabel();
         orientationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        orientationLabel.setForeground(Color.WHITE);
 
         add(Box.createVerticalStrut(8));
         add(hintLabel);
@@ -103,6 +108,7 @@ public class ShipPalettePanel extends JPanel {
                 BorderFactory.createLineBorder(CARD_BORDER),
                 BorderFactory.createEmptyBorder(6, 8, 6, 8)
         ));
+        panel.setOpaque(true);
 
         panel.setMinimumSize(SHIP_CARD_SIZE);
         panel.setPreferredSize(SHIP_CARD_SIZE);
@@ -115,9 +121,11 @@ public class ShipPalettePanel extends JPanel {
         JLabel nameLabel = new JLabel(shipType.getDisplayName(), SwingConstants.CENTER);
         nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         nameLabel.setFont(nameLabel.getFont().deriveFont(Font.BOLD, 13f));
+        nameLabel.setForeground(Color.WHITE);
 
         JLabel detailLabel = new JLabel("", SwingConstants.CENTER);
         detailLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        detailLabel.setForeground(Color.WHITE);
 
         labels.put(shipType, detailLabel);
 

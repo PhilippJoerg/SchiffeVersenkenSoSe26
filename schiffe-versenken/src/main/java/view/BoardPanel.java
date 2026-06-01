@@ -56,8 +56,7 @@ public class BoardPanel extends JPanel {
         this.enemyBoard = enemyBoard;
         this.cells = createEmptyBoard();
 
-        setOpaque(true);
-        setBackground(BACKGROUND_COLOR);
+        setOpaque(false);
 
         // Kleinste erlaubte Panelgröße
         setMinimumSize(new Dimension(
@@ -135,7 +134,7 @@ public class BoardPanel extends JPanel {
     // Zeichnet A-J oben und 1-10 links
     private void drawCoordinates(Graphics2D g2, BoardGeometry geometry) {
         FontMetrics fm = g2.getFontMetrics();
-        g2.setColor(Color.BLACK);
+        g2.setColor(Color.WHITE);
 
         for (int col = 0; col < GRID_SIZE; col++) {
             String label = String.valueOf((char) ('A' + col));

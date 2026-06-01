@@ -233,8 +233,9 @@ public class Com {
         }
         System.out.println();
 
-        ServerSocket ss = new ServerSocket(port);
-        socket = ss.accept();
+        try (ServerSocket ss = new ServerSocket(port)) {
+            socket = ss.accept();
+        }
         setupStreamsAndReader();
         if (listener != null)
             listener.onConnected();
