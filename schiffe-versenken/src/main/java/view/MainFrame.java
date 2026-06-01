@@ -158,7 +158,7 @@ public class MainFrame extends JFrame {
     }
 
     // Zeigt den Startscreen
-    public void showStartScreen() {
+    public final void showStartScreen() {
         screenLayout.show(screenPanel, START_SCREEN);
     }
 
