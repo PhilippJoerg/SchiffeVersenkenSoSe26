@@ -1,16 +1,6 @@
 package view;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.awt.Point;
-import java.awt.datatransfer.Transferable;
-
 import javax.swing.TransferHandler;
-
-import org.junit.jupiter.api.Test;
 
 import controller.ShipPlacementController;
 import models.ShipOrientation;

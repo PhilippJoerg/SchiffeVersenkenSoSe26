@@ -35,7 +35,6 @@ public class BoardPanel extends JPanel {
     private static final int MAX_CELL_SIZE = 56;
 
     // Farben der Spielfeld-Elemente
-    private static final Color BACKGROUND_COLOR = new Color(238, 238, 238);
     private static final Color WATER_COLOR = new Color(185, 220, 240);
     private static final Color GRID_COLOR = new Color(90, 135, 165);
     private static final Color SHIP_COLOR = new Color(145, 150, 160);
