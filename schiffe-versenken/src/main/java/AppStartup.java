@@ -45,14 +45,11 @@ public class AppStartup {
                     difficulty = frame.getSelectedDifficulty();
                     startPlacement(frame, null, false, false);
                 } else {
-                    // HOST or JOIN -> start network handshake
                     startNetworkConnection(frame);
                 }
             });
 
             frame.setVisible(true);
-
-            // waiting for user to click start
         });
     }
 

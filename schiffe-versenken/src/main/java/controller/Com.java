@@ -21,7 +21,6 @@ import java.util.Enumeration;
 import java.util.List;
 
 public class Com {
-    // Optional internal state machine similar to the original CLI Com.java
     public enum State {
         START,
         WAITING_FOR_SIZE_DONE,
@@ -304,7 +303,6 @@ public class Com {
                     if (parts.length > 1 && listener != null) {
                         int rows = Integer.parseInt(parts[1]);
                         int cols = parts.length > 2 ? Integer.parseInt(parts[2]) : rows;
-                        // store locally for compatibility with original Com
                         numRows = rows;
                         numCols = cols;
                         listener.onSize(rows, cols);
@@ -328,7 +326,6 @@ public class Com {
                     if (parts.length > 1 && listener != null) {
                         long id = Long.parseLong(parts[1]);
                         listener.onSave(id);
-                        // original behavior: acknowledge immediately
                         try { sendOk(); } catch (IOException ex) { }
                     }
                     break;
@@ -336,7 +333,6 @@ public class Com {
                     if (parts.length > 1 && listener != null) {
                         long id = Long.parseLong(parts[1]);
                         listener.onLoad(id);
-                        // original behavior: acknowledge immediately
                         try { sendOk(); } catch (IOException ex) { }
                     }
                     break;
@@ -344,7 +340,6 @@ public class Com {
                     if (listener != null) {
                         listener.onOk();
                     }
-                    // restore state on OK like original
                     if (currentState == State.WAITING_OK_SAVE && previousState != null) {
                         currentState = previousState;
                         previousState = null;
@@ -353,7 +348,6 @@ public class Com {
                     }
                     break;
                 default:
-                    // ignore unknown
             }
         } catch (Exception e) {
             // ignore parse errors

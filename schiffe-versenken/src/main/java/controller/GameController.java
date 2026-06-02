@@ -192,7 +192,6 @@ public class GameController {
                 try {
                     com.sendAnswer(answer);
                     if (answer == 0) {
-                        // Opponent missed; wait for pass before taking the turn.
                         myTurnNetwork = false;
                         frame.setStatus(
                                 "Gegner hat bei " + (char) ('A' + col) + (row + 1) + " daneben. Warte auf pass.");

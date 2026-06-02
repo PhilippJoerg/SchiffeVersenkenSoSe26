@@ -20,6 +20,5 @@ public interface PlacementView {
     void setOwnBoardClickListener(BoardClickListener listener);
     void setOwnBoardTransferHandler(TransferHandler transferHandler);
     void setStatus(String text);
-    // allow controller to obtain the actual BoardPanel for transfer handlers
     BoardPanel getOwnBoard();
 }

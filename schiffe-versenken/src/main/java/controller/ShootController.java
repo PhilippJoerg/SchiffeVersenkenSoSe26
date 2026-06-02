@@ -40,7 +40,7 @@ public class ShootController {
         CellState[][] enemyBoard = gameModel.getEnemyBoard();
         if (gameModel.isGameOver() || !BoardUtils.isInsideBoard(col, row)
                 || (enemyBoard[col][row] == CellState.HIT || enemyBoard[col][row] == CellState.MISS)) {
-            return false; // invalid shot
+            return false;
         }
         if (enemyBoard[col][row] == CellState.SHIP) {
             enemyBoard[col][row] = CellState.HIT;
@@ -84,7 +84,7 @@ public class ShootController {
                 return shootProbabilityDensity();
         
             default:
-                return null; // should never happen
+                return null;
         }
     }
 
@@ -94,7 +94,7 @@ public class ShootController {
      */
     public int evaluateIncomingShot(int col, int row) {
         if (gameModel.isGameOver() || !BoardUtils.isInsideBoard(col, row)) {
-            return 0; // treat invalid as miss
+            return 0;
         }
 
         int result = 0;
@@ -149,7 +149,7 @@ public class ShootController {
      */
     private int[] shootRandom() {
         if (availableCells.isEmpty()) {
-            return null; // no empty cells, but shouldn't happen
+            return null; 
         }
 
         Random random = new Random();
