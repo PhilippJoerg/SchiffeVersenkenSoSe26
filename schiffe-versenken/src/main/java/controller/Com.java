@@ -218,21 +218,6 @@ public class Com {
      * Startet einen Server-Socket und wartet auf die Verbindung eines Clients.
      */
     public void connectAsServer(int port) throws IOException {
-        // print local IPs to console for convenience
-        System.out.print("My IP address(es):");
-        Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
-        while (nis.hasMoreElements()) {
-            NetworkInterface ni = nis.nextElement();
-            Enumeration<InetAddress> ias = ni.getInetAddresses();
-            while (ias.hasMoreElements()) {
-                InetAddress ia = ias.nextElement();
-                if (!ia.isLoopbackAddress()) {
-                    System.out.print(" " + ia.getHostAddress());
-                }
-            }
-        }
-        System.out.println();
-
         try (ServerSocket ss = new ServerSocket(port)) {
             socket = ss.accept();
         }
