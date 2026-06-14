@@ -414,6 +414,9 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
     // Bindet die Save-Action (aus dem Controller)
     public void setSaveAction(Runnable action) {
         if (saveMenuItem != null) {
+            for (var listener : saveMenuItem.getActionListeners()) {
+                saveMenuItem.removeActionListener(listener);
+            }
             saveMenuItem.addActionListener(e -> action.run());
         }
     }
@@ -421,6 +424,9 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
     // Bindet die Load-Action (aus dem Controller)
     public void setLoadAction(Runnable action) {
         if (loadMenuItem != null) {
+            for (var listener : loadMenuItem.getActionListeners()) {
+                loadMenuItem.removeActionListener(listener);
+            }
             loadMenuItem.addActionListener(e -> action.run());
         }
     }

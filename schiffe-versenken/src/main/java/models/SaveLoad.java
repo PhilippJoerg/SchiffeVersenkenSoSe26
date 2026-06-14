@@ -10,11 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class SaveLoad {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String VERSION = "1";
 
     public static void saveGame(File file, GameModel model) throws IOException {
         GameState gs = new GameState();
-        gs.version = VERSION;
         gs.difficulty = model.getDifficulty() != null ? model.getDifficulty().name() : null;
         gs.gameOver = model.isGameOver();
         gs.playerWon = model.didPlayerWin();
@@ -25,10 +23,6 @@ public class SaveLoad {
 
     public static GameModel loadGame(File file) throws IOException {
         GameState gs = MAPPER.readValue(file, GameState.class);
-        if (gs == null || gs.version == null) {
-            throw new IOException("Invalid save file: missing version");
-        }
-
         CellState[][] own = fromStringGrid(gs.ownBoard);
         CellState[][] enemy = fromStringGrid(gs.enemyBoard);
         GameDifficulty difficulty = gs.difficulty != null ? GameDifficulty.valueOf(gs.difficulty) : GameDifficulty.EASY;
@@ -65,7 +59,6 @@ public class SaveLoad {
 
     // DTO for JSON
     public static class GameState {
-        public String version;
         public String[][] ownBoard;
         public String[][] enemyBoard;
         public String difficulty;

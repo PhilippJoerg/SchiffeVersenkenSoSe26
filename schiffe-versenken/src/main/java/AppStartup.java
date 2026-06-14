@@ -3,6 +3,10 @@
  * Startklasse: Initialisiert die Benutzeroberfläche, fragt Gegner und Schwierigkeit ab
  * und startet das Spiel entweder lokal oder im Netzwerk.
  */
+import java.io.File;
+import java.io.IOException;
+
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -12,6 +16,7 @@ import controller.NetworkHandshakeController;
 import controller.ShipPlacementController;
 import models.GameDifficulty;
 import models.GameModel;
+import models.SaveLoad;
 import view.MainFrame;
 
 public class AppStartup {
@@ -49,6 +54,7 @@ public class AppStartup {
                 }
             });
 
+            frame.setLoadAction(() -> handleGlobalLoad(frame));
             frame.setVisible(true);
         });
     }
@@ -133,6 +139,31 @@ public class AppStartup {
             frame.setLocalIpAddress("");
             gameController = new GameController(frame, gameModel);
         }
+    }
+
+    private static void handleGlobalLoad(MainFrame frame) {
+        JFileChooser chooser = new JFileChooser();
+        int result = chooser.showOpenDialog(frame);
+        if (result != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File file = chooser.getSelectedFile();
+        try {
+            GameModel loaded = SaveLoad.loadGame(file);
+            startLoadedGame(frame, loaded);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(frame, "Fehler beim Laden: " + e.getMessage(), "Fehler",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private static void startLoadedGame(MainFrame frame, GameModel loadedModel) {
+        frame.showGameScreen();
+        frame.setConnectionStatus("Lokales Spiel geladen");
+        frame.setLocalIpAddress("");
+        gameController = new GameController(frame, loadedModel);
+        frame.setStatus("Geladenes Spiel gestartet.");
     }
 
 }
