@@ -256,25 +256,32 @@ public class GameController {
             @Override
             public void onAnswer(int answer) {
                 if (pendingShotCol >= 0 && pendingShotRow >= 0) {
-                    if (answer == 0) {
-                        model.getEnemyBoard()[pendingShotCol][pendingShotRow] = CellState.MISS;
-                        frame.setEnemyBoard(model.getEnemyBoard());
-                        try {
-                            com.sendPass();
-                        } catch (Exception e) {
-                            frame.setStatus("Fehler beim Senden von pass: " + e.getMessage());
+                    CellState[][] enemy = model.getEnemyBoard();
+                    CellState current = enemy[pendingShotCol][pendingShotRow];
+                    // Reject if the cell was already shot locally
+                    if (current == CellState.HIT || current == CellState.MISS) {
+                        frame.setStatus("Ungültige Antwort: Feld bereits beschrieben.");
+                    } else {
+                        if (answer == 0) {
+                            enemy[pendingShotCol][pendingShotRow] = CellState.MISS;
+                            frame.setEnemyBoard(model.getEnemyBoard());
+                            try {
+                                com.sendPass();
+                            } catch (Exception e) {
+                                frame.setStatus("Fehler beim Senden von pass: " + e.getMessage());
+                            }
+                            myTurnNetwork = false;
+                            frame.setStatus("Daneben. Gegner ist dran.");
+                        } else if (answer == 1) {
+                            enemy[pendingShotCol][pendingShotRow] = CellState.HIT;
+                            frame.setEnemyBoard(model.getEnemyBoard());
+                            frame.setStatus("Treffer! Du darfst weiter schießen.");
+                        } else if (answer == 2) {
+                            enemy[pendingShotCol][pendingShotRow] = CellState.HIT;
+                            frame.setEnemyBoard(model.getEnemyBoard());
+                            frame.setStatus("Treffer. Alle gegnerischen Schiffe versenkt. Du hast gewonnen!");
+                            showEndScreen("Spiel beendet", "Du hast gewonnen!");
                         }
-                        myTurnNetwork = false;
-                        frame.setStatus("Daneben. Gegner ist dran.");
-                    } else if (answer == 1) {
-                        model.getEnemyBoard()[pendingShotCol][pendingShotRow] = CellState.HIT;
-                        frame.setEnemyBoard(model.getEnemyBoard());
-                        frame.setStatus("Treffer! Du darfst weiter schießen.");
-                    } else if (answer == 2) {
-                        model.getEnemyBoard()[pendingShotCol][pendingShotRow] = CellState.HIT;
-                        frame.setEnemyBoard(model.getEnemyBoard());
-                        frame.setStatus("Treffer. Alle gegnerischen Schiffe versenkt. Du hast gewonnen!");
-                        showEndScreen("Spiel beendet", "Du hast gewonnen!");
                     }
                     pendingShotCol = -1;
                     pendingShotRow = -1;

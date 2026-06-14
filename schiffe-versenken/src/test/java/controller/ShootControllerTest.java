@@ -44,6 +44,18 @@ class ShootControllerTest {
     }
 
     @Test
+    void testShootRejectsRepeatedShot() {
+        CellState[][] enemy = gameModel.getEnemyBoard();
+        enemy[0][0] = CellState.SHIP;
+        // first shot should be accepted
+        assertTrue(shootController.shoot(0, 0));
+        // second shot on same cell should be rejected
+        assertFalse(shootController.shoot(0, 0));
+        // board state should remain HIT
+        assertEquals(CellState.HIT, enemy[0][0]);
+    }
+
+    @Test
     void testEvaluateIncomingShotReturnsMissAndHit() {
         int result = shootController.evaluateIncomingShot(1, 1);
         assertTrue(result == 0);
@@ -51,6 +63,22 @@ class ShootControllerTest {
         gameModel.getOwnBoard()[0][0] = CellState.SHIP;
         int hit = shootController.evaluateIncomingShot(0, 0);
         assertTrue(hit == 1 || hit == 2);
+    }
+
+    @Test
+    void testEvaluateIncomingShotRejectsRepeatedShot() {
+        // ensure own board has a ship
+        CellState[][] own = gameModel.getOwnBoard();
+        own[0][0] = CellState.SHIP;
+
+        int first = shootController.evaluateIncomingShot(0, 0);
+        assertTrue(first == 1 || first == 2);
+
+        // second incoming shot to same cell should be rejected/treated as miss (no overwrite)
+        int second = shootController.evaluateIncomingShot(0, 0);
+        assertEquals(0, second);
+        // the cell should remain HIT
+        assertEquals(CellState.HIT, own[0][0]);
     }
 
     @Test
