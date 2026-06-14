@@ -162,6 +162,7 @@ public class ShootController {
             enqueueTargetCells(col, row);
             if (isShipSunk(col, row)) {
                 cleanupTargetQueueForSunkShip(col, row);
+                result = 2;
             }
             if (isBoardSunk(ownBoard)) {
                 gameModel.setGameOver(true);
@@ -453,6 +454,9 @@ public class ShootController {
         if (ownBoard[col][row] == CellState.SHIP) {
             ownBoard[col][row] = CellState.HIT;
             result = 1;
+            if (isShipSunk(col, row)) {
+                result = 2;
+            }
             if (isBoardSunk(ownBoard)) {
                 gameModel.setGameOver(true);
                 gameModel.setPlayerWon(false);

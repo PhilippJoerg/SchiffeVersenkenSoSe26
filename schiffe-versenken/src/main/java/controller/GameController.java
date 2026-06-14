@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 import models.SaveLoad;
-
+import models.BoardUtils;
 import models.CellState;
 import models.GameModel;
 import view.GameView;
@@ -153,8 +153,11 @@ public class GameController {
                 frame.setStatus("Du hast gewonnen!");
                 showEndScreen("Spiel beendet", "Du hast gewonnen!");
             } else {
-                // Schiff getroffen, aber noch nicht alle versenkt → Spieler darf weiter schießen
-                frame.setStatus("Treffer! Schieße weiter.");
+                if (BoardUtils.isShipSunkAt(model.getEnemyBoard(), col, row)) {
+                    frame.setStatus("Du hast ein Schiff versenkt! Schieße weiter.");
+                } else {
+                    frame.setStatus("Treffer! Schieße weiter.");
+                }
             }
             return;
         }
@@ -185,9 +188,17 @@ public class GameController {
 
             frame.setOwnBoard(model.getOwnBoard());
             String coord = (char) ('A' + compShot[0]) + String.valueOf(compShot[1] + 1);
-            boolean hit = compShot[2] == 1;
+            int outcome = compShot[2]; // 0=miss,1=hit,2=sunk
 
-            if (hit) {
+            if (outcome == 2) { // sunk
+                if (model.isGameOver()) {
+                    frame.setStatus("Computer hat bei " + coord + " ein Schiff versenkt und gewonnen!");
+                    showEndScreen("Spiel beendet", "Computer hat gewonnen!");
+                    stopComputerTurn();
+                } else {
+                    frame.setStatus("Computer hat bei " + coord + " ein Schiff versenkt. Computer denkt...");
+                }
+            } else if (outcome == 1) { // hit
                 if (model.isGameOver()) {
                     frame.setStatus("Computer hat bei " + coord + " getroffen und gewonnen!");
                     showEndScreen("Spiel beendet", "Computer hat gewonnen!");
@@ -195,7 +206,7 @@ public class GameController {
                 } else {
                     frame.setStatus("Computer hat bei " + coord + " getroffen. Computer denkt...");
                 }
-            } else {
+            } else { // miss
                 frame.setStatus("Computer hat bei " + coord + " daneben. Dein Zug.");
                 stopComputerTurn();
             }

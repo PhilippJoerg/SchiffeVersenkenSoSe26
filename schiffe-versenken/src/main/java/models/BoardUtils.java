@@ -142,4 +142,55 @@ public class BoardUtils {
         }
         return true;
     }
+
+    /**
+     * Prüft, ob das Schiff, zu dem die Zelle (col,row) gehört, bereits vollständig versenkt ist.
+     * Akzeptiert Zellen mit Zustand HIT oder SHIP (z.B. vor/ nach Auswertung).
+     */
+    public static boolean isShipSunkAt(CellState[][] board, int col, int row) {
+        if (!isInsideBoard(col, row)) {
+            return false;
+        }
+        CellState start = board[col][row];
+        if (start != CellState.HIT && start != CellState.SHIP) {
+            return false;
+        }
+
+        // helper to test ship segment
+        java.util.function.Predicate<CellState> isSegment = s -> s == CellState.HIT || s == CellState.SHIP;
+
+        // try horizontal
+        int left = col;
+        while (left - 1 >= 0 && isSegment.test(board[left - 1][row])) {
+            left--;
+        }
+        int right = col;
+        while (right + 1 < GRID_SIZE && isSegment.test(board[right + 1][row])) {
+            right++;
+        }
+        if (right > left) {
+            for (int c = left; c <= right; c++) {
+                if (board[c][row] == CellState.SHIP) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // vertical
+        int up = row;
+        while (up - 1 >= 0 && isSegment.test(board[col][up - 1])) {
+            up--;
+        }
+        int down = row;
+        while (down + 1 < GRID_SIZE && isSegment.test(board[col][down + 1])) {
+            down++;
+        }
+        for (int r = up; r <= down; r++) {
+            if (board[col][r] == CellState.SHIP) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
