@@ -12,6 +12,7 @@ public class ShipPlacementModel {
 
     private final CellState[][] ownBoard;
     private final EnumMap<ShipType, Integer> remainingShips;
+    private final GameSettings settings;
     private ShipOrientation currentOrientation;
 
     public ShipPlacementModel(GameSettings settings) {

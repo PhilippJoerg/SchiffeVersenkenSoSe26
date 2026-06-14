@@ -8,6 +8,7 @@ package controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
 import models.BoardUtils;
 import models.CellState;
 import models.GameDifficulty;
@@ -352,11 +353,14 @@ public class ShootController {
     }
 
     private void enqueueTargetCells(int col, int row) {
+        CellState[][] ownBoard = gameModel.getOwnBoard();
         int[][] offsets = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+
         for (int[] offset : offsets) {
             int nextCol = col + offset[0];
             int nextRow = row + offset[1];
-            if (BoardUtils.isInsideBoard(nextCol, nextRow) && isCellAvailable(nextCol, nextRow)
+
+            if (BoardUtils.isInsideBoard(ownBoard, nextCol, nextRow) && isCellAvailable(nextCol, nextRow)
                     && !containsTargetCell(nextCol, nextRow)) {
                 targetQueue.add(new int[]{nextCol, nextRow});
             }
