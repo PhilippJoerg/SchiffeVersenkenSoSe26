@@ -48,7 +48,7 @@ public class ShootController {
         }
         if (enemyBoard[col][row] == CellState.SHIP) {
             enemyBoard[col][row] = CellState.HIT;
-            if (checkWin()) {
+            if (isBoardSunk(enemyBoard)) {
                 gameModel.setGameOver(true);
                 gameModel.setPlayerWon(true);
             }
@@ -59,13 +59,12 @@ public class ShootController {
     }
 
     /**
-     * Überprüft, ob alle Schiffe auf dem gegnerischen Board versenkt wurden.
+     * Überprüft, ob auf dem angegebenen Board noch Schiffe vorhanden sind.
      */
-    private boolean checkWin() {
-        CellState[][] enemyBoard = gameModel.getEnemyBoard();
+    private boolean isBoardSunk(CellState[][] board) {
         for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {
             for (int row = 0; row < BoardUtils.GRID_SIZE; row++) {
-                if (enemyBoard[col][row] == CellState.SHIP) {
+                if (board[col][row] == CellState.SHIP) {
                     return false;
                 }
             }
@@ -106,7 +105,7 @@ public class ShootController {
         if (ownBoard[col][row] == CellState.SHIP) {
             ownBoard[col][row] = CellState.HIT;
             result = 1;
-            if (checkComputerWin()) {
+            if (isBoardSunk(ownBoard)) {
                 gameModel.setGameOver(true);
                 gameModel.setPlayerWon(false);
                 result = 2;
@@ -161,7 +160,7 @@ public class ShootController {
             ownBoard[col][row] = CellState.HIT;
             result = 1;
             enqueueTargetCells(col, row);
-            if (checkComputerWin()) {
+            if (isBoardSunk(ownBoard)) {
                 gameModel.setGameOver(true);
                 gameModel.setPlayerWon(false);
             }
@@ -253,7 +252,7 @@ public class ShootController {
         if (ownBoard[col][row] == CellState.SHIP) {
             ownBoard[col][row] = CellState.HIT;
             result = 1;
-            if (checkComputerWin()) {
+            if (isBoardSunk(ownBoard)) {
                 gameModel.setGameOver(true);
                 gameModel.setPlayerWon(false);
             }
@@ -261,21 +260,5 @@ public class ShootController {
             ownBoard[col][row] = CellState.MISS;
         }
         return new int[] { col, row, result };
-    }
-
-    /**
-     * Überprüft, ob alle eigenen Schiffe vom Computer getroffen wurden.
-     * TODO: remove dupicate and refactor checkWin()
-     */
-    private boolean checkComputerWin() {
-        CellState[][] ownBoard = gameModel.getOwnBoard();
-        for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {
-            for (int row = 0; row < BoardUtils.GRID_SIZE; row++) {
-                if (ownBoard[col][row] == CellState.SHIP) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 }
