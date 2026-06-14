@@ -15,11 +15,15 @@ import models.GameModel;
 
 public class ShootController {
     private final GameModel gameModel;
+    private final Random random;
     private List<int[]> availableCells;
+    private final List<int[]> targetQueue;
     private final GameDifficulty difficulty;
 
     public ShootController(GameModel gameModel) {
         this.gameModel = gameModel;
+        this.random = new Random();
+        this.targetQueue = new ArrayList<>();
         this.difficulty = gameModel.getDifficulty();
         initAvailableCells();
     }
@@ -119,7 +123,7 @@ public class ShootController {
      */
     private int[] shootProbabilityDensity() {
         // TODO: implement shootProbabilityDensity()
-        // 2. Mittel: Hunt-and-Target mit Parität (Checkerboard Strategy)
+        // 3. Schwer: Hunt-and-Target mit Parität (Checkerboard Strategy)
         // Dieser Algorithmus kombiniert ein systematisches Suchmuster mit einer gezielten Verfolgung bei Treffern. 
         // - Suchphase (Hunt): Das Spielfeld wird wie ein Schachbrett betrachtet. Da das kleinste Schiff meist zwei Felder lang ist, reicht es aus, 
         //   nur jedes zweite Feld (z.B. nur die dunklen Felder) zu beschießen, um jedes Schiff mindestens einmal zu treffen.
@@ -131,17 +135,104 @@ public class ShootController {
 
     /**
      * Platzhalter für eine mittlere KI-Strategie mit Schachbrett- und Jagd-Modus.
+     * TODO: add a sunk ship tracking to avoid shooting around already sunk ships
      */
     private int[] shootCheckerboardAndHunt() {
-        // TODO: implement shootCheckerboardAndHunt()
-        // 3. Schwer: Wahrscheinlichkeitsdichte-Algorithmus (Probability Density Function)
-        // Dies ist die stärkste Strategie, die oft von Computer-KIs genutzt wird. 
-        // - Vorgehensweise: Der Algorithmus berechnet für jedes Feld auf dem Gitter, wie viele Möglichkeiten es gibt, die noch übrigen Schiffe dort zu 
-        //   platzieren.Felder in der Mitte haben anfangs eine höhere Wahrscheinlichkeit, da dort Schiffe in mehr Ausrichtungen (horizontal/vertikal) hinpassen 
-        //   als in den Ecken. Nach jedem Schuss (Treffer oder Fehlschuss) wird die „Heatmap“ neu berechnet. Ein Fehlschuss senkt die Wahrscheinlichkeit der 
-        //   umliegenden Felder drastisch, während ein Treffer sie massiv erhöht. 
-        // - Effizienz: Extrem hoch. Erfahrene Algorithmen benötigen oft nur 30 bis 40 Schüsse, um die gesamte Flotte zu versenken. YouTube·Vsauce2
-        throw new UnsupportedOperationException("Unimplemented method 'shootCheckerboardAndHunt'");
+        if (availableCells.isEmpty()) {
+            return null;
+        }
+
+        int[] cell = pollNextTargetCell();
+        if (cell == null) {
+            cell = pickParityCell();
+        }
+
+        if (cell == null) {
+            return null;
+        }
+
+        int col = cell[0];
+        int row = cell[1];
+        removeAvailableCell(col, row);
+
+        CellState[][] ownBoard = gameModel.getOwnBoard();
+        int result = 0;
+        if (ownBoard[col][row] == CellState.SHIP) {
+            ownBoard[col][row] = CellState.HIT;
+            result = 1;
+            enqueueTargetCells(col, row);
+            if (checkComputerWin()) {
+                gameModel.setGameOver(true);
+                gameModel.setPlayerWon(false);
+            }
+        } else {
+            ownBoard[col][row] = CellState.MISS;
+        }
+
+        return new int[] { col, row, result };
+    }
+
+    private int[] pollNextTargetCell() {
+        while (!targetQueue.isEmpty()) {
+            int[] next = targetQueue.remove(0);
+            if (isCellAvailable(next[0], next[1])) {
+                return next;
+            }
+        }
+        return null;
+    }
+
+    private int[] pickParityCell() {
+        List<int[]> parityCells = new ArrayList<>();
+        for (int[] cell : availableCells) {
+            if ((cell[0] + cell[1]) % 2 == 0) {
+                parityCells.add(cell);
+            }
+        }
+        if (!parityCells.isEmpty()) {
+            return parityCells.get(random.nextInt(parityCells.size()));
+        }
+        return availableCells.get(random.nextInt(availableCells.size()));
+    }
+
+    private boolean isCellAvailable(int col, int row) {
+        for (int[] cell : availableCells) {
+            if (cell[0] == col && cell[1] == row) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void removeAvailableCell(int col, int row) {
+        for (int i = 0; i < availableCells.size(); i++) {
+            int[] cell = availableCells.get(i);
+            if (cell[0] == col && cell[1] == row) {
+                availableCells.remove(i);
+                return;
+            }
+        }
+    }
+
+    private boolean containsTargetCell(int col, int row) {
+        for (int[] cell : targetQueue) {
+            if (cell[0] == col && cell[1] == row) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void enqueueTargetCells(int col, int row) {
+        int[][] offsets = { { 0, -1 }, { 0, 1 }, { -1, 0 }, { 1, 0 } };
+        for (int[] offset : offsets) {
+            int nextCol = col + offset[0];
+            int nextRow = row + offset[1];
+            if (BoardUtils.isInsideBoard(nextCol, nextRow) && isCellAvailable(nextCol, nextRow)
+                    && !containsTargetCell(nextCol, nextRow)) {
+                targetQueue.add(new int[] { nextCol, nextRow });
+            }
+        }
     }
 
     /**

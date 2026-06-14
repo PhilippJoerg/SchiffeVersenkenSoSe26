@@ -63,4 +63,22 @@ class ShootControllerTest {
         java.util.List<int[]> availableCells = (java.util.List<int[]>) availableCellsField.get(shootController);
         assertTrue(availableCells.size() < BoardUtils.GRID_SIZE * BoardUtils.GRID_SIZE);
     }
+
+    @Test
+    void testShootCheckerboardAndHuntRemovesAvailableCells() throws Exception {
+        CellState[][] ownBoard = BoardUtils.createEmptyCellBoard();
+        ownBoard[0][0] = CellState.SHIP;
+        gameModel = new GameModel(ownBoard, GameDifficulty.MEDIUM);
+        shootController = new ShootController(gameModel);
+
+        int[] shot = shootController.computerShoot();
+        assertEquals(3, shot.length);
+        assertTrue(BoardUtils.isInsideBoard(shot[0], shot[1]));
+
+        Field availableCellsField = ShootController.class.getDeclaredField("availableCells");
+        availableCellsField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        java.util.List<int[]> availableCells = (java.util.List<int[]>) availableCellsField.get(shootController);
+        assertTrue(availableCells.size() < BoardUtils.GRID_SIZE * BoardUtils.GRID_SIZE);
+    }
 }
