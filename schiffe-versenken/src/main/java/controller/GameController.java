@@ -74,7 +74,6 @@ public class GameController {
         int res = chooser.showSaveDialog(null);
         if (res != JFileChooser.APPROVE_OPTION) return;
         File file = chooser.getSelectedFile();
-        // ensure .json extension
         if (!file.getName().toLowerCase().endsWith(".json")) {
             file = new File(file.getParentFile(), file.getName() + ".json");
         }

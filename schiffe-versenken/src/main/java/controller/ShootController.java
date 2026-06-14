@@ -85,7 +85,7 @@ public class ShootController {
 
             case GameDifficulty.HARD:
                 return shootProbabilityDensity();
-        
+
             default:
                 return null;
         }
@@ -122,13 +122,13 @@ public class ShootController {
      */
     private int[] shootProbabilityDensity() {
         // TODO: implement shootProbabilityDensity()
-        // 3. Schwer: Hunt-and-Target mit Parität (Checkerboard Strategy)
-        // Dieser Algorithmus kombiniert ein systematisches Suchmuster mit einer gezielten Verfolgung bei Treffern. 
-        // - Suchphase (Hunt): Das Spielfeld wird wie ein Schachbrett betrachtet. Da das kleinste Schiff meist zwei Felder lang ist, reicht es aus, 
-        //   nur jedes zweite Feld (z.B. nur die dunklen Felder) zu beschießen, um jedes Schiff mindestens einmal zu treffen.
-        // - Angriffsphase (Target): Sobald ein Schiff getroffen wurde, wechselt der Algorithmus in den "Target"-Modus und prüft die vier direkt 
-        //   angrenzenden Felder (oben, unten, links, rechts), um das Schiff vollständig zu versenken.
-        // - Effizienz: Deutlich höher als der Zufall, da die Anzahl der benötigten Schüsse in der Suchphase halbiert wird. 
+        // 3. Schwer: Wahrscheinlichkeitsdichte-Algorithmus (Probability Density Function)
+        // Dies ist die stärkste Strategie, die oft von Computer-KIs genutzt wird. 
+        // - Vorgehensweise: Der Algorithmus berechnet für jedes Feld auf dem Gitter, wie viele Möglichkeiten es gibt, die noch übrigen Schiffe dort zu 
+        //   platzieren.Felder in der Mitte haben anfangs eine höhere Wahrscheinlichkeit, da dort Schiffe in mehr Ausrichtungen (horizontal/vertikal) hinpassen 
+        //   als in den Ecken. Nach jedem Schuss (Treffer oder Fehlschuss) wird die „Heatmap“ neu berechnet. Ein Fehlschuss senkt die Wahrscheinlichkeit der 
+        //   umliegenden Felder drastisch, während ein Treffer sie massiv erhöht. 
+        // - Effizienz: Extrem hoch. Erfahrene Algorithmen benötigen oft nur 30 bis 40 Schüsse, um die gesamte Flotte zu versenken.
         throw new UnsupportedOperationException("Unimplemented method 'shootProbabilityDensity'");
     }
 
@@ -160,6 +160,9 @@ public class ShootController {
             ownBoard[col][row] = CellState.HIT;
             result = 1;
             enqueueTargetCells(col, row);
+            if (isShipSunk(col, row)) {
+                cleanupTargetQueueForSunkShip(col, row);
+            }
             if (isBoardSunk(ownBoard)) {
                 gameModel.setGameOver(true);
                 gameModel.setPlayerWon(false);
@@ -172,6 +175,21 @@ public class ShootController {
     }
 
     private int[] pollNextTargetCell() {
+        List<List<int[]>> clusters = getActiveHitClusters();
+        clusters.sort((a, b) -> Integer.compare(b.size(), a.size()));
+        for (List<int[]> cluster : clusters) {
+            Orientation ori = inferOrientation(cluster);
+            List<int[]> candidates = getClusterCandidates(cluster, ori);
+            for (int[] cand : candidates) {
+                int c = cand[0];
+                int r = cand[1];
+                if (BoardUtils.isInsideBoard(c, r) && isCellAvailable(c, r)) {
+                    removeTargetQueueCell(c, r);
+                    return new int[] { c, r };
+                }
+            }
+        }
+
         while (!targetQueue.isEmpty()) {
             int[] next = targetQueue.remove(0);
             if (isCellAvailable(next[0], next[1])) {
@@ -179,6 +197,106 @@ public class ShootController {
             }
         }
         return null;
+    }
+
+    private enum Orientation {
+        HORIZONTAL, VERTICAL, UNKNOWN
+    }
+
+    private List<List<int[]>> getActiveHitClusters() {
+        List<List<int[]>> clusters = new ArrayList<>();
+        CellState[][] ownBoard = gameModel.getOwnBoard();
+        boolean[][] visited = new boolean[BoardUtils.GRID_SIZE][BoardUtils.GRID_SIZE];
+        for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {
+            for (int row = 0; row < BoardUtils.GRID_SIZE; row++) {
+                if (!visited[col][row] && ownBoard[col][row] == CellState.HIT) {
+                    List<int[]> cluster = new ArrayList<>();
+                    List<int[]> stack = new ArrayList<>();
+                    stack.add(new int[] { col, row });
+                    visited[col][row] = true;
+                    while (!stack.isEmpty()) {
+                        int[] cur = stack.remove(stack.size() - 1);
+                        cluster.add(cur);
+                        int cx = cur[0];
+                        int cy = cur[1];
+                        int[][] nbrs = { { cx - 1, cy }, { cx + 1, cy }, { cx, cy - 1 }, { cx, cy + 1 } };
+                        for (int[] n : nbrs) {
+                            int nx = n[0];
+                            int ny = n[1];
+                            if (BoardUtils.isInsideBoard(nx, ny) && !visited[nx][ny]
+                                    && ownBoard[nx][ny] == CellState.HIT) {
+                                visited[nx][ny] = true;
+                                stack.add(new int[] { nx, ny });
+                            }
+                        }
+                    }
+                    clusters.add(cluster);
+                }
+            }
+        }
+        return clusters;
+    }
+
+    private Orientation inferOrientation(List<int[]> cluster) {
+        if (cluster.size() < 2) {
+            return Orientation.UNKNOWN;
+        }
+        boolean sameRow = true;
+        boolean sameCol = true;
+        int firstCol = cluster.get(0)[0];
+        int firstRow = cluster.get(0)[1];
+        for (int[] c : cluster) {
+            if (c[1] != firstRow) {
+                sameRow = false;
+            }
+            if (c[0] != firstCol) {
+                sameCol = false;
+            }
+        }
+        if (sameRow) {
+            return Orientation.HORIZONTAL;
+        }
+        if (sameCol) {
+            return Orientation.VERTICAL;
+        }
+        return Orientation.UNKNOWN;
+    }
+
+    private List<int[]> getClusterCandidates(List<int[]> cluster, Orientation ori) {
+        List<int[]> candidates = new ArrayList<>();
+        if (cluster.isEmpty()) {
+            return candidates;
+        }
+        if (ori == Orientation.HORIZONTAL) {
+            int row = cluster.get(0)[1];
+            int minCol = Integer.MAX_VALUE;
+            int maxCol = Integer.MIN_VALUE;
+            for (int[] c : cluster) {
+                minCol = Math.min(minCol, c[0]);
+                maxCol = Math.max(maxCol, c[0]);
+            }
+            candidates.add(new int[] { minCol - 1, row });
+            candidates.add(new int[] { maxCol + 1, row });
+            return candidates;
+        } else if (ori == Orientation.VERTICAL) {
+            int col = cluster.get(0)[0];
+            int minRow = Integer.MAX_VALUE;
+            int maxRow = Integer.MIN_VALUE;
+            for (int[] c : cluster) {
+                minRow = Math.min(minRow, c[1]);
+                maxRow = Math.max(maxRow, c[1]);
+            }
+            candidates.add(new int[] { col, minRow - 1 });
+            candidates.add(new int[] { col, maxRow + 1 });
+            return candidates;
+        }
+        int col = cluster.get(0)[0];
+        int row = cluster.get(0)[1];
+        int[][] offsets = { { 0, -1 }, { 0, 1 }, { -1, 0 }, { 1, 0 } };
+        for (int[] off : offsets) {
+            candidates.add(new int[] { col + off[0], row + off[1] });
+        }
+        return candidates;
     }
 
     private int[] pickParityCell() {
@@ -234,12 +352,95 @@ public class ShootController {
         }
     }
 
+    private void cleanupTargetQueueForSunkShip(int col, int row) {
+        for (int[] shipCell : getShipCells(col, row)) {
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    int nextCol = shipCell[0] + dx;
+                    int nextRow = shipCell[1] + dy;
+                    if (!BoardUtils.isInsideBoard(nextCol, nextRow)) {
+                        continue;
+                    }
+                    removeAvailableCell(nextCol, nextRow);
+                    removeTargetQueueCell(nextCol, nextRow);
+                }
+            }
+        }
+    }
+
+    private void removeTargetQueueCell(int col, int row) {
+        for (int i = targetQueue.size() - 1; i >= 0; i--) {
+            int[] cell = targetQueue.get(i);
+            if (cell[0] == col && cell[1] == row) {
+                targetQueue.remove(i);
+            }
+        }
+    }
+
+    private boolean isShipSunk(int col, int row) {
+        List<int[]> shipCells = getShipCells(col, row);
+        if (shipCells.isEmpty()) {
+            return false;
+        }
+        CellState[][] ownBoard = gameModel.getOwnBoard();
+        for (int[] cell : shipCells) {
+            if (ownBoard[cell[0]][cell[1]] == CellState.SHIP) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private List<int[]> getShipCells(int col, int row) {
+        List<int[]> shipCells = new ArrayList<>();
+        CellState[][] ownBoard = gameModel.getOwnBoard();
+        if (!BoardUtils.isInsideBoard(col, row)) {
+            return shipCells;
+        }
+        CellState startState = ownBoard[col][row];
+        if (startState != CellState.HIT && startState != CellState.SHIP) {
+            return shipCells;
+        }
+
+        int left = col;
+        while (left - 1 >= 0 && isShipSegment(ownBoard[left - 1][row])) {
+            left--;
+        }
+        int right = col;
+        while (right + 1 < BoardUtils.GRID_SIZE && isShipSegment(ownBoard[right + 1][row])) {
+            right++;
+        }
+        if (right > left) {
+            for (int current = left; current <= right; current++) {
+                shipCells.add(new int[] { current, row });
+            }
+            return shipCells;
+        }
+
+        int up = row;
+        while (up - 1 >= 0 && isShipSegment(ownBoard[col][up - 1])) {
+            up--;
+        }
+        int down = row;
+        while (down + 1 < BoardUtils.GRID_SIZE && isShipSegment(ownBoard[col][down + 1])) {
+            down++;
+        }
+        for (int current = up; current <= down; current++) {
+            shipCells.add(new int[] { col, current });
+        }
+        return shipCells;
+    }
+
+    private boolean isShipSegment(CellState state) {
+        return state == CellState.HIT || state == CellState.SHIP;
+    }
+
     /**
      * Führt einen zufälligen Schuss des Computers aus und markiert das Ergebnis.
      */
     private int[] shootRandom() {
         if (availableCells.isEmpty()) {
-            return null; 
+            return null;
         }
 
         Random random = new Random();

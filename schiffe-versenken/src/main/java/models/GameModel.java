@@ -122,7 +122,6 @@ public class GameModel {
      */
     public void restoreFrom(GameModel other) {
         if (other == null) return;
-        // copy board contents
         CellState[][] otherOwn = other.getOwnBoard();
         CellState[][] otherEnemy = other.getEnemyBoard();
         for (int c = 0; c < BoardUtils.GRID_SIZE; c++) {
