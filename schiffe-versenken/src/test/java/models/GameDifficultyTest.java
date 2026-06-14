@@ -10,7 +10,8 @@ class GameDifficultyTest {
     void testGetDisplayNameAndToString() {
         assertEquals("Einfach", GameDifficulty.EASY.getDisplayName());
         assertEquals("Einfach", GameDifficulty.EASY.toString());
-        assertEquals("Mittel (not implemented)", GameDifficulty.MEDIUM.getDisplayName());
+        assertEquals("Mittel", GameDifficulty.MEDIUM.getDisplayName());
+        assertEquals("Mittel", GameDifficulty.MEDIUM.toString());
         assertEquals("Schwer (not implemented)", GameDifficulty.HARD.getDisplayName());
     }
 
