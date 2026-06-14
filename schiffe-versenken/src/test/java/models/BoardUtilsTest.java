@@ -54,6 +54,7 @@ class BoardUtilsTest {
     void testPlaceRandomShipsFillsShipsWithoutError() {
         CellState[][] board = BoardUtils.createEmptyCellBoard();
         BoardUtils.placeRandomShips(board);
+
         int shipCount = 0;
         for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {
             for (int row = 0; row < BoardUtils.GRID_SIZE; row++) {
@@ -62,7 +63,13 @@ class BoardUtilsTest {
                 }
             }
         }
-        assertTrue(shipCount > 0);
+
+        int expectedShipCount = ShipType.BATTLESHIP.getAmount() * ShipType.BATTLESHIP.getSize()
+                + ShipType.CRUISER.getAmount() * ShipType.CRUISER.getSize()
+                + ShipType.DESTROYER.getAmount() * ShipType.DESTROYER.getSize()
+                + ShipType.SUBMARINE.getAmount() * ShipType.SUBMARINE.getSize();
+
+        assertEquals(expectedShipCount, shipCount);
     }
 
     @Test

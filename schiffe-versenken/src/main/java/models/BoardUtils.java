@@ -8,6 +8,8 @@ import java.util.Random;
 
 public class BoardUtils {
     public static final int GRID_SIZE = 10;
+    public static final int MAX_PLACEMENT_ATTEMPTS_PER_SHIP = 100;
+    public static final int MAX_BOARD_RESTARTS = 100;
 
     /**
      * Erzeugt ein leeres 10x10-Spielfeld mit dem Zustand EMPTY.
@@ -20,6 +22,17 @@ public class BoardUtils {
             }
         }
         return board;
+    }
+
+    /**
+     * Setzt ein Board auf den Zustand EMPTY zurück.
+     */
+    public static void clearBoard(CellState[][] board) {
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
+                board[col][row] = CellState.EMPTY;
+            }
+        }
     }
 
     /**
@@ -68,27 +81,48 @@ public class BoardUtils {
 
     public static void placeRandomShips(CellState[][] board) {
         Random random = new Random();
-        // Alle Schiffstypen (z. B. U-Boot, Kreuzer, ...) der Reihe nach durchgehen
-        for (ShipType shipType : ShipType.values()) {
-            // Jeden Typ so oft platzieren, wie es die Spielregeln vorgeben (z. B. 2× Zerstörer)
-            for (int i = 0; i < shipType.getAmount(); i++) {
-                boolean placed = false;
-                // Solange würfeln, bis eine regelkonforme Position gefunden wurde
-                while (!placed) {
-                    int col = random.nextInt(GRID_SIZE);
-                    int row = random.nextInt(GRID_SIZE);
-                    // Zufällig horizontal oder vertikal ausrichten
-                    ShipOrientation orientation = random.nextBoolean()
-                            ? ShipOrientation.HORIZONTAL
-                            : ShipOrientation.VERTICAL;
-                    // Prüfen ob das Schiff an dieser Stelle passt (kein Rand-Überschreitung, kein Überlappen)
-                    if (canPlaceShip(board, shipType, col, row, orientation)) {
-                        placeShip(board, shipType, col, row, orientation);
-                        placed = true; // Schleife beenden, nächstes Schiff platzieren
+        int restartCount = 0;
+
+        while (restartCount < MAX_BOARD_RESTARTS) {
+            clearBoard(board);
+            boolean success = true;
+
+            for (ShipType shipType : ShipType.values()) {
+                for (int i = 0; i < shipType.getAmount(); i++) {
+                    boolean placed = false;
+                    int attemptCount = 0;
+
+                    while (!placed && attemptCount < MAX_PLACEMENT_ATTEMPTS_PER_SHIP) {
+                        int col = random.nextInt(GRID_SIZE);
+                        int row = random.nextInt(GRID_SIZE);
+                        ShipOrientation orientation = random.nextBoolean()
+                                ? ShipOrientation.HORIZONTAL
+                                : ShipOrientation.VERTICAL;
+
+                        if (canPlaceShip(board, shipType, col, row, orientation)) {
+                            placeShip(board, shipType, col, row, orientation);
+                            placed = true;
+                        }
+                        attemptCount++;
+                    }
+
+                    if (!placed) {
+                        success = false;
+                        break;
                     }
                 }
+                if (!success) {
+                    break;
+                }
             }
+
+            if (success) {
+                return;
+            }
+            restartCount++;
         }
+
+        throw new IllegalStateException("Unable to place all ships after " + MAX_BOARD_RESTARTS + " restarts");
     }
 
     /**
