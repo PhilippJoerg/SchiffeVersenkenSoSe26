@@ -6,7 +6,7 @@ package models;
 
 public enum GameDifficulty {
     EASY("Einfach"),
-    MEDIUM("Mittel (not implemented)"),
+    MEDIUM("Mittel"),
     HARD("Schwer (not implemented)");
 
     private final String displayName;
