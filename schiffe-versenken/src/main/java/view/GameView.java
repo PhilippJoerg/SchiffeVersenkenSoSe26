@@ -14,4 +14,6 @@ public interface GameView {
     void setShootButtonEnabled(boolean enabled);
     void setRotateButtonEnabled(boolean enabled);
     void setAutoPlaceButtonEnabled(boolean enabled);
+    void setSaveAction(Runnable action);
+    void setLoadAction(Runnable action);
 } 

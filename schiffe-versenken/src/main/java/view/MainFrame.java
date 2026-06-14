@@ -23,6 +23,9 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -93,6 +96,8 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
 
     // Button zum Schießen auf das Gegnerfeld
     private final JButton shootButton;
+    private JMenuItem saveMenuItem;
+    private JMenuItem loadMenuItem;
 
     public MainFrame() {
         super("Schiffe versenken");
@@ -153,6 +158,18 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
 
         // Anwendung startet mit dem Startscreen
         showStartScreen();
+        setJMenuBar(createMenuBar());
+    }
+
+    private JMenuBar createMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu file = new JMenu("Datei");
+        saveMenuItem = new JMenuItem("Speichern...");
+        loadMenuItem = new JMenuItem("Laden...");
+        file.add(saveMenuItem);
+        file.add(loadMenuItem);
+        menuBar.add(file);
+        return menuBar;
     }
 
     /*
@@ -392,6 +409,20 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
     // Setzt die Aktion für den Schießen-Button
     public void setShootAction(Runnable action) {
         shootButton.addActionListener(e -> action.run());
+    }
+
+    // Bindet die Save-Action (aus dem Controller)
+    public void setSaveAction(Runnable action) {
+        if (saveMenuItem != null) {
+            saveMenuItem.addActionListener(e -> action.run());
+        }
+    }
+
+    // Bindet die Load-Action (aus dem Controller)
+    public void setLoadAction(Runnable action) {
+        if (loadMenuItem != null) {
+            loadMenuItem.addActionListener(e -> action.run());
+        }
     }
 
     // Aktiviert oder deaktiviert den Drehen-Button

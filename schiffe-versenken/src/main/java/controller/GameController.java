@@ -4,8 +4,13 @@ package controller;
  * Datei: controller/GameController.java
  * Steuert den Spielablauf: Verarbeitung von Schüssen, Computergegner-Loop und Netzwerkinteraktion.
  */
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
+import java.io.File;
+import java.io.IOException;
+
+import models.SaveLoad;
 
 import models.CellState;
 import models.GameModel;
@@ -55,6 +60,49 @@ public class GameController {
         frame.setShootButtonEnabled(false); // not needed, since clicking on board
         frame.setRotateButtonEnabled(false); // disable rotate during game
         frame.setAutoPlaceButtonEnabled(false); // disable auto-placement during game
+
+        try {
+            frame.setSaveAction(this::handleSave);
+            frame.setLoadAction(this::handleLoad);
+        } catch (Exception e) {
+            // ignore if view doesn't support save/load
+        }
+    }
+
+    private void handleSave() {
+        JFileChooser chooser = new JFileChooser();
+        int res = chooser.showSaveDialog(null);
+        if (res != JFileChooser.APPROVE_OPTION) return;
+        File file = chooser.getSelectedFile();
+        // ensure .json extension
+        if (!file.getName().toLowerCase().endsWith(".json")) {
+            file = new File(file.getParentFile(), file.getName() + ".json");
+        }
+        try {
+            SaveLoad.saveGame(file, model);
+            JOptionPane.showMessageDialog(null, "Spiel gespeichert: " + file.getName(), "Speichern",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Fehler beim Speichern: " + e.getMessage(), "Fehler",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void handleLoad() {
+        JFileChooser chooser = new JFileChooser();
+        int res = chooser.showOpenDialog(null);
+        if (res != JFileChooser.APPROVE_OPTION) return;
+        File file = chooser.getSelectedFile();
+        try {
+            GameModel loaded = SaveLoad.loadGame(file);
+            model.restoreFrom(loaded);
+            frame.setOwnBoard(model.getOwnBoard());
+            frame.setEnemyBoard(model.getEnemyBoard());
+            frame.setStatus("Spiel geladen: " + file.getName());
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Fehler beim Laden: " + e.getMessage(), "Fehler",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**

@@ -28,6 +28,19 @@ public class GameModel {
     }
 
     /**
+     * Konstruktor zum Wiederherstellen eines gespeicherten Spielzustands.
+     */
+    public GameModel(CellState[][] ownBoard, CellState[][] enemyBoard, GameDifficulty difficulty,
+            boolean gameOver, boolean playerWon) {
+        this.ownBoard = ownBoard;
+        this.enemyBoard = enemyBoard;
+        this.difficulty = difficulty;
+        this.gameOver = gameOver;
+        this.playerWon = playerWon;
+        this.shootController = new ShootController(this);
+    }
+
+    /**
      * Platziert die Schiffe des Gegners zufällig auf dem gegnerischen Board.
      */
     private void placeEnemyShips() {
@@ -102,5 +115,25 @@ public class GameModel {
      */
     public boolean didPlayerWin() {
         return playerWon;
+    }
+
+    /**
+     * Überschreibt den aktuellen Spielzustand mit einem geladenen Modell.
+     */
+    public void restoreFrom(GameModel other) {
+        if (other == null) return;
+        // copy board contents
+        CellState[][] otherOwn = other.getOwnBoard();
+        CellState[][] otherEnemy = other.getEnemyBoard();
+        for (int c = 0; c < BoardUtils.GRID_SIZE; c++) {
+            for (int r = 0; r < BoardUtils.GRID_SIZE; r++) {
+                this.ownBoard[c][r] = otherOwn[c][r];
+                this.enemyBoard[c][r] = otherEnemy[c][r];
+            }
+        }
+        this.difficulty = other.getDifficulty();
+        this.gameOver = other.isGameOver();
+        this.playerWon = other.didPlayerWin();
+        this.shootController = new controller.ShootController(this);
     }
 }

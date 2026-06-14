@@ -58,6 +58,14 @@ class GameControllerTest {
         @Override
         public void setAutoPlaceButtonEnabled(boolean enabled) {
         }
+
+        @Override
+        public void setSaveAction(Runnable action) {
+        }
+
+        @Override
+        public void setLoadAction(Runnable action) {
+        }
     }
 
     static class TestCom extends Com {
