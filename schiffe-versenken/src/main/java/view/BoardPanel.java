@@ -46,21 +46,23 @@ public class BoardPanel extends JPanel {
     private final boolean enemyBoard;
 
     // Zustand aller Felder: cells[col][row]
-    private final CellState[][] cells;
+    private CellState[][] cells;
+    private int gridSize;
 
     // Reaktion auf Klicks ins Spielfeld
     private BoardClickListener clickListener;
 
     public BoardPanel(boolean enemyBoard) {
         this.enemyBoard = enemyBoard;
-        this.cells = createEmptyBoard();
+        this.gridSize = GRID_SIZE;
+        this.cells = createEmptyBoard(gridSize);
 
         setOpaque(false);
 
         // Kleinste erlaubte Panelgröße
         setMinimumSize(new Dimension(
-                LABEL_SPACE + GRID_SIZE * MIN_CELL_SIZE + 1,
-                LABEL_SPACE + GRID_SIZE * MIN_CELL_SIZE + 1
+                LABEL_SPACE + gridSize * MIN_CELL_SIZE + 1,
+                LABEL_SPACE + gridSize * MIN_CELL_SIZE + 1
         ));
 
         // Startgröße für das Layout
@@ -95,10 +97,24 @@ public class BoardPanel extends JPanel {
     public void setCells(CellState[][] newCells) {
         validateBoard(newCells);
 
-        for (int row = 0; row < GRID_SIZE; row++) {
-            System.arraycopy(newCells[row], 0, cells[row], 0, GRID_SIZE);
+        this.gridSize = newCells.length;
+        this.cells = createEmptyBoard(gridSize);
+
+        for (int col = 0; col < gridSize; col++) {
+            System.arraycopy(newCells[col], 0, cells[col], 0, gridSize);
         }
 
+        setMinimumSize(new Dimension(
+                LABEL_SPACE + gridSize * MIN_CELL_SIZE + 1,
+                LABEL_SPACE + gridSize * MIN_CELL_SIZE + 1
+        ));
+
+        setPreferredSize(new Dimension(
+                LABEL_SPACE + gridSize * CELL_SIZE + 1,
+                LABEL_SPACE + gridSize * CELL_SIZE + 1
+        ));
+
+        revalidate();
         repaint();
     }
 
@@ -135,7 +151,7 @@ public class BoardPanel extends JPanel {
         FontMetrics fm = g2.getFontMetrics();
         g2.setColor(Color.WHITE);
 
-        for (int col = 0; col < GRID_SIZE; col++) {
+        for (int col = 0; col < gridSize; col++) {
             String label = String.valueOf((char) ('A' + col));
 
             int x = geometry.startX + col * geometry.cellSize
@@ -145,7 +161,7 @@ public class BoardPanel extends JPanel {
             g2.drawString(label, x, y);
         }
 
-        for (int row = 0; row < GRID_SIZE; row++) {
+        for (int row = 0; row < gridSize; row++) {
             String label = String.valueOf(row + 1);
 
             int x = geometry.startX - 8 - fm.stringWidth(label);
@@ -158,8 +174,8 @@ public class BoardPanel extends JPanel {
 
     // Zeichnet alle Zellen inklusive Inhalt
     private void drawCells(Graphics2D g2, BoardGeometry geometry) {
-        for (int row = 0; row < GRID_SIZE; row++) {
-            for (int col = 0; col < GRID_SIZE; col++) {
+        for (int row = 0; row < gridSize; row++) {
+            for (int col = 0; col < gridSize; col++) {
                 CellState state = cells[col][row];
 
                 int x = geometry.startX + col * geometry.cellSize;
@@ -199,7 +215,7 @@ public class BoardPanel extends JPanel {
 
             case EMPTY:
             default:
-                
+
                 break;
         }
     }
@@ -233,7 +249,7 @@ public class BoardPanel extends JPanel {
     private void drawGrid(Graphics2D g2, BoardGeometry geometry) {
         g2.setColor(GRID_COLOR);
 
-        for (int i = 0; i <= GRID_SIZE; i++) {
+        for (int i = 0; i <= gridSize; i++) {
             int x = geometry.startX + i * geometry.cellSize;
             int y = geometry.startY + i * geometry.cellSize;
 
@@ -272,7 +288,7 @@ public class BoardPanel extends JPanel {
         int col = x / geometry.cellSize;
         int row = y / geometry.cellSize;
 
-        if (col >= GRID_SIZE || row >= GRID_SIZE) {
+        if (col >= gridSize || row >= gridSize) {
             return null;
         }
 
@@ -287,10 +303,10 @@ public class BoardPanel extends JPanel {
         int availableWidth = Math.max(1, getWidth() - LABEL_SPACE - 1);
         int availableHeight = Math.max(1, getHeight() - LABEL_SPACE - 1);
 
-        int dynamicCellSize = Math.min(availableWidth, availableHeight) / GRID_SIZE;
+        int dynamicCellSize = Math.min(availableWidth, availableHeight) / gridSize;
         int cellSize = Math.max(MIN_CELL_SIZE, Math.min(MAX_CELL_SIZE, dynamicCellSize));
 
-        int boardSize = GRID_SIZE * cellSize;
+        int boardSize = gridSize * cellSize;
 
         int startX = LABEL_SPACE + Math.max(0, (getWidth() - LABEL_SPACE - boardSize) / 2);
         int startY = LABEL_SPACE + Math.max(0, (getHeight() - LABEL_SPACE - boardSize) / 2);
@@ -299,11 +315,11 @@ public class BoardPanel extends JPanel {
     }
 
     // Erstellt ein leeres Board
-    private CellState[][] createEmptyBoard() {
-        CellState[][] board = new CellState[GRID_SIZE][GRID_SIZE];
+    private CellState[][] createEmptyBoard(int size) {
+        CellState[][] board = new CellState[size][size];
 
-        for (int row = 0; row < GRID_SIZE; row++) {
-            for (int col = 0; col < GRID_SIZE; col++) {
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
                 board[col][row] = CellState.EMPTY;
             }
         }
@@ -311,21 +327,23 @@ public class BoardPanel extends JPanel {
         return board;
     }
 
-    // Prüft, ob das Board 10x10 groß ist
     private void validateBoard(CellState[][] board) {
-        if (board == null || board.length != GRID_SIZE) {
-            throw new IllegalArgumentException("Board must have 10 rows.");
+        if (board == null || board.length == 0) {
+            throw new IllegalArgumentException("Board must not be null or empty.");
         }
 
-        for (CellState[] row : board) {
-            if (row == null || row.length != GRID_SIZE) {
-                throw new IllegalArgumentException("Each board row must have 10 columns.");
+        int size = board.length;
+
+        for (CellState[] column : board) {
+            if (column == null || column.length != size) {
+                throw new IllegalArgumentException("Board must be square.");
             }
         }
     }
 
     // Bündelt die berechneten Zeichenwerte des Boards
     private static final class BoardGeometry {
+
         private final int startX;
         private final int startY;
         private final int cellSize;

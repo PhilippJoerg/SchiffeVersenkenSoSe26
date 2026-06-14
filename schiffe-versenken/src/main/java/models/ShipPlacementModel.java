@@ -14,8 +14,9 @@ public class ShipPlacementModel {
     private final EnumMap<ShipType, Integer> remainingShips;
     private ShipOrientation currentOrientation;
 
-    public ShipPlacementModel() {
-        ownBoard = BoardUtils.createEmptyCellBoard();
+    public ShipPlacementModel(GameSettings settings) {
+        this.settings = settings;
+        ownBoard = BoardUtils.createEmptyCellBoard(settings.getBoardSize());
         remainingShips = createRemainingShips();
         currentOrientation = ShipOrientation.HORIZONTAL;
     }
@@ -42,7 +43,8 @@ public class ShipPlacementModel {
     }
 
     /**
-     * Dreht das aktuell zu platzierende Schiff zwischen horizontal und vertikal.
+     * Dreht das aktuell zu platzierende Schiff zwischen horizontal und
+     * vertikal.
      */
     public void rotateCurrentShip() {
         currentOrientation = currentOrientation == ShipOrientation.HORIZONTAL
@@ -90,7 +92,7 @@ public class ShipPlacementModel {
      */
     public void autoPlaceShips() {
         resetBoard();
-        BoardUtils.placeRandomShips(ownBoard);
+        BoardUtils.placeRandomShips(ownBoard, settings.getShipCounts());
         for (ShipType shipType : ShipType.values()) {
             remainingShips.put(shipType, 0);
         }
@@ -152,16 +154,13 @@ public class ShipPlacementModel {
     }
 
     /**
-     * Setzt das eigene Board und die verbleibenden Schiffe auf den Ausgangszustand zurück.
+     * Setzt das eigene Board und die verbleibenden Schiffe auf den
+     * Ausgangszustand zurück.
      */
     private void resetBoard() {
-        for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {
-            for (int row = 0; row < BoardUtils.GRID_SIZE; row++) {
-                ownBoard[col][row] = CellState.EMPTY;
-            }
-        }
+        BoardUtils.clearBoard(ownBoard);
         for (ShipType type : ShipType.values()) {
-            remainingShips.put(type, type.getAmount());
+            remainingShips.put(type, settings.getShipCount(type));
         }
     }
 
@@ -171,8 +170,8 @@ public class ShipPlacementModel {
     private EnumMap<ShipType, Integer> createRemainingShips() {
         EnumMap<ShipType, Integer> result = new EnumMap<>(ShipType.class);
         for (ShipType type : ShipType.values()) {
-            result.put(type, type.getAmount());
+            result.put(type, settings.getShipCount(type));
         }
         return result;
     }
-} 
+}

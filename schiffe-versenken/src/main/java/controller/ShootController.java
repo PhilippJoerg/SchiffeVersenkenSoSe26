@@ -14,6 +14,7 @@ import models.GameDifficulty;
 import models.GameModel;
 
 public class ShootController {
+
     private final GameModel gameModel;
     private final Random random;
     private List<int[]> availableCells;
@@ -29,20 +30,22 @@ public class ShootController {
     }
 
     private void initAvailableCells() {
-        availableCells = new ArrayList<>();
-        for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {
-            for (int row = 0; row < BoardUtils.GRID_SIZE; row++) {
-                availableCells.add(new int[] { col, row });
+        int boardSize = gameModel.getOwnBoard().length;
+
+        for (int col = 0; col < boardSize; col++) {
+            for (int row = 0; row < boardSize; row++) {
+                availableCells.add(new int[]{col, row});
             }
         }
     }
 
     /**
-     * Wertet einen Schuss auf das gegnerische Board aus und markiert Treffer oder Fehlschuss.
+     * Wertet einen Schuss auf das gegnerische Board aus und markiert Treffer
+     * oder Fehlschuss.
      */
     public boolean shoot(int col, int row) {
         CellState[][] enemyBoard = gameModel.getEnemyBoard();
-        if (gameModel.isGameOver() || !BoardUtils.isInsideBoard(col, row)
+        if (gameModel.isGameOver() || !BoardUtils.isInsideBoard(enemyBoard, col, row)
                 || (enemyBoard[col][row] == CellState.HIT || enemyBoard[col][row] == CellState.MISS)) {
             return false;
         }
@@ -62,8 +65,10 @@ public class ShootController {
      * Überprüft, ob auf dem angegebenen Board noch Schiffe vorhanden sind.
      */
     private boolean isBoardSunk(CellState[][] board) {
-        for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {
-            for (int row = 0; row < BoardUtils.GRID_SIZE; row++) {
+        int boardSize = board.length;
+
+        for (int col = 0; col < boardSize; col++) {
+            for (int row = 0; row < boardSize; row++) {
                 if (board[col][row] == CellState.SHIP) {
                     return false;
                 }
@@ -73,7 +78,8 @@ public class ShootController {
     }
 
     /**
-     * Bestimmt den nächsten Schuss des Computers abhängig von der Schwierigkeit.
+     * Bestimmt den nächsten Schuss des Computers abhängig von der
+     * Schwierigkeit.
      */
     public int[] computerShoot() {
         switch (difficulty) {
@@ -92,11 +98,12 @@ public class ShootController {
     }
 
     /**
-     * Wertet einen eingehenden Schuss vom Netzwerkgegner aus und liefert das Ergebnis zurück.
-     * 0 = Wasser, 1 = Treffer, 2 = Versenkt
+     * Wertet einen eingehenden Schuss vom Netzwerkgegner aus und liefert das
+     * Ergebnis zurück. 0 = Wasser, 1 = Treffer, 2 = Versenkt
      */
     public int evaluateIncomingShot(int col, int row) {
-        if (gameModel.isGameOver() || !BoardUtils.isInsideBoard(col, row)) {
+        CellState[][] enemyBoard = gameModel.getEnemyBoard();
+        if (gameModel.isGameOver() || !BoardUtils.isInsideBoard(enemyBoard, col, row)) {
             return 0;
         }
 
@@ -118,7 +125,8 @@ public class ShootController {
     }
 
     /**
-     * Platzhalter für eine schwere KI-Strategie auf Basis von Wahrscheinlichkeitsdichte.
+     * Platzhalter für eine schwere KI-Strategie auf Basis von
+     * Wahrscheinlichkeitsdichte.
      */
     private int[] shootProbabilityDensity() {
         // TODO: implement shootProbabilityDensity()
@@ -133,8 +141,9 @@ public class ShootController {
     }
 
     /**
-     * Platzhalter für eine mittlere KI-Strategie mit Schachbrett- und Jagd-Modus.
-     * TODO: add a sunk ship tracking to avoid shooting around already sunk ships
+     * Platzhalter für eine mittlere KI-Strategie mit Schachbrett- und
+     * Jagd-Modus. TODO: add a sunk ship tracking to avoid shooting around
+     * already sunk ships
      */
     private int[] shootCheckerboardAndHunt() {
         if (availableCells.isEmpty()) {
@@ -172,7 +181,7 @@ public class ShootController {
             ownBoard[col][row] = CellState.MISS;
         }
 
-        return new int[] { col, row, result };
+        return new int[]{col, row, result};
     }
 
     private int[] pollNextTargetCell() {
@@ -184,9 +193,9 @@ public class ShootController {
             for (int[] cand : candidates) {
                 int c = cand[0];
                 int r = cand[1];
-                if (BoardUtils.isInsideBoard(c, r) && isCellAvailable(c, r)) {
+                if (BoardUtils.isInsideBoard(gameModel.getOwnBoard(), c, r) && isCellAvailable(c, r)) {
                     removeTargetQueueCell(c, r);
-                    return new int[] { c, r };
+                    return new int[]{c, r};
                 }
             }
         }
@@ -207,27 +216,28 @@ public class ShootController {
     private List<List<int[]>> getActiveHitClusters() {
         List<List<int[]>> clusters = new ArrayList<>();
         CellState[][] ownBoard = gameModel.getOwnBoard();
-        boolean[][] visited = new boolean[BoardUtils.GRID_SIZE][BoardUtils.GRID_SIZE];
-        for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {
-            for (int row = 0; row < BoardUtils.GRID_SIZE; row++) {
+        int boardSize = ownBoard.length;
+        boolean[][] visited = new boolean[boardSize][boardSize];
+
+        for (int col = 0; col < boardSize; col++) {
+            for (int row = 0; row < boardSize; row++) {
                 if (!visited[col][row] && ownBoard[col][row] == CellState.HIT) {
                     List<int[]> cluster = new ArrayList<>();
                     List<int[]> stack = new ArrayList<>();
-                    stack.add(new int[] { col, row });
+                    stack.add(new int[]{col, row});
                     visited[col][row] = true;
                     while (!stack.isEmpty()) {
                         int[] cur = stack.remove(stack.size() - 1);
                         cluster.add(cur);
                         int cx = cur[0];
                         int cy = cur[1];
-                        int[][] nbrs = { { cx - 1, cy }, { cx + 1, cy }, { cx, cy - 1 }, { cx, cy + 1 } };
+                        int[][] nbrs = {{cx - 1, cy}, {cx + 1, cy}, {cx, cy - 1}, {cx, cy + 1}};
                         for (int[] n : nbrs) {
                             int nx = n[0];
                             int ny = n[1];
-                            if (BoardUtils.isInsideBoard(nx, ny) && !visited[nx][ny]
-                                    && ownBoard[nx][ny] == CellState.HIT) {
+                            if (BoardUtils.isInsideBoard(ownBoard, nx, ny) && !visited[nx][ny] && ownBoard[nx][ny] == CellState.HIT) {
                                 visited[nx][ny] = true;
-                                stack.add(new int[] { nx, ny });
+                                stack.add(new int[]{nx, ny});
                             }
                         }
                     }
@@ -276,8 +286,8 @@ public class ShootController {
                 minCol = Math.min(minCol, c[0]);
                 maxCol = Math.max(maxCol, c[0]);
             }
-            candidates.add(new int[] { minCol - 1, row });
-            candidates.add(new int[] { maxCol + 1, row });
+            candidates.add(new int[]{minCol - 1, row});
+            candidates.add(new int[]{maxCol + 1, row});
             return candidates;
         } else if (ori == Orientation.VERTICAL) {
             int col = cluster.get(0)[0];
@@ -287,15 +297,15 @@ public class ShootController {
                 minRow = Math.min(minRow, c[1]);
                 maxRow = Math.max(maxRow, c[1]);
             }
-            candidates.add(new int[] { col, minRow - 1 });
-            candidates.add(new int[] { col, maxRow + 1 });
+            candidates.add(new int[]{col, minRow - 1});
+            candidates.add(new int[]{col, maxRow + 1});
             return candidates;
         }
         int col = cluster.get(0)[0];
         int row = cluster.get(0)[1];
-        int[][] offsets = { { 0, -1 }, { 0, 1 }, { -1, 0 }, { 1, 0 } };
+        int[][] offsets = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
         for (int[] off : offsets) {
-            candidates.add(new int[] { col + off[0], row + off[1] });
+            candidates.add(new int[]{col + off[0], row + off[1]});
         }
         return candidates;
     }
@@ -342,24 +352,25 @@ public class ShootController {
     }
 
     private void enqueueTargetCells(int col, int row) {
-        int[][] offsets = { { 0, -1 }, { 0, 1 }, { -1, 0 }, { 1, 0 } };
+        int[][] offsets = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
         for (int[] offset : offsets) {
             int nextCol = col + offset[0];
             int nextRow = row + offset[1];
             if (BoardUtils.isInsideBoard(nextCol, nextRow) && isCellAvailable(nextCol, nextRow)
                     && !containsTargetCell(nextCol, nextRow)) {
-                targetQueue.add(new int[] { nextCol, nextRow });
+                targetQueue.add(new int[]{nextCol, nextRow});
             }
         }
     }
 
     private void cleanupTargetQueueForSunkShip(int col, int row) {
+        CellState[][] ownBoard = gameModel.getOwnBoard();
         for (int[] shipCell : getShipCells(col, row)) {
             for (int dx = -1; dx <= 1; dx++) {
                 for (int dy = -1; dy <= 1; dy++) {
                     int nextCol = shipCell[0] + dx;
                     int nextRow = shipCell[1] + dy;
-                    if (!BoardUtils.isInsideBoard(nextCol, nextRow)) {
+                    if (!BoardUtils.isInsideBoard(ownBoard, nextCol, nextRow)) {
                         continue;
                     }
                     removeAvailableCell(nextCol, nextRow);
@@ -395,9 +406,11 @@ public class ShootController {
     private List<int[]> getShipCells(int col, int row) {
         List<int[]> shipCells = new ArrayList<>();
         CellState[][] ownBoard = gameModel.getOwnBoard();
-        if (!BoardUtils.isInsideBoard(col, row)) {
+        if (!BoardUtils.isInsideBoard(ownBoard, col, row)) {
             return shipCells;
         }
+
+        int boardSize = ownBoard.length;
         CellState startState = ownBoard[col][row];
         if (startState != CellState.HIT && startState != CellState.SHIP) {
             return shipCells;
@@ -408,12 +421,12 @@ public class ShootController {
             left--;
         }
         int right = col;
-        while (right + 1 < BoardUtils.GRID_SIZE && isShipSegment(ownBoard[right + 1][row])) {
+        while (right + 1 < boardSize && isShipSegment(ownBoard[right + 1][row])) {
             right++;
         }
         if (right > left) {
             for (int current = left; current <= right; current++) {
-                shipCells.add(new int[] { current, row });
+                shipCells.add(new int[]{current, row});
             }
             return shipCells;
         }
@@ -423,11 +436,11 @@ public class ShootController {
             up--;
         }
         int down = row;
-        while (down + 1 < BoardUtils.GRID_SIZE && isShipSegment(ownBoard[col][down + 1])) {
+        while (down + 1 < boardSize && isShipSegment(ownBoard[col][down + 1])) {
             down++;
         }
         for (int current = up; current <= down; current++) {
-            shipCells.add(new int[] { col, current });
+            shipCells.add(new int[]{col, current});
         }
         return shipCells;
     }
@@ -437,7 +450,8 @@ public class ShootController {
     }
 
     /**
-     * Führt einen zufälligen Schuss des Computers aus und markiert das Ergebnis.
+     * Führt einen zufälligen Schuss des Computers aus und markiert das
+     * Ergebnis.
      */
     private int[] shootRandom() {
         if (availableCells.isEmpty()) {
@@ -464,6 +478,6 @@ public class ShootController {
         } else {
             ownBoard[col][row] = CellState.MISS;
         }
-        return new int[] { col, row, result };
+        return new int[]{col, row, result};
     }
 }

@@ -4,9 +4,11 @@
  */
 package models;
 
+import java.util.Map;
 import java.util.Random;
 
 public class BoardUtils {
+
     public static final int GRID_SIZE = 10;
     public static final int MAX_PLACEMENT_ATTEMPTS_PER_SHIP = 100;
     public static final int MAX_BOARD_RESTARTS = 100;
@@ -15,12 +17,18 @@ public class BoardUtils {
      * Erzeugt ein leeres 10x10-Spielfeld mit dem Zustand EMPTY.
      */
     public static CellState[][] createEmptyCellBoard() {
-        CellState[][] board = new CellState[GRID_SIZE][GRID_SIZE];
-        for (int row = 0; row < GRID_SIZE; row++) {
-            for (int col = 0; col < GRID_SIZE; col++) {
+        return createEmptyCellBoard(GRID_SIZE);
+    }
+
+    public static CellState[][] createEmptyCellBoard(int boardSize) {
+        CellState[][] board = new CellState[boardSize][boardSize];
+
+        for (int row = 0; row < boardSize; row++) {
+            for (int col = 0; col < boardSize; col++) {
                 board[col][row] = CellState.EMPTY;
             }
         }
+
         return board;
     }
 
@@ -28,8 +36,10 @@ public class BoardUtils {
      * Setzt ein Board auf den Zustand EMPTY zurück.
      */
     public static void clearBoard(CellState[][] board) {
-        for (int row = 0; row < GRID_SIZE; row++) {
-            for (int col = 0; col < GRID_SIZE; col++) {
+        int boardSize = board.length;
+
+        for (int row = 0; row < boardSize; row++) {
+            for (int col = 0; col < boardSize; col++) {
                 board[col][row] = CellState.EMPTY;
             }
         }
@@ -38,12 +48,14 @@ public class BoardUtils {
     /**
      * Prüft, ob ein Feld innerhalb des gültigen Spielfeldbereichs liegt.
      */
-    public static boolean isInsideBoard(int col, int row) {
-        return col >= 0 && col < GRID_SIZE && row >= 0 && row < GRID_SIZE;
+    public static boolean isInsideBoard(CellState[][] board, int col, int row) {
+        int boardSize = board.length;
+        return col >= 0 && col < boardSize && row >= 0 && row < boardSize;
     }
 
     /**
-     * Prüft, ob ein Schiff an der angegebenen Position und Ausrichtung platziert werden kann.
+     * Prüft, ob ein Schiff an der angegebenen Position und Ausrichtung
+     * platziert werden kann.
      */
     public static boolean canPlaceShip(CellState[][] board, ShipType shipType, int startCol, int startRow,
             ShipOrientation orientation) {
@@ -55,7 +67,7 @@ public class BoardUtils {
             } else {
                 row += i;
             }
-            if (!isInsideBoard(col, row) || board[col][row] != CellState.EMPTY || !isCellFree(board, col, row)) {
+            if (!isInsideBoard(board, col, row) || board[col][row] != CellState.EMPTY || !isCellFree(board, col, row)) {
                 return false;
             }
         }
@@ -79,7 +91,7 @@ public class BoardUtils {
         }
     }
 
-    public static void placeRandomShips(CellState[][] board) {
+    public static void placeRandomShips(CellState[][] board, Map<ShipType, Integer> shipCounts) {
         Random random = new Random();
         int restartCount = 0;
 
@@ -88,13 +100,16 @@ public class BoardUtils {
             boolean success = true;
 
             for (ShipType shipType : ShipType.values()) {
-                for (int i = 0; i < shipType.getAmount(); i++) {
+                int amount = shipCounts.getOrDefault(shipType, 0);
+
+                for (int i = 0; i < amount; i++) {
                     boolean placed = false;
                     int attemptCount = 0;
 
                     while (!placed && attemptCount < MAX_PLACEMENT_ATTEMPTS_PER_SHIP) {
-                        int col = random.nextInt(GRID_SIZE);
-                        int row = random.nextInt(GRID_SIZE);
+                        int boardSize = board.length;
+                        int col = random.nextInt(boardSize);
+                        int row = random.nextInt(boardSize);
                         ShipOrientation orientation = random.nextBoolean()
                                 ? ShipOrientation.HORIZONTAL
                                 : ShipOrientation.VERTICAL;
@@ -103,6 +118,7 @@ public class BoardUtils {
                             placeShip(board, shipType, col, row, orientation);
                             placed = true;
                         }
+
                         attemptCount++;
                     }
 
@@ -111,6 +127,7 @@ public class BoardUtils {
                         break;
                     }
                 }
+
                 if (!success) {
                     break;
                 }
@@ -119,6 +136,7 @@ public class BoardUtils {
             if (success) {
                 return;
             }
+
             restartCount++;
         }
 
@@ -133,7 +151,7 @@ public class BoardUtils {
             for (int j = -1; j <= 1; j++) {
                 int checkX = x + i;
                 int checkY = y + j;
-                if (isInsideBoard(checkX, checkY)) {
+                if (isInsideBoard(board, checkX, checkY)) {
                     if (board[checkX][checkY] == CellState.SHIP) {
                         return false;
                     }
@@ -144,11 +162,14 @@ public class BoardUtils {
     }
 
     /**
-     * Prüft, ob das Schiff, zu dem die Zelle (col,row) gehört, bereits vollständig versenkt ist.
-     * Akzeptiert Zellen mit Zustand HIT oder SHIP (z.B. vor/ nach Auswertung).
+     * Prüft, ob das Schiff, zu dem die Zelle (col,row) gehört, bereits
+     * vollständig versenkt ist. Akzeptiert Zellen mit Zustand HIT oder SHIP
+     * (z.B. vor/ nach Auswertung).
      */
     public static boolean isShipSunkAt(CellState[][] board, int col, int row) {
-        if (!isInsideBoard(col, row)) {
+        int boardSize = board.length;
+
+        if (!isInsideBoard(board, col, row)) {
             return false;
         }
         CellState start = board[col][row];
@@ -165,7 +186,7 @@ public class BoardUtils {
             left--;
         }
         int right = col;
-        while (right + 1 < GRID_SIZE && isSegment.test(board[right + 1][row])) {
+        while (right + 1 < boardSize && isSegment.test(board[right + 1][row])) {
             right++;
         }
         if (right > left) {
@@ -183,7 +204,7 @@ public class BoardUtils {
             up--;
         }
         int down = row;
-        while (down + 1 < GRID_SIZE && isSegment.test(board[col][down + 1])) {
+        while (down + 1 < boardSize && isSegment.test(board[col][down + 1])) {
             down++;
         }
         for (int r = up; r <= down; r++) {

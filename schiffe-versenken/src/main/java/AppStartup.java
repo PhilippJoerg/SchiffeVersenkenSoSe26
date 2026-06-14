@@ -16,6 +16,7 @@ import controller.NetworkHandshakeController;
 import controller.ShipPlacementController;
 import models.GameDifficulty;
 import models.GameModel;
+import models.GameSettings;
 import models.SaveLoad;
 import view.MainFrame;
 
@@ -26,7 +27,8 @@ public class AppStartup {
     private static GameController gameController;
 
     /**
-     * Programmstartpunkt: erzeugt das Hauptfenster und startet den Spielauswahl-Dialog.
+     * Programmstartpunkt: erzeugt das Hauptfenster und startet den
+     * Spielauswahl-Dialog.
      */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -45,12 +47,14 @@ public class AppStartup {
             });
 
             frame.setStartAction(() -> {
+                GameSettings settings = frame.getGameSettings();
+
                 String opponent = frame.getSelectedOpponent();
                 if ("COMPUTER".equals(opponent)) {
                     difficulty = frame.getSelectedDifficulty();
-                    startPlacement(frame, null, false, false);
+                    startPlacement(frame, null, false, false, settings);
                 } else {
-                    startNetworkConnection(frame);
+                    startNetworkConnection(frame, settings);
                 }
             });
 
@@ -60,15 +64,16 @@ public class AppStartup {
     }
 
     /**
-     * Initialisiert die Schiffplatzierung und zeigt den Status für den aktuellen Spielmodus an.
+     * Initialisiert die Schiffplatzierung und zeigt den Status für den
+     * aktuellen Spielmodus an.
      */
-    private static void startPlacement(MainFrame frame, Com com, boolean networkMode, boolean iStart) {
+    private static void startPlacement(MainFrame frame, Com com, boolean networkMode, boolean iStart, GameSettings settings) {
         String playerName = getPlayerName(frame);
         frame.showGameScreen();
-        placementController = new ShipPlacementController(frame, () -> startGame(frame, com, networkMode, iStart));
+        placementController = new ShipPlacementController(frame, () -> startGame(frame, com, networkMode, iStart, settings), settings);
         frame.setStatus(networkMode
-            ? playerName + ", Verbindung hergestellt. Platziere deine Schiffe."
-            : playerName + ", platziere deine Schiffe.");
+                ? playerName + ", Verbindung hergestellt. Platziere deine Schiffe."
+                : playerName + ", platziere deine Schiffe.");
     }
 
     private static String getPlayerName(MainFrame frame) {
@@ -79,7 +84,7 @@ public class AppStartup {
     /**
      * Baut die Netzwerkverbindung auf und startet Host- oder Client-Handshake.
      */
-    private static void startNetworkConnection(MainFrame frame) {
+    private static void startNetworkConnection(MainFrame frame, GameSettings settings) {
         final int port = 50000;
 
         String opponent = frame.getSelectedOpponent();
@@ -87,7 +92,7 @@ public class AppStartup {
             NetworkHandshakeController.startHost(frame, port, new NetworkHandshakeController.ReadyCallback() {
                 @Override
                 public void onReady(Com com, boolean iStart) {
-                    startPlacement(frame, com, true, iStart);
+                    startPlacement(frame, com, true, iStart, settings);
                 }
 
                 @Override
@@ -96,7 +101,7 @@ public class AppStartup {
                     JOptionPane.showMessageDialog(frame, message + ": " + e.getMessage());
                     frame.setConnectionStatus("Starte lokales Spiel.");
                     frame.setLocalIpAddress("");
-                    startPlacement(frame, null, false, false);
+                    startPlacement(frame, null, false, false, settings);
                 }
             });
         } else if ("JOIN".equals(opponent)) {
@@ -104,13 +109,13 @@ public class AppStartup {
             if (host == null || host.trim().isEmpty()) {
                 frame.setConnectionStatus("Keine Host-IP angegeben. Starte lokales Spiel.");
                 frame.setLocalIpAddress("");
-                startPlacement(frame, null, false, false);
+                startPlacement(frame, null, false, false, settings);
                 return;
             }
             NetworkHandshakeController.startClient(frame, host.trim(), port, new NetworkHandshakeController.ReadyCallback() {
                 @Override
                 public void onReady(Com com, boolean iStart) {
-                    startPlacement(frame, com, true, iStart);
+                    startPlacement(frame, com, true, iStart, settings);
                 }
 
                 @Override
@@ -119,7 +124,7 @@ public class AppStartup {
                     JOptionPane.showMessageDialog(frame, message + ": " + e.getMessage());
                     frame.setConnectionStatus("Starte lokales Spiel.");
                     frame.setLocalIpAddress("");
-                    startPlacement(frame, null, false, false);
+                    startPlacement(frame, null, false, false, settings);
                 }
             });
         }
@@ -128,8 +133,12 @@ public class AppStartup {
     /**
      * Startet das eigentliche Spiel und erstellt den passenden GameController.
      */
-    private static void startGame(MainFrame frame, Com com, boolean networkMode, boolean iStart) {
-        GameModel gameModel = new GameModel(placementController.getOwnBoard(), networkMode ? GameDifficulty.EASY : difficulty);
+    private static void startGame(MainFrame frame, Com com, boolean networkMode, boolean iStart, GameSettings settings) {
+        GameModel gameModel = new GameModel(
+                placementController.getOwnBoard(),
+                networkMode ? GameDifficulty.EASY : difficulty,
+                settings
+        );
 
         if (networkMode) {
             frame.setConnectionStatus("Netzwerkspiel gestartet");

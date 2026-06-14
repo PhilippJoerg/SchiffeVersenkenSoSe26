@@ -20,6 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
+import java.util.EnumMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -36,9 +37,9 @@ import javax.swing.TransferHandler;
 import models.CellState;
 import models.ShipOrientation;
 import models.ShipType;
+import models.GameSettings;
 
 // Linke Drag-and-Drop-Palette für verfügbare Schiffe
-
 public class MainFrame extends JFrame implements view.GameView, view.PlacementView, view.ConnectionView {
 
     // Namen der Screens im CardLayout
@@ -89,7 +90,6 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
 
     // Button zum Drehen der Schiffe
     private final JButton rotateButton;
-
 
     // Button zum automatische Platzierung
     private final JButton autoPlaceButton;
@@ -143,7 +143,6 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         setResizable(true);
 
         // rotate and auto-place buttons are added inside the board panel
-        
         // Fenstergröße anhand der Inhalte berechnen
         pack();
 
@@ -209,7 +208,6 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         // Statusleiste optisch anpassen
         statusLabel.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         statusLabel.setFont(statusLabel.getFont().deriveFont(Font.PLAIN, 14f));
-
 
         rootPanel.add(shipPalettePanel, BorderLayout.WEST);
         rootPanel.add(centerPanel, BorderLayout.CENTER);
@@ -341,6 +339,17 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
 
     public models.GameDifficulty getSelectedDifficulty() {
         return startScreenPanel.getSelectedDifficulty();
+    }
+
+    public GameSettings getGameSettings() {
+        EnumMap<ShipType, Integer> shipCounts = new EnumMap<>(ShipType.class);
+
+        shipCounts.put(ShipType.BATTLESHIP, startScreenPanel.getBattleshipCount());
+        shipCounts.put(ShipType.CRUISER, startScreenPanel.getCruiserCount());
+        shipCounts.put(ShipType.DESTROYER, startScreenPanel.getDestroyerCount());
+        shipCounts.put(ShipType.SUBMARINE, startScreenPanel.getSubmarineCount());
+
+        return new GameSettings(startScreenPanel.getBoardSize(), shipCounts);
     }
 
     public String getHostIpAddress() {

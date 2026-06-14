@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Utility to save and load game state as JSON.
  */
 public class SaveLoad {
+
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static void saveGame(File file, GameModel model) throws IOException {
@@ -30,7 +31,9 @@ public class SaveLoad {
     }
 
     private static String[][] toStringGrid(CellState[][] board) {
-        if (board == null) return null;
+        if (board == null) {
+            return null;
+        }
         int size = board.length;
         String[][] res = new String[size][size];
         for (int c = 0; c < size; c++) {
@@ -42,23 +45,37 @@ public class SaveLoad {
     }
 
     private static CellState[][] fromStringGrid(String[][] grid) throws IOException {
-        if (grid == null) return null;
-        int size = grid.length;
-        if (size != BoardUtils.GRID_SIZE) {
-            throw new IOException("Saved board size does not match expected grid size");
+        if (grid == null) {
+            return null;
         }
+
+        int size = grid.length;
+
+        if (size == 0) {
+            throw new IOException("Saved board must not be empty");
+        }
+
+        for (String[] column : grid) {
+            if (column == null || column.length != size) {
+                throw new IOException("Saved board must be square");
+            }
+        }
+
         CellState[][] res = new CellState[size][size];
+
         for (int c = 0; c < size; c++) {
             for (int r = 0; r < size; r++) {
                 String v = grid[c][r];
                 res[c][r] = v != null ? CellState.valueOf(v) : CellState.EMPTY;
             }
         }
+
         return res;
     }
 
     // DTO for JSON
     public static class GameState {
+
         public String[][] ownBoard;
         public String[][] enemyBoard;
         public String difficulty;

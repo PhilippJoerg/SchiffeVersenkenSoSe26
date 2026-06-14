@@ -9,8 +9,9 @@ package models;
 import controller.ShootController;
 
 public class GameModel {
-    private final CellState[][] ownBoard;
-    private final CellState[][] enemyBoard;
+
+    private CellState[][] ownBoard;
+    private CellState[][] enemyBoard;
     private boolean gameOver = false;
     private boolean playerWon = false;
     private GameDifficulty difficulty;
@@ -19,11 +20,11 @@ public class GameModel {
     /**
      * Erzeugt das Spielmodell und platziert die Gegner-Schiffe zufällig.
      */
-    public GameModel(CellState[][] ownBoard, GameDifficulty difficulty) {
+    public GameModel(CellState[][] ownBoard, GameDifficulty difficulty, GameSettings settings) {
         this.ownBoard = ownBoard;
-        this.enemyBoard = BoardUtils.createEmptyCellBoard();
+        this.enemyBoard = BoardUtils.createEmptyCellBoard(settings.getBoardSize());
         this.difficulty = difficulty;
-        placeEnemyShips();
+        placeEnemyShips(settings);
         this.shootController = new ShootController(this);
     }
 
@@ -43,8 +44,8 @@ public class GameModel {
     /**
      * Platziert die Schiffe des Gegners zufällig auf dem gegnerischen Board.
      */
-    private void placeEnemyShips() {
-        BoardUtils.placeRandomShips(enemyBoard);
+    private void placeEnemyShips(GameSettings settings) {
+        BoardUtils.placeRandomShips(enemyBoard, settings.getShipCounts());
     }
 
     /**
@@ -121,18 +122,15 @@ public class GameModel {
      * Überschreibt den aktuellen Spielzustand mit einem geladenen Modell.
      */
     public void restoreFrom(GameModel other) {
-        if (other == null) return;
-        CellState[][] otherOwn = other.getOwnBoard();
-        CellState[][] otherEnemy = other.getEnemyBoard();
-        for (int c = 0; c < BoardUtils.GRID_SIZE; c++) {
-            for (int r = 0; r < BoardUtils.GRID_SIZE; r++) {
-                this.ownBoard[c][r] = otherOwn[c][r];
-                this.enemyBoard[c][r] = otherEnemy[c][r];
-            }
-        }
-        this.difficulty = other.getDifficulty();
-        this.gameOver = other.isGameOver();
-        this.playerWon = other.didPlayerWin();
-        this.shootController = new controller.ShootController(this);
+    if (other == null) {
+        return;
     }
+
+    this.ownBoard = other.getOwnBoard();
+    this.enemyBoard = other.getEnemyBoard();
+    this.difficulty = other.getDifficulty();
+    this.gameOver = other.isGameOver();
+    this.playerWon = other.didPlayerWin();
+    this.shootController = new ShootController(this);
+}
 }

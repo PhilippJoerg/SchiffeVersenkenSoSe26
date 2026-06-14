@@ -25,8 +25,8 @@ import models.GameDifficulty;
 public class StartScreenPanel extends JPanel {
 
     private static final int DEFAULT_BOARD_SIZE = 10;
-    private static final String[] SHIP_NAMES = {"Träger", "Schlachtschiff", "Kreuzer", "U-Boot", "Zerstörer"};
-    private static final int[] SHIP_SIZES = {5, 4, 3, 3, 2};
+    private static final String[] SHIP_NAMES = {"Schlachtschiff", "Kreuzer", "Zerstörer", "U-Boot"};
+    private static final int[] SHIP_SIZES = {5, 4, 3, 2};
 
     private final JTextField nameTextField;
     private final JButton startButton;
@@ -37,11 +37,10 @@ public class StartScreenPanel extends JPanel {
     private String hostIpAddress = "";
 
     private int boardSize = DEFAULT_BOARD_SIZE;
-    private int carrierCount = 1;
     private int battleshipCount = 1;
     private int cruiserCount = 2;
-    private int submarineCount = 1;
-    private int destroyerCount = 2;
+    private int destroyerCount = 3;
+    private int submarineCount = 4;
 
     public StartScreenPanel() {
         setOpaque(false);
@@ -91,7 +90,7 @@ public class StartScreenPanel extends JPanel {
         String[] temporaryOpponentSelection = {opponentSelection};
         GameDifficulty[] temporaryDifficulty = {selectedDifficulty};
         int[] temporaryBoardSize = {boardSize};
-        int[] temporaryShipCounts = {carrierCount, battleshipCount, cruiserCount, submarineCount, destroyerCount};
+        int[] temporaryShipCounts = {battleshipCount, cruiserCount, destroyerCount, submarineCount};
         String[] temporaryHostIp = {hostIpAddress};
 
         JPanel settingsPanel = new JPanel(new BorderLayout(24, 0));
@@ -117,12 +116,10 @@ public class StartScreenPanel extends JPanel {
             opponentSelection = temporaryOpponentSelection[0];
             selectedDifficulty = temporaryDifficulty[0];
             boardSize = temporaryBoardSize[0];
-            carrierCount = temporaryShipCounts[0];
-            battleshipCount = temporaryShipCounts[1];
-            cruiserCount = temporaryShipCounts[2];
+            battleshipCount = temporaryShipCounts[0];
+            cruiserCount = temporaryShipCounts[1];
+            destroyerCount = temporaryShipCounts[2];
             submarineCount = temporaryShipCounts[3];
-            destroyerCount = temporaryShipCounts[4];
-            hostIpAddress = temporaryHostIp[0].trim();
         }
     }
 
@@ -159,9 +156,12 @@ public class StartScreenPanel extends JPanel {
         bg.add(joinBtn);
 
         switch (temporaryOpponentSelection[0]) {
-            case "HOST" -> hostBtn.setSelected(true);
-            case "JOIN" -> joinBtn.setSelected(true);
-            default -> computerBtn.setSelected(true);
+            case "HOST" ->
+                hostBtn.setSelected(true);
+            case "JOIN" ->
+                joinBtn.setSelected(true);
+            default ->
+                computerBtn.setSelected(true);
         }
 
         computerBtn.addActionListener(e -> temporaryOpponentSelection[0] = "COMPUTER");
@@ -215,9 +215,12 @@ public class StartScreenPanel extends JPanel {
         buttonGroup.add(size12Button);
 
         switch (temporaryBoardSize[0]) {
-            case 8 -> size8Button.setSelected(true);
-            case 12 -> size12Button.setSelected(true);
-            default -> size10Button.setSelected(true);
+            case 8 ->
+                size8Button.setSelected(true);
+            case 12 ->
+                size12Button.setSelected(true);
+            default ->
+                size10Button.setSelected(true);
         }
 
         size8Button.addActionListener(e -> temporaryBoardSize[0] = 8);
@@ -313,10 +316,6 @@ public class StartScreenPanel extends JPanel {
 
     public String getHostIpAddress() {
         return hostIpAddress == null ? "" : hostIpAddress.trim();
-    }
-
-    public int getCarrierCount() {
-        return carrierCount;
     }
 
     public int getBattleshipCount() {

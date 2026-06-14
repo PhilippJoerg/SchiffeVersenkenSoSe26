@@ -8,6 +8,7 @@ package controller;
 import java.util.Map;
 
 import models.CellState;
+import models.GameSettings;
 import models.ShipOrientation;
 import models.ShipPlacementModel;
 import models.ShipType;
@@ -15,16 +16,18 @@ import view.BoardDropListener;
 import view.PlacementView;
 
 public class ShipPlacementController {
+
     private final PlacementView frame;
     private final ShipPlacementModel model;
     private final Runnable onFinished;
 
     /**
-     * Initialisiert den Platzierungs-Controller mit View und Fertigstellungs-Callback.
+     * Initialisiert den Platzierungs-Controller mit View und
+     * Fertigstellungs-Callback.
      */
-    public ShipPlacementController(PlacementView frame, Runnable onFinished) {
+    public ShipPlacementController(PlacementView frame, Runnable onFinished, GameSettings settings) {
         this.frame = frame;
-        this.model = new ShipPlacementModel();
+        this.model = new ShipPlacementModel(settings);
         this.onFinished = onFinished;
 
         frame.setOwnBoard(model.getOwnBoard());
@@ -84,7 +87,8 @@ public class ShipPlacementController {
     }
 
     /**
-     * Versucht das nächste verfügbare Schiff an der geklickten Position zu platzieren.
+     * Versucht das nächste verfügbare Schiff an der geklickten Position zu
+     * platzieren.
      */
     private void placeCurrentShip(int col, int row) {
         if (model.isPlacementFinished()) {
@@ -129,7 +133,8 @@ public class ShipPlacementController {
     }
 
     /**
-     * Aktualisiert den Statustext mit dem nächsten zu platzierenden Schiff und seiner Ausrichtung.
+     * Aktualisiert den Statustext mit dem nächsten zu platzierenden Schiff und
+     * seiner Ausrichtung.
      */
     private void updateStatus() {
         if (model.isPlacementFinished()) {
@@ -140,7 +145,7 @@ public class ShipPlacementController {
         ShipType shipType = model.getNextShipType();
         frame.setStatus(
                 "Platziere: " + shipType.getDisplayName() + " (" + shipType.getSize() + ")"
-                        + " - Ausrichtung: " + orientationText());
+                + " - Ausrichtung: " + orientationText());
     }
 
     /**
