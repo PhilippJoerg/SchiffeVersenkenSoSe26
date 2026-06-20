@@ -14,6 +14,7 @@ import controller.Com;
 import controller.GameController;
 import controller.NetworkHandshakeController;
 import controller.ShipPlacementController;
+import models.BoardUtils;
 import models.GameDifficulty;
 import models.GameModel;
 import models.GameSettings;
@@ -70,6 +71,7 @@ public class AppStartup {
     private static void startPlacement(MainFrame frame, Com com, boolean networkMode, boolean iStart, GameSettings settings) {
         String playerName = getPlayerName(frame);
         frame.showGameScreen();
+        frame.setEnemyBoard(BoardUtils.createEmptyCellBoard(settings.getBoardSize()));
         placementController = new ShipPlacementController(frame, () -> startGame(frame, com, networkMode, iStart, settings), settings);
         frame.setStatus(networkMode
                 ? playerName + ", Verbindung hergestellt. Platziere deine Schiffe."

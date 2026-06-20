@@ -18,13 +18,14 @@ public class ShootController {
 
     private final GameModel gameModel;
     private final Random random;
-    private List<int[]> availableCells;
+    private final List<int[]> availableCells;
     private final List<int[]> targetQueue;
     private final GameDifficulty difficulty;
 
     public ShootController(GameModel gameModel) {
         this.gameModel = gameModel;
         this.random = new Random();
+        this.availableCells = new ArrayList<>();
         this.targetQueue = new ArrayList<>();
         this.difficulty = gameModel.getDifficulty();
         initAvailableCells();
