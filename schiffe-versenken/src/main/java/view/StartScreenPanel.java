@@ -21,12 +21,15 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import models.GameDifficulty;
+import models.ShipLimitRules;
+import models.ShipType;
 
 public class StartScreenPanel extends JPanel {
 
     private static final int DEFAULT_BOARD_SIZE = 10;
     private static final String[] SHIP_NAMES = {"Schlachtschiff", "Kreuzer", "Zerstörer", "U-Boot"};
     private static final int[] SHIP_SIZES = {5, 4, 3, 2};
+    private final JLabel[] shipCountLabels = new JLabel[SHIP_NAMES.length];
 
     private final JTextField nameTextField;
     private final JButton startButton;
@@ -99,8 +102,8 @@ public class StartScreenPanel extends JPanel {
         JPanel opponentPanel = createOpponentPanel(temporaryOpponentSelection);
         JPanel difficultyPanel = createDifficultyPanel(temporaryDifficulty);
         JPanel hostIpPanel = createHostIpPanel(temporaryHostIp);
-        JPanel boardSizePanel = createBoardSizePanel(temporaryBoardSize);
-        JPanel shipSettingsPanel = createShipSettingsPanel(temporaryShipCounts);
+        JPanel shipSettingsPanel = createShipSettingsPanel(temporaryShipCounts, temporaryBoardSize);
+        JPanel boardSizePanel = createBoardSizePanel(temporaryBoardSize, temporaryShipCounts);
 
         JPanel topPanel = new JPanel(new BorderLayout(8, 8));
         topPanel.add(opponentPanel, BorderLayout.WEST);
@@ -120,6 +123,18 @@ public class StartScreenPanel extends JPanel {
             cruiserCount = temporaryShipCounts[1];
             destroyerCount = temporaryShipCounts[2];
             submarineCount = temporaryShipCounts[3];
+        }
+    }
+
+    private void applyShipLimits(int boardSize, int[] temporaryShipCounts) {
+        for (int i = 0; i < temporaryShipCounts.length; i++) {
+            int max = ShipLimitRules.getMaxCount(boardSize, SHIP_TYPES[i]);
+
+            if (temporaryShipCounts[i] > max) {
+                temporaryShipCounts[i] = max;
+            }
+
+            shipCountLabels[i].setText(String.valueOf(temporaryShipCounts[i]));
         }
     }
 
@@ -201,7 +216,7 @@ public class StartScreenPanel extends JPanel {
         return panel;
     }
 
-    private JPanel createBoardSizePanel(int[] temporaryBoardSize) {
+    private JPanel createBoardSizePanel(int[] temporaryBoardSize, int[] temporaryShipCounts) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Spielfeldgröße"));
 
@@ -223,9 +238,20 @@ public class StartScreenPanel extends JPanel {
                 size10Button.setSelected(true);
         }
 
-        size8Button.addActionListener(e -> temporaryBoardSize[0] = 8);
-        size10Button.addActionListener(e -> temporaryBoardSize[0] = 10);
-        size12Button.addActionListener(e -> temporaryBoardSize[0] = 12);
+        size8Button.addActionListener(e -> {
+            temporaryBoardSize[0] = 8;
+            applyShipLimits(8, temporaryShipCounts);
+        });
+
+        size10Button.addActionListener(e -> {
+            temporaryBoardSize[0] = 10;
+            applyShipLimits(10, temporaryShipCounts);
+        });
+
+        size12Button.addActionListener(e -> {
+            temporaryBoardSize[0] = 12;
+            applyShipLimits(12, temporaryShipCounts);
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -242,7 +268,7 @@ public class StartScreenPanel extends JPanel {
         return panel;
     }
 
-    private JPanel createShipSettingsPanel(int[] temporaryShipCounts) {
+    private JPanel createShipSettingsPanel(int[] temporaryShipCounts, int[] temporaryBoardSize) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Schiffe"));
 
@@ -251,16 +277,24 @@ public class StartScreenPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         for (int i = 0; i < SHIP_NAMES.length; i++) {
-            addShipRow(panel, gbc, i, SHIP_NAMES[i], SHIP_SIZES[i], temporaryShipCounts, i);
+            addShipRow(panel, gbc, i, SHIP_NAMES[i], SHIP_SIZES[i], temporaryShipCounts, temporaryBoardSize, i);
         }
 
         return panel;
     }
 
-    private void addShipRow(JPanel panel, GridBagConstraints gbc, int row, String shipName, int shipSize, int[] temporaryShipCounts, int shipIndex) {
+    private static final ShipType[] SHIP_TYPES = {
+        ShipType.BATTLESHIP,
+        ShipType.CRUISER,
+        ShipType.DESTROYER,
+        ShipType.SUBMARINE
+    };
+
+    private void addShipRow(JPanel panel, GridBagConstraints gbc, int row, String shipName, int shipSize, int[] temporaryShipCounts, int[] temporaryBoardSize, int shipIndex) {
         JLabel nameLabel = new JLabel(shipName);
         JLabel sizeLabel = new JLabel("Größe " + shipSize);
         JLabel countLabel = new JLabel(String.valueOf(temporaryShipCounts[shipIndex]), SwingConstants.CENTER);
+        shipCountLabels[shipIndex] = countLabel;
 
         JButton minusButton = new JButton("-");
         JButton plusButton = new JButton("+");
@@ -273,7 +307,9 @@ public class StartScreenPanel extends JPanel {
         });
 
         plusButton.addActionListener(e -> {
-            if (temporaryShipCounts[shipIndex] < 9) {
+            int max = ShipLimitRules.getMaxCount(temporaryBoardSize[0], SHIP_TYPES[shipIndex]);
+
+            if (temporaryShipCounts[shipIndex] < max) {
                 temporaryShipCounts[shipIndex]++;
                 countLabel.setText(String.valueOf(temporaryShipCounts[shipIndex]));
             }
