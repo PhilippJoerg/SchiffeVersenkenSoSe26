@@ -4,16 +4,17 @@ package controller;
  * Datei: controller/GameController.java
  * Steuert den Spielablauf: Verarbeitung von Schüssen, Computergegner-Loop und Netzwerkinteraktion.
  */
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.Timer;
 import java.io.File;
 import java.io.IOException;
 
-import models.SaveLoad;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
+
 import models.BoardUtils;
 import models.CellState;
 import models.GameModel;
+import models.SaveLoad;
 import view.GameView;
 
 public class GameController {
@@ -26,21 +27,23 @@ public class GameController {
     private Com com;
     private boolean networkMode = false;
     private boolean myTurnNetwork = false;
+    private final Runnable backToMainMenuAction;
     private int pendingShotCol = -1;
     private int pendingShotRow = -1;
 
     /**
      * Erstellt einen lokalen Spiel-Controller für ein Einzelspiel.
      */
-    public GameController(GameView frame, GameModel model) {
-        this(frame, model, null, false);
-    }
+    public GameController(GameView frame, GameModel model, Runnable backToMainMenuAction) {
+    this(frame, model, null, false, backToMainMenuAction);
+}
 
     /**
      * Erstellt einen Spiel-Controller für ein Netzwerkspiel mit Verbindungsobjekt und Startreihenfolge.
      */
-    public GameController(GameView frame, GameModel model, Com com, boolean iStart) {
+    public GameController(GameView frame, GameModel model, Com com, boolean iStart, Runnable backToMainMenuAction) {
         this.frame = frame;
+        this.backToMainMenuAction = backToMainMenuAction;
         this.model = model;
         this.com = com;
         this.networkMode = (com != null);
@@ -230,8 +233,21 @@ public class GameController {
      * Zeigt das Endbildschirm-Dialogfenster mit Titel und Nachricht an.
      */
     private void showEndScreen(String title, String message) {
-        JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
-    }
+    Object[] options = {"Hauptmenü"};
+
+    JOptionPane.showOptionDialog(
+            null,
+            message,
+            title,
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.INFORMATION_MESSAGE,
+            null,
+            options,
+            options[0]
+    );
+
+    backToMainMenuAction.run();
+}
 
     /**
      * Richtet die Netzwerkereignisse für den Spielverlauf (Schuss, Antwort, Pass) ein.

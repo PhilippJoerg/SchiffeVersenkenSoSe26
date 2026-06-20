@@ -132,6 +132,15 @@ public class AppStartup {
         }
     }
 
+    private static void returnToMainMenu(MainFrame frame) {
+    placementController = null;
+    gameController = null;
+    frame.setConnectionStatus("Nicht verbunden");
+    frame.setLocalIpAddress("");
+    frame.setStatus("Bereit.");
+    frame.showStartScreen();
+}
+
     /**
      * Startet das eigentliche Spiel und erstellt den passenden GameController.
      */
@@ -144,11 +153,11 @@ public class AppStartup {
 
         if (networkMode) {
             frame.setConnectionStatus("Netzwerkspiel gestartet");
-            gameController = new GameController(frame, gameModel, com, iStart);
+            gameController = new GameController(frame, gameModel, com, iStart, () -> returnToMainMenu(frame));
         } else {
             frame.setConnectionStatus("Lokales Spiel gegen Computer");
             frame.setLocalIpAddress("");
-            gameController = new GameController(frame, gameModel);
+            gameController = new GameController(frame, gameModel, () -> returnToMainMenu(frame));
         }
     }
 
@@ -173,7 +182,7 @@ public class AppStartup {
         frame.showGameScreen();
         frame.setConnectionStatus("Lokales Spiel geladen");
         frame.setLocalIpAddress("");
-        gameController = new GameController(frame, loadedModel);
+        gameController = new GameController(frame, loadedModel, () -> returnToMainMenu(frame));
         frame.setStatus("Geladenes Spiel gestartet.");
     }
 
