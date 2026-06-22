@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Systemdokumentation - Klasse Com</title>
+<style>
+body{font-family:Arial,sans-serif;margin:40px;}
+h1,h2,h3{color:#003366;}
+code{background:#f4f4f4;padding:2px 4px;}
+table{border-collapse:collapse;width:100%;}
+th,td{border:1px solid #ccc;padding:8px;}
+th{background:#eee;}
+</style>
+</head>
+<body>
+<h1>Systemdokumentation </h1>
+
+<h2>Package: controller</h2>
+<h3>Klasse: Com</h3>
+<p>
+Die Klasse <code>Com</code> implementiert die Netzwerkkommunikation eines Schiffe-versenken-Spiels.
+Sie unterstützt den Betrieb als Server oder Client und verarbeitet den Nachrichtenaustausch
+über TCP-Sockets.
+</p>
+
+<h3>Hauptaufgaben</h3>
+<ul>
+<li>Aufbau von Server- und Client-Verbindungen</li>
+<li>Senden und Empfangen von Spielnachrichten</li>
+<li>Verwaltung des Kommunikationszustands</li>
+<li>Benachrichtigung der Anwendung über Listener-Callbacks</li>
+</ul>
+
+<h3>Enum State</h3>
+<p>Definiert die Kommunikations- und Spielzustände.</p>
+
+<h3>Wichtige Methoden</h3>
+<table>
+<tr><th>Methode</th><th>Beschreibung</th></tr>
+<tr><td>connectAsServer(int port)</td><td>Startet einen Server und wartet auf einen Client.</td></tr>
+<tr><td>connectAsClient(String host, int port)</td><td>Verbindet sich mit einem Server.</td></tr>
+<tr><td>sendShot(int col, int row)</td><td>Sendet einen Schuss.</td></tr>
+<tr><td>sendAnswer(int answer)</td><td>Sendet das Ergebnis eines Schusses.</td></tr>
+<tr><td>sendReady()</td><td>Meldet Spielbereitschaft.</td></tr>
+<tr><td>saveGame()</td><td>Sendet eine Speicheranforderung.</td></tr>
+<tr><td>fireShot(int row, int col)</td><td>Feuert einen Schuss bei eigenem Zug.</td></tr>
+<tr><td>close()</td><td>Schließt die Verbindung.</td></tr>
+</table>
+
+<h3>Interface Listener</h3>
+<p>
+Das Interface stellt Ereignis-Callbacks bereit, die von der Anwendung implementiert werden können.
+Beispiele: <code>onConnected()</code>, <code>onShot()</code>, <code>onAnswer()</code>,
+<code>onSave()</code>, <code>onDisconnected()</code>.
+</p>
+
+<h3>Nachrichtenprotokoll</h3>
+<ul>
+<li>COIN &lt;zahl&gt;</li>
+<li>size &lt;rows&gt; [&lt;cols&gt;]</li>
+<li>ships &lt;länge1&gt; &lt;länge2&gt; ...</li>
+<li>shot &lt;col&gt; &lt;row&gt;</li>
+<li>answer &lt;wert&gt;</li>
+<li>ready</li>
+<li>done</li>
+<li>save &lt;id&gt;</li>
+<li>load &lt;id&gt;</li>
+<li>ok</li>
+<li>pass</li>
+</ul>
+
+<h3>Architektur</h3>
+<p>
+Die Klasse verwendet einen separaten Reader-Thread zum kontinuierlichen Empfang von Nachrichten.
+Eingehende Befehle werden durch <code>handleLine()</code> analysiert und an den Listener weitergeleitet.
+</p>
+
+</body>
+</html>
