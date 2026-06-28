@@ -3,6 +3,7 @@ package view;
 import javax.swing.TransferHandler;
 
 import controller.ShipPlacementController;
+import models.GameSettings;
 import models.ShipOrientation;
 import models.ShipType;
 
@@ -42,7 +43,7 @@ class BoardDropListenerTest {
     static class TestPlacementController extends ShipPlacementController {
         TestPlacementController() {
             super(new TestFrame(), () -> {
-            });
+            }, GameSettings.defaultSettings());
         }
 
         @Override

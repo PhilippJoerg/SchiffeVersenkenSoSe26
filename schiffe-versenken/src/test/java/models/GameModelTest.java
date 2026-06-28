@@ -16,7 +16,7 @@ class GameModelTest {
     void setUp() {
         ownBoard = BoardUtils.createEmptyCellBoard();
         ownBoard[0][0] = CellState.SHIP;
-        gameModel = new GameModel(ownBoard, GameDifficulty.EASY);
+        gameModel = new GameModel(ownBoard, GameDifficulty.EASY, GameSettings.defaultSettings());
     }
 
     @Test
@@ -51,9 +51,9 @@ class GameModelTest {
         int[] result = gameModel.computerShoot();
         assertNotNull(result);
         assertEquals(3, result.length);
-        assertTrue(result[0] >= 0 && result[0] < BoardUtils.GRID_SIZE);
-        assertTrue(result[1] >= 0 && result[1] < BoardUtils.GRID_SIZE);
-        assertTrue(result[2] >= 0 && result[2] <= 1);
+        assertTrue(result[0] >= 0 && result[0] < gameModel.getOwnBoard().length);
+        assertTrue(result[1] >= 0 && result[1] < gameModel.getOwnBoard().length);
+        assertTrue(result[2] >= 0 && result[2] <= 2);
     }
 
     @Test

@@ -13,7 +13,7 @@ class ShipPlacementModelTest {
 
     @BeforeEach
     void setUp() {
-        model = new ShipPlacementModel();
+        model = new ShipPlacementModel(GameSettings.defaultSettings());
     }
 
     @Test

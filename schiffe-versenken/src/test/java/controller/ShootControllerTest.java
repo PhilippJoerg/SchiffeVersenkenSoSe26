@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import models.BoardUtils;
 import models.CellState;
 import models.GameDifficulty;
+import models.GameSettings;
 import models.GameModel;
 
 class ShootControllerTest {
@@ -23,7 +24,7 @@ class ShootControllerTest {
     void setUp() {
         CellState[][] ownBoard = BoardUtils.createEmptyCellBoard();
         ownBoard[0][0] = CellState.SHIP;
-        gameModel = new GameModel(ownBoard, GameDifficulty.EASY);
+        gameModel = new GameModel(ownBoard, GameDifficulty.EASY, GameSettings.defaultSettings());
         shootController = new ShootController(gameModel);
     }
 
@@ -96,12 +97,12 @@ class ShootControllerTest {
     void testShootCheckerboardAndHuntRemovesAvailableCells() throws Exception {
         CellState[][] ownBoard = BoardUtils.createEmptyCellBoard();
         ownBoard[0][0] = CellState.SHIP;
-        gameModel = new GameModel(ownBoard, GameDifficulty.MEDIUM);
+        gameModel = new GameModel(ownBoard, GameDifficulty.MEDIUM, GameSettings.defaultSettings());
         shootController = new ShootController(gameModel);
 
         int[] shot = shootController.computerShoot();
         assertEquals(3, shot.length);
-        assertTrue(BoardUtils.isInsideBoard(shot[0], shot[1]));
+        assertTrue(BoardUtils.isInsideBoard(gameModel.getOwnBoard(), shot[0], shot[1]));
 
         Field availableCellsField = ShootController.class.getDeclaredField("availableCells");
         availableCellsField.setAccessible(true);

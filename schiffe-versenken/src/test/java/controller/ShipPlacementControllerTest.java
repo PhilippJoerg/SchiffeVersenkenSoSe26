@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import models.CellState;
+import models.GameSettings;
 import models.ShipOrientation;
 import models.ShipType;
 import view.BoardPanel;
@@ -26,7 +27,6 @@ class ShipPlacementControllerTest {
         private CellState[][] ownBoard;
         private Map<ShipType, Integer> remainingCounts;
         private ShipOrientation orientation;
-        private BoardClickListener listener;
         private String status;
 
         @Override
@@ -46,7 +46,6 @@ class ShipPlacementControllerTest {
 
         @Override
         public void setOwnBoardClickListener(BoardClickListener listener) {
-            this.listener = listener;
         }
 
         @Override
@@ -69,7 +68,7 @@ class ShipPlacementControllerTest {
     void setUp() {
         frame = new TestPlacementView();
         finished = false;
-        controller = new ShipPlacementController(frame, () -> finished = true);
+        controller = new ShipPlacementController(frame, () -> finished = true, GameSettings.defaultSettings());
     }
 
     @Test

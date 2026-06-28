@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import models.CellState;
 import models.GameDifficulty;
+import models.GameSettings;
 import models.GameModel;
 import models.BoardUtils;
 import view.BoardClickListener;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.Test;
 class GameControllerTest {
 
     private TestGameView view;
-    private GameController gameController;
     private TestCom com;
     private GameModel model;
 
@@ -102,9 +102,10 @@ class GameControllerTest {
     @BeforeEach
     void setUp() {
         view = new TestGameView();
-        model = new GameModel(BoardUtils.createEmptyCellBoard(), GameDifficulty.EASY);
+        model = new GameModel(BoardUtils.createEmptyCellBoard(), GameDifficulty.EASY, GameSettings.defaultSettings());
         com = new TestCom(null);
-        gameController = new GameController(view, model, com, true);
+        new GameController(view, model, com, true, () -> {
+        });
     }
 
     @Test

@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 
 class BoardUtilsTest {
@@ -23,12 +25,13 @@ class BoardUtilsTest {
 
     @Test
     void testIsInsideBoardBoundsAndOutOfBounds() {
-        assertTrue(BoardUtils.isInsideBoard(0, 0));
-        assertTrue(BoardUtils.isInsideBoard(9, 9));
-        assertFalse(BoardUtils.isInsideBoard(-1, 0));
-        assertFalse(BoardUtils.isInsideBoard(0, -1));
-        assertFalse(BoardUtils.isInsideBoard(BoardUtils.GRID_SIZE, 0));
-        assertFalse(BoardUtils.isInsideBoard(0, BoardUtils.GRID_SIZE));
+        CellState[][] board = BoardUtils.createEmptyCellBoard();
+        assertTrue(BoardUtils.isInsideBoard(board, 0, 0));
+        assertTrue(BoardUtils.isInsideBoard(board, 9, 9));
+        assertFalse(BoardUtils.isInsideBoard(board, -1, 0));
+        assertFalse(BoardUtils.isInsideBoard(board, 0, -1));
+        assertFalse(BoardUtils.isInsideBoard(board, BoardUtils.GRID_SIZE, 0));
+        assertFalse(BoardUtils.isInsideBoard(board, 0, BoardUtils.GRID_SIZE));
     }
 
     @Test
@@ -53,7 +56,8 @@ class BoardUtilsTest {
     @Test
     void testPlaceRandomShipsFillsShipsWithoutError() {
         CellState[][] board = BoardUtils.createEmptyCellBoard();
-        BoardUtils.placeRandomShips(board);
+        Map<ShipType, Integer> shipCounts = GameSettings.defaultSettings().getShipCounts();
+        BoardUtils.placeRandomShips(board, shipCounts);
 
         int shipCount = 0;
         for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {
