@@ -23,7 +23,7 @@ Dieses Projekt wurde im Rahmen des Programmierpraktikums im Sommersemester 2026 
 - `README.md` enthält die Projektübersicht
 
 ### Dokumentation
-Die generierte Javadoc-Dokumentation befindet sich unter [doc/index.html](doc/index.html).
+Die generierte Javadoc-Dokumentation befindet sich unter <a href="doc/index.html" target="_blank" rel="noopener noreferrer">doc/index.html</a>.
 
 ### Termine
 - Zwischenpräsentation: 20. Mai 2026
@@ -57,7 +57,7 @@ This project was developed as part of the programming practical course in the su
 - `README.md` contains the project overview
 
 ### Documentation
-The generated Javadoc documentation is available at [doc/index.html](doc/index.html).
+The generated Javadoc documentation is available at <a href="doc/index.html" target="_blank" rel="noopener noreferrer">doc/index.html</a>.
 
 ### Milestones
 - Midterm presentation: May 20, 2026
