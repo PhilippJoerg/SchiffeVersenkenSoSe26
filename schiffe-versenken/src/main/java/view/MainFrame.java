@@ -8,6 +8,7 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.EnumMap;
 
 import javax.imageio.ImageIO;
+import javax.swing.Box;
 import javax.swing.BorderFactory;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -118,7 +120,7 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         loadingBar.setVisible(false);
         rotateButton = new JButton("Drehen");
         autoPlaceButton = new JButton("Auto-Platzieren");
-        shootButton = new JButton("Schießen");
+        // TODO: refactor: shootButton logic should be removed completely, since i disabled it. Broader refactoring across view/controller is needed
 
         startBackground = loadBackgroundImage(START_BACKGROUND_PATH);
         gameBackground = loadBackgroundImage(GAME_BACKGROUND_PATH);
@@ -186,7 +188,7 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         centerPanel.setOpaque(false);
 
         JPanel ownBoardPanel = createBoardPanel("Eigenes Feld", ownBoard, rotateButton, autoPlaceButton);
-        JPanel enemyBoardPanel = createBoardPanel("Gegnerfeld", enemyBoard, shootButton);
+        JPanel enemyBoardPanel = createBoardPanel("Gegnerfeld", enemyBoard, createActionSpacer(shootButton));
 
         // Einstellungen für flexible Größenverteilung
         GridBagConstraints gbc = new GridBagConstraints();
@@ -287,7 +289,7 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         }
     }
 
-    private JPanel createBoardPanel(String title, BoardPanel boardPanel, JButton... actionButtons) {
+    private JPanel createBoardPanel(String title, BoardPanel boardPanel, Component... actionComponents) {
         JPanel panel = new JPanel(new BorderLayout(8, 8));
         panel.setOpaque(false);
         panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -298,8 +300,8 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         buttonPanel.setOpaque(false);
-        for (JButton b : actionButtons) {
-            buttonPanel.add(b);
+        for (Component actionComponent : actionComponents) {
+            buttonPanel.add(actionComponent);
         }
 
         panel.add(titleLabel, BorderLayout.NORTH);
@@ -307,6 +309,10 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
         return panel;
+    }
+
+    private Component createActionSpacer(JButton templateButton) {
+        return Box.createRigidArea(templateButton.getPreferredSize());
     }
 
     // Zeigt den Startscreen
