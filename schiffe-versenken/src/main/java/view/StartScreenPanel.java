@@ -24,6 +24,10 @@ import models.GameDifficulty;
 import models.ShipLimitRules;
 import models.ShipType;
 
+/**
+ * de: Die Klasse StartScreenPanel stellt das Startbildschirm-Panel dar.
+ * en: The StartScreenPanel class represents the start screen panel.
+ */
 public class StartScreenPanel extends JPanel {
 
     private static final int DEFAULT_BOARD_SIZE = 10;
@@ -45,6 +49,10 @@ public class StartScreenPanel extends JPanel {
     private int destroyerCount = 3;
     private int submarineCount = 4;
 
+    /**
+     * de: Konstruktor für StartScreenPanel.
+     * en: Constructor for StartScreenPanel.
+     */
     public StartScreenPanel() {
         setOpaque(false);
         setLayout(new BorderLayout());
@@ -89,6 +97,11 @@ public class StartScreenPanel extends JPanel {
         add(centerPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * de: Zeigt den Einstellungsdialog an.
+     * en: Shows the settings dialog.
+     *
+     */
     private void showSettingsDialog() {
         String[] temporaryOpponentSelection = {opponentSelection};
         GameDifficulty[] temporaryDifficulty = {selectedDifficulty};
@@ -126,6 +139,13 @@ public class StartScreenPanel extends JPanel {
         }
     }
 
+    /**
+     * de: Wendet die Schiffslimits basierend auf der Brettgröße an.
+     * en: Applies the ship limits based on the board size.
+     *
+     * @param boardSize de: Die Größe des Brettes. en: The size of the board.
+     * @param temporaryShipCounts de: Die temporären Schiffszahlen. en: The temporary ship counts.
+     */
     private void applyShipLimits(int boardSize, int[] temporaryShipCounts) {
         for (int i = 0; i < temporaryShipCounts.length; i++) {
             int max = ShipLimitRules.getMaxCount(boardSize, SHIP_TYPES[i]);
@@ -138,6 +158,13 @@ public class StartScreenPanel extends JPanel {
         }
     }
 
+    /**
+     * de: Erstellt das Panel für die Host-IP-Eingabe.
+     * en: Creates the panel for host IP input.
+     *
+     * @param temporaryHostIp de: Die temporäre Host-IP. en: The temporary host IP.
+     * @return de: Das erstellte JPanel. en: The created JPanel.
+     */
     private JPanel createHostIpPanel(String[] temporaryHostIp) {
         JPanel panel = new JPanel(new BorderLayout(8, 8));
         panel.setBorder(BorderFactory.createTitledBorder("Host-IP für Beitreten"));
@@ -147,6 +174,12 @@ public class StartScreenPanel extends JPanel {
         hostIpField.setToolTipText("IP-Adresse des Hosts für den Beitritt eingeben");
         hostIpField.addActionListener(e -> temporaryHostIp[0] = hostIpField.getText().trim());
         hostIpField.addFocusListener(new java.awt.event.FocusAdapter() {
+            /**
+             * de: Wird aufgerufen, wenn das Textfeld den Fokus verliert.
+             * en: Called when the text field loses focus.
+             *
+             * @param e de: Das FocusEvent. en: The FocusEvent.
+             */
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
                 temporaryHostIp[0] = hostIpField.getText().trim();
@@ -157,6 +190,13 @@ public class StartScreenPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * de: Erstellt das Panel für die Gegnerauswahl.
+     * en: Creates the panel for opponent selection.
+     *
+     * @param temporaryOpponentSelection de: Die temporäre Gegnerauswahl. en: The temporary opponent selection.
+     * @return de: Das erstellte JPanel. en: The created JPanel.
+     */
     private JPanel createOpponentPanel(String[] temporaryOpponentSelection) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Gegner"));
@@ -198,6 +238,13 @@ public class StartScreenPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * de: Erstellt das Panel für die Schwierigkeitsauswahl.
+     * en: Creates the panel for difficulty selection.
+     *
+     * @param temporaryDifficulty de: Die temporäre Schwierigkeitsauswahl. en: The temporary difficulty selection.
+     * @return de: Das erstellte JPanel. en: The created JPanel.
+     */
     private JPanel createDifficultyPanel(GameDifficulty[] temporaryDifficulty) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Schwierigkeit"));
@@ -216,6 +263,14 @@ public class StartScreenPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * de: Erstellt das Panel für die Spielfeldgröße.
+     * en: Creates the panel for board size selection.
+     *
+     * @param temporaryBoardSize de: Die temporäre Spielfeldgröße. en: The temporary board size.
+     * @param temporaryShipCounts de: Die temporären Schiffszahlen. en: The temporary ship counts.
+     * @return de: Das erstellte JPanel. en: The created JPanel.
+     */
     private JPanel createBoardSizePanel(int[] temporaryBoardSize, int[] temporaryShipCounts) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Spielfeldgröße"));
@@ -268,6 +323,14 @@ public class StartScreenPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * de: Erstellt das Panel für die Schiffeinstellungen.
+     * en: Creates the panel for ship settings.
+     *
+     * @param temporaryShipCounts de: Die temporären Schiffszahlen. en: The temporary ship counts.
+     * @param temporaryBoardSize de: Die temporäre Spielfeldgröße. en: The temporary board size.
+     * @return de: Das erstellte JPanel. en: The created JPanel.
+     */
     private JPanel createShipSettingsPanel(int[] temporaryShipCounts, int[] temporaryBoardSize) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Schiffe"));
@@ -290,6 +353,19 @@ public class StartScreenPanel extends JPanel {
         ShipType.SUBMARINE
     };
 
+    /**
+     * de: Erstellt eine Zeile für ein Schiff im Schiffeinstellungen-Panel.
+     * en: Creates a row for a ship in the ship settings panel.
+     *
+     * @param panel de: Das Panel, dem die Zeile hinzugefügt wird. en: The panel to which the row is added.
+     * @param gbc de: Die GridBagConstraints für die Layout-Steuerung. en: The GridBagConstraints for layout control.
+     * @param row de: Die Zeilennummer. en: The row number.
+     * @param shipName de: Der Name des Schiffs. en: The name of the ship.
+     * @param shipSize de: Die Größe des Schiffs. en: The size of the ship.
+     * @param temporaryShipCounts de: Die temporären Schiffszahlen. en: The temporary ship counts.
+     * @param temporaryBoardSize de: Die temporäre Spielfeldgröße. en: The temporary board size.
+     * @param shipIndex de: Der Index des Schiffs. en: The index of the ship.
+     */
     private void addShipRow(JPanel panel, GridBagConstraints gbc, int row, String shipName, int shipSize, int[] temporaryShipCounts, int[] temporaryBoardSize, int shipIndex) {
         JLabel nameLabel = new JLabel(shipName);
         JLabel sizeLabel = new JLabel("Größe " + shipSize);
@@ -330,46 +406,112 @@ public class StartScreenPanel extends JPanel {
         panel.add(counterPanel, gbc);
     }
 
+    /**
+     * de: Gibt die Auswahl des Gegners zurück.
+     * en: Returns the opponent selection.
+     *
+     * @return de: Die Auswahl des Gegners. en: The opponent selection.
+     */
     public String getOpponentSelection() {
         return opponentSelection;
     }
 
+    /**
+     * de: Gibt die ausgewählte Schwierigkeitsstufe zurück.
+     * en: Returns the selected difficulty level.
+     *
+     * @return de: Die ausgewählte Schwierigkeitsstufe. en: The selected difficulty level.
+     */
     public GameDifficulty getSelectedDifficulty() {
         return selectedDifficulty;
     }
 
+    /**
+     * de: Gibt den Namen des Spielers zurück.
+     * en: Returns the player's name.
+     *
+     * @return de: Der Name des Spielers. en: The player's name.
+     */
     public String getPlayerName() {
         return nameTextField.getText().trim();
     }
 
+    /**
+     * de: Gibt den Wert des Textfeldes zurück.
+     * en: Returns the value of the text field.
+     *
+     * @return de: Der Wert des Textfeldes. en: The value of the text field.
+     */
     public String getTextFieldValue() {
         return nameTextField.getText().trim();
     }
 
+    /**
+     * de: Gibt die Größe des Spielfeldes zurück.
+     * en: Returns the size of the board.
+     *
+     * @return de: Die Größe des Spielfeldes. en: The size of the board.
+     */
     public int getBoardSize() {
         return boardSize;
     }
 
+    /**
+     * de: Gibt die IP-Adresse des Hosts zurück.
+     * en: Returns the host IP address.
+     *
+     * @return de: Die IP-Adresse des Hosts. en: The host IP address.
+     */
     public String getHostIpAddress() {
         return hostIpAddress == null ? "" : hostIpAddress.trim();
     }
 
+    /**
+     * de: Gibt die Anzahl der Schlachtschiffe zurück.
+     * en: Returns the number of battleships.
+     *
+     * @return de: Die Anzahl der Schlachtschiffe. en: The number of battleships.
+     */
     public int getBattleshipCount() {
         return battleshipCount;
     }
 
+    /**
+     * de: Gibt die Anzahl der Kreuzer zurück.
+     * en: Returns the number of cruisers.
+     *
+     * @return de: Die Anzahl der Kreuzer. en: The number of cruisers.
+     */
     public int getCruiserCount() {
         return cruiserCount;
     }
 
+    /**
+     * de: Gibt die Anzahl der U-Boote zurück.
+     * en: Returns the number of submarines.
+     *
+     * @return de: Die Anzahl der U-Boote. en: The number of submarines.
+     */
     public int getSubmarineCount() {
         return submarineCount;
     }
 
+    /**
+     * de: Gibt die Anzahl der Zerstörer zurück.
+     * en: Returns the number of destroyers.
+     *
+     * @return de: Die Anzahl der Zerstörer. en: The number of destroyers.
+     */
     public int getDestroyerCount() {
         return destroyerCount;
     }
 
+    /**
+     * de: Setzt die Aktion, die beim Starten des Spiels ausgeführt wird.
+     * en: Sets the action to be performed when starting the game.
+     *
+     * @param action de: Parameter action. en: Parameter action.
+     */
     public void setStartAction(Runnable action) {
         startButton.addActionListener(e -> action.run());
         nameTextField.addActionListener(e -> action.run());

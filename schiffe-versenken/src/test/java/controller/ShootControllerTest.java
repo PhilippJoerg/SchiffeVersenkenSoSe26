@@ -15,11 +15,20 @@ import models.GameDifficulty;
 import models.GameSettings;
 import models.GameModel;
 
+/**
+ * de: Testet den ShootController.
+ * en: Tests the ShootController.
+ */
 class ShootControllerTest {
 
     private GameModel gameModel;
     private ShootController shootController;
 
+    /**
+     * de: Reagiert auf das Ereignis "SetUp".
+     * en: Responds to the "SetUp" event.
+     *
+     */
     @BeforeEach
     void setUp() {
         CellState[][] ownBoard = BoardUtils.createEmptyCellBoard();
@@ -28,6 +37,11 @@ class ShootControllerTest {
         shootController = new ShootController(gameModel);
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestShootInvalidWhenOutOfBoundsOrGameOver".
+     * en: Responds to the "TestShootInvalidWhenOutOfBoundsOrGameOver" event.
+     *
+     */
     @Test
     void testShootInvalidWhenOutOfBoundsOrGameOver() {
         assertFalse(shootController.shoot(-1, 0));
@@ -35,6 +49,11 @@ class ShootControllerTest {
         assertFalse(shootController.shoot(0, 0));
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestShootHitAndWin".
+     * en: Responds to the "TestShootHitAndWin" event.
+     *
+     */
     @Test
     void testShootHitAndWin() {
         CellState[][] enemy = gameModel.getEnemyBoard();
@@ -44,6 +63,11 @@ class ShootControllerTest {
         assertTrue(gameModel.isGameOver() || true);
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestShootRejectsRepeatedShot".
+     * en: Responds to the "TestShootRejectsRepeatedShot" event.
+     *
+     */
     @Test
     void testShootRejectsRepeatedShot() {
         CellState[][] enemy = gameModel.getEnemyBoard();
@@ -56,6 +80,11 @@ class ShootControllerTest {
         assertEquals(CellState.HIT, enemy[0][0]);
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestEvaluateIncomingShotReturnsMissAndHit".
+     * en: Responds to the "TestEvaluateIncomingShotReturnsMissAndHit" event.
+     *
+     */
     @Test
     void testEvaluateIncomingShotReturnsMissAndHit() {
         int result = shootController.evaluateIncomingShot(1, 1);
@@ -66,6 +95,11 @@ class ShootControllerTest {
         assertTrue(hit == 1 || hit == 2);
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestEvaluateIncomingShotRejectsRepeatedShot".
+     * en: Responds to the "TestEvaluateIncomingShotRejectsRepeatedShot" event.
+     *
+     */
     @Test
     void testEvaluateIncomingShotRejectsRepeatedShot() {
         // ensure own board has a ship
@@ -82,6 +116,12 @@ class ShootControllerTest {
         assertEquals(CellState.HIT, own[0][0]);
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestShootRandomRemovesAvailableCells".
+     * en: Responds to the "TestShootRandomRemovesAvailableCells" event.
+     *
+     * @throws Exception de: Bei Fehler waehrend der Ausfuehrung. en: If an error occurs during execution.
+     */
     @Test
     void testShootRandomRemovesAvailableCells() throws Exception {
         int[] shot = shootController.computerShoot();
@@ -93,6 +133,12 @@ class ShootControllerTest {
         assertTrue(availableCells.size() < BoardUtils.GRID_SIZE * BoardUtils.GRID_SIZE);
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestShootCheckerboardAndHuntRemovesAvailableCells".
+     * en: Responds to the "TestShootCheckerboardAndHuntRemovesAvailableCells" event.
+     *
+     * @throws Exception de: Bei Fehler waehrend der Ausfuehrung. en: If an error occurs during execution.
+     */
     @Test
     void testShootCheckerboardAndHuntRemovesAvailableCells() throws Exception {
         CellState[][] ownBoard = BoardUtils.createEmptyCellBoard();

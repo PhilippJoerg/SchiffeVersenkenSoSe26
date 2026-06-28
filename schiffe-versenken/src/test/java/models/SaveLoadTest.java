@@ -6,8 +6,18 @@ import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * de: Testet die Klasse SaveLoad.
+ * en: Tests the SaveLoad class.
+ */
 class SaveLoadTest {
 
+    /**
+     * de: Reagiert auf das Ereignis "TestSaveLoadRoundTrip".
+     * en: Responds to the "TestSaveLoadRoundTrip" event.
+     *
+     * @throws Exception de: Bei Fehler waehrend der Ausfuehrung. en: If an error occurs during execution.
+     */
     @Test
     void testSaveLoadRoundTrip() throws Exception {
         CellState[][] own = BoardUtils.createEmptyCellBoard();

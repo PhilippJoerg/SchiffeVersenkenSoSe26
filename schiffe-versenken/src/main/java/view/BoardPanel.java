@@ -19,15 +19,33 @@ import javax.swing.JPanel;
 
 import models.CellState;
 
+/**
+ * de: Die Klasse BoardPanel stellt ein 10x10-Spielfeld dar, inklusive Beschriftung, Zelleninhalt
+ * und Klick-/Zeichenlogik.
+ * en: The BoardPanel class represents a 10x10 game board, including labels, cell content,
+ * and click/draw logic.
+ */
 public class BoardPanel extends JPanel {
 
     // Spielfeldgröße: 10x10
+    /**
+     * de: Das Feld GRID_SIZE gibt die Größe des Spielfelds an.
+     * en: The field GRID_SIZE specifies the size of the game board.
+     */
     public static final int GRID_SIZE = 10;
 
     // Standardgröße einer Zelle
+    /**
+     * de: Das Feld CELL_SIZE gibt die Standardgröße einer Zelle an.
+     * en: The field CELL_SIZE specifies the default size of a cell.
+     */
     public static final int CELL_SIZE = 32;
 
     // Platz für Beschriftung oben und links
+    /**
+     * de: Das Feld LABEL_SPACE gibt den Platz für die Beschriftung oben und links an.
+     * en: The field LABEL_SPACE specifies the space for labels at the top and left.
+     */
     public static final int LABEL_SPACE = 28;
 
     // Grenzen für skalierende Zellgröße
@@ -52,6 +70,12 @@ public class BoardPanel extends JPanel {
     // Reaktion auf Klicks ins Spielfeld
     private BoardClickListener clickListener;
 
+    /**
+     * de: Konstruktor für BoardPanel.
+     * en: Constructor for BoardPanel.
+     *
+     * @param enemyBoard de: Gibt an, ob dieses Board das Gegnerfeld ist. en: Indicates whether this board is the enemy board.
+     */
     public BoardPanel(boolean enemyBoard) {
         this.enemyBoard = enemyBoard;
         this.gridSize = GRID_SIZE;
@@ -73,6 +97,12 @@ public class BoardPanel extends JPanel {
 
         // Wandelt Mausklicks in Spielfeldkoordinaten um
         addMouseListener(new MouseAdapter() {
+            /**
+             * de: Überschreibt die Methode mouseClicked.
+             * en: Overrides the method mouseClicked.
+             *
+             * @param e de: Parameter e. en: Parameter e.
+             */
             @Override
             public void mouseClicked(MouseEvent e) {
                 Point cell = cellAt(e.getPoint());
@@ -85,14 +115,21 @@ public class BoardPanel extends JPanel {
     }
 
     // Setzt die Klick-Aktion für gültige Felder
+    /**
+     * de: Setzt den Listener für Klicks auf das Board.
+     * en: Sets the listener for clicks on the board.
+     *
+     * @param clickListener de: Parameter clickListener. en: Parameter clickListener.
+     */
     public void setBoardClickListener(BoardClickListener clickListener) {
         this.clickListener = clickListener;
     }
 
-    /*
-     * Aktualisiert das Board.
-     * Das Array wird kopiert, damit spätere Änderungen am übergebenen Array
-     * das Panel nicht unkontrolliert verändern.
+    /**
+     * de: Aktualisiert das Board. Das Array wird kopiert, damit spätere Änderungen am übergebenen Array das Panel nicht unkontrolliert verändern.
+     * en: Updates the board. The array is copied to prevent uncontrolled changes to the panel from later modifications to the passed array.
+     *
+     * @param newCells de: Neues Spielfeld mit Zellzustaenden. en: New board with cell states.
      */
     public void setCells(CellState[][] newCells) {
         validateBoard(newCells);
@@ -119,14 +156,21 @@ public class BoardPanel extends JPanel {
     }
 
     // Gibt zurück, ob es das Gegnerfeld ist
+    /**
+     * de: Gibt zurück, ob dieses Board das Gegnerfeld ist.
+     * en: Returns whether this board is the enemy board.
+     *
+     * @return de: Rueckgabewert der Methode. en: Method return value.
+     */
     public boolean isEnemyBoard() {
         return enemyBoard;
     }
 
-    /*
-     * Zeichnet das komplette Panel neu.
-     * Wird automatisch von Swing aufgerufen, z. B. nach repaint()
-     * oder beim Ändern der Fenstergröße.
+    /**
+     * de: Zeichnet das komplette Panel inklusive Koordinaten, Zellen und Raster.
+     * en: Paints the complete panel including coordinates, cells, and grid.
+     *
+     * @param g de: Zeichenkontext von Swing. en: Swing graphics context.
      */
     @Override
     protected void paintComponent(Graphics g) {
@@ -147,6 +191,13 @@ public class BoardPanel extends JPanel {
     }
 
     // Zeichnet A-J oben und 1-10 links
+    /**
+     * de: Zeichnet die Koordinatenbeschriftungen für das Board.
+     * en: Draws the coordinate labels for the board.
+     *
+     * @param g2 de: Zeichenkontext von Swing. en: Swing graphics context.
+     * @param geometry de: Geometrieinformationen des Boards. en: Geometry information of the board.
+     */
     private void drawCoordinates(Graphics2D g2, BoardGeometry geometry) {
         FontMetrics fm = g2.getFontMetrics();
         g2.setColor(Color.WHITE);
@@ -172,7 +223,13 @@ public class BoardPanel extends JPanel {
         }
     }
 
-    // Zeichnet alle Zellen inklusive Inhalt
+    /**
+     * de: Zeichnet alle Zellen des Boards einschließlich ihres Inhalts.
+     * en: Draws all cells of the board, including their content.
+     *
+     * @param g2 de: Zeichenkontext von Swing. en: Swing graphics context.
+     * @param geometry de: Geometrieinformationen des Boards. en: Geometry information of the board.
+     */
     private void drawCells(Graphics2D g2, BoardGeometry geometry) {
         for (int row = 0; row < gridSize; row++) {
             for (int col = 0; col < gridSize; col++) {
@@ -190,8 +247,8 @@ public class BoardPanel extends JPanel {
     }
 
     /*
-     * Zeichnet den Inhalt einer Zelle.
-     * Gegnerische Schiffe werden nicht angezeigt.
+     * de: Zeichnet den Inhalt einer Zelle.
+     * en: Draws the content of a cell.
      */
     private void drawCellContent(Graphics2D g2, int x, int y, int cellSize, CellState state) {
         switch (state) {
@@ -220,7 +277,15 @@ public class BoardPanel extends JPanel {
         }
     }
 
-    // Zeichnet ein Schiff als abgerundetes Rechteck
+    /**
+     * de: Zeichnet ein Schiff als abgerundetes Rechteck.
+     * en: Draws a ship as a rounded rectangle.
+     *
+     * @param g2 de: Zeichenkontext von Swing. en: Swing graphics context.
+     * @param x de: X-Koordinate der Zelle. en: X-coordinate of the cell.
+     * @param y de: Y-Koordinate der Zelle. en: Y-coordinate of the cell.
+     * @param cellSize de: Größe der Zelle. en: Size of the cell.
+     */
     private void drawShip(Graphics2D g2, int x, int y, int cellSize) {
         int padding = Math.max(2, cellSize / 10);
         int arc = Math.max(8, cellSize / 3);
@@ -236,7 +301,18 @@ public class BoardPanel extends JPanel {
         g2.drawRoundRect(shipX, shipY, shipSize, shipSize, arc, arc);
     }
 
-    // Zeichnet einen mittigen Kreis für Treffer oder Fehlschuss
+
+    /**
+     * de: Zeichnet einen mittigen Kreis für Treffer oder Fehlschuss.
+     * en: Draws a centered circle for hit or miss.
+     *
+     * @param g2 de: Zeichenkontext von Swing. en: Swing graphics context.
+     * @param x de: X-Koordinate der Zelle. en: X-coordinate of the cell.
+     * @param y de: Y-Koordinate der Zelle. en: Y-coordinate of the cell.
+     * @param cellSize de: Größe der Zelle. en: Size of the cell.
+     * @param color de: Farbe des Kreises. en: Color of the circle.
+     * @param size de: Größe des Kreises. en: Size of the circle.
+     */
     private void drawCenteredCircle(Graphics2D g2, int x, int y, int cellSize, Color color, int size) {
         int circleX = x + (cellSize - size) / 2;
         int circleY = y + (cellSize - size) / 2;
@@ -245,7 +321,14 @@ public class BoardPanel extends JPanel {
         g2.fillOval(circleX, circleY, size, size);
     }
 
-    // Zeichnet das Raster über die Zellen
+
+    /**
+     * de: Zeichnet das Raster über die Zellen.
+     * en: Draws the grid over the cells.
+     *
+     * @param g2 de: Zeichenkontext von Swing. en: Swing graphics context.
+     * @param geometry de: Geometrie des Boards. en: Geometry of the board.
+     */
     private void drawGrid(Graphics2D g2, BoardGeometry geometry) {
         g2.setColor(GRID_COLOR);
 
@@ -314,7 +397,13 @@ public class BoardPanel extends JPanel {
         return new BoardGeometry(startX, startY, cellSize, boardSize);
     }
 
-    // Erstellt ein leeres Board
+    /**
+     * de: Erstellt ein leeres Board mit der angegebenen Größe.
+     * en: Creates an empty board with the specified size.
+     *
+     * @param size de: Größe des Boards. en: Size of the board.
+     * @return de: Ein leeres Board. en: An empty board.
+     */
     private CellState[][] createEmptyBoard(int size) {
         CellState[][] board = new CellState[size][size];
 
@@ -327,6 +416,12 @@ public class BoardPanel extends JPanel {
         return board;
     }
 
+    /**
+     * de: Validiert das Board.
+     * en: Validates the board.
+     *
+     * @param board de: Das zu validierende Board. en: The board to validate.
+     */
     private void validateBoard(CellState[][] board) {
         if (board == null || board.length == 0) {
             throw new IllegalArgumentException("Board must not be null or empty.");
@@ -349,6 +444,16 @@ public class BoardPanel extends JPanel {
         private final int cellSize;
         private final int boardSize;
 
+        /**
+         * de: Bündelt die berechneten Zeichenwerte des Boards.
+         * en: Encapsulates the calculated drawing values of the board.
+         *
+         * @param startX de: Startposition X des Boards. en: Start position X of the board.
+         * @param startY de: Startposition Y des Boards. en: Start position Y of the board.
+         * @param cellSize de: Größe einer Zelle. en: Size of a cell.
+         * @param boardSize de: Größe des Boards. en: Size of the board.
+         * @return de: Rueckgabewert der Methode. en: Method return value.
+         */
         private BoardGeometry(int startX, int startY, int cellSize, int boardSize) {
             this.startX = startX;
             this.startY = startY;

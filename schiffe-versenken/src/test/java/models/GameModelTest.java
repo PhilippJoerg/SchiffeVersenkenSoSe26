@@ -7,11 +7,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * de: Testet die Klasse GameModel.
+ * en: Tests the GameModel class.
+ */
 class GameModelTest {
 
     private GameModel gameModel;
     private CellState[][] ownBoard;
 
+    /**
+     * de: Reagiert auf das Ereignis "SetUp".
+     * en: Responds to the "SetUp" event.
+     *
+     */
     @BeforeEach
     void setUp() {
         ownBoard = BoardUtils.createEmptyCellBoard();
@@ -19,6 +28,11 @@ class GameModelTest {
         gameModel = new GameModel(ownBoard, GameDifficulty.EASY, GameSettings.defaultSettings());
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestConstructorInitializesBoardsAndDifficulty".
+     * en: Responds to the "TestConstructorInitializesBoardsAndDifficulty" event.
+     *
+     */
     @Test
     void testConstructorInitializesBoardsAndDifficulty() {
         assertNotNull(gameModel.getOwnBoard());
@@ -26,6 +40,11 @@ class GameModelTest {
         assertEquals(GameDifficulty.EASY, gameModel.getDifficulty());
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestShootMissAndHitAndGameOver".
+     * en: Responds to the "TestShootMissAndHitAndGameOver" event.
+     *
+     */
     @Test
     void testShootMissAndHitAndGameOver() {
         CellState[][] enemy = gameModel.getEnemyBoard();
@@ -40,12 +59,22 @@ class GameModelTest {
         assertTrue(gameModel.isGameOver() || true);
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestEvaluateIncomingShotInvalidParameters".
+     * en: Responds to the "TestEvaluateIncomingShotInvalidParameters" event.
+     *
+     */
     @Test
     void testEvaluateIncomingShotInvalidParameters() {
         int invalid = gameModel.evaluateIncomingShot(-1, -1);
         assertEquals(0, invalid);
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestComputerShootReturnsValidResult".
+     * en: Responds to the "TestComputerShootReturnsValidResult" event.
+     *
+     */
     @Test
     void testComputerShootReturnsValidResult() {
         int[] result = gameModel.computerShoot();
@@ -56,6 +85,11 @@ class GameModelTest {
         assertTrue(result[2] >= 0 && result[2] <= 2);
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestSettersForGameStatus".
+     * en: Responds to the "TestSettersForGameStatus" event.
+     *
+     */
     @Test
     void testSettersForGameStatus() {
         gameModel.setGameOver(true);

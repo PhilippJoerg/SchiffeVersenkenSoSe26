@@ -12,8 +12,18 @@ import org.junit.jupiter.api.Test;
 
 import models.GameDifficulty;
 
+/**
+ * de: Testet die Klasse StartScreenPanelSmokeTest.
+ * en: Tests the StartScreenPanelSmokeTest class.
+ */
 class StartScreenPanelSmokeTest {
 
+    /**
+     * de: Reagiert auf das Ereignis "SmokeDefaults".
+     * en: Reacts to the event "SmokeDefaults".
+     *
+     * @throws Exception de: Bei Fehler waehrend der Ausfuehrung. en: If an error occurs during execution.
+     */
     @Test
     void smokeDefaults() throws Exception {
         Assumptions.assumeFalse(

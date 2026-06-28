@@ -9,8 +9,17 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * de: Testet die BoardUtils-Klasse.
+ * en: Tests the BoardUtils class.
+ */
 class BoardUtilsTest {
 
+    /**
+     * de: Reagiert auf das Ereignis "TestCreateEmptyCellBoardHasEmptyCells".
+     * en: Responds to the "TestCreateEmptyCellBoardHasEmptyCells" event.
+     *
+     */
     @Test
     void testCreateEmptyCellBoardHasEmptyCells() {
         CellState[][] board = BoardUtils.createEmptyCellBoard();
@@ -23,6 +32,11 @@ class BoardUtilsTest {
         }
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestIsInsideBoardBoundsAndOutOfBounds".
+     * en: Responds to the "TestIsInsideBoardBoundsAndOutOfBounds" event.
+     *
+     */
     @Test
     void testIsInsideBoardBoundsAndOutOfBounds() {
         CellState[][] board = BoardUtils.createEmptyCellBoard();
@@ -34,6 +48,11 @@ class BoardUtilsTest {
         assertFalse(BoardUtils.isInsideBoard(board, 0, BoardUtils.GRID_SIZE));
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestCanPlaceShipValidAndInvalidPositions".
+     * en: Responds to the "TestCanPlaceShipValidAndInvalidPositions" event.
+     *
+     */
     @Test
     void testCanPlaceShipValidAndInvalidPositions() {
         CellState[][] board = BoardUtils.createEmptyCellBoard();
@@ -44,6 +63,11 @@ class BoardUtilsTest {
         assertFalse(BoardUtils.canPlaceShip(board, ShipType.CRUISER, 0, 0, ShipOrientation.HORIZONTAL));
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestPlaceShipWritesShipCells".
+     * en: Responds to the "TestPlaceShipWritesShipCells" event.
+     *
+     */
     @Test
     void testPlaceShipWritesShipCells() {
         CellState[][] board = BoardUtils.createEmptyCellBoard();
@@ -53,6 +77,11 @@ class BoardUtilsTest {
         assertEquals(CellState.EMPTY, board[2][5]);
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestPlaceRandomShipsFillsShipsWithoutError".
+     * en: Responds to the "TestPlaceRandomShipsFillsShipsWithoutError" event.
+     *
+     */
     @Test
     void testPlaceRandomShipsFillsShipsWithoutError() {
         CellState[][] board = BoardUtils.createEmptyCellBoard();
@@ -76,6 +105,11 @@ class BoardUtilsTest {
         assertEquals(expectedShipCount, shipCount);
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestIsCellFreeOnEmptyAndNeighborCells".
+     * en: Responds to the "TestIsCellFreeOnEmptyAndNeighborCells" event.
+     *
+     */
     @Test
     void testIsCellFreeOnEmptyAndNeighborCells() {
         CellState[][] board = BoardUtils.createEmptyCellBoard();
@@ -86,6 +120,11 @@ class BoardUtilsTest {
         assertFalse(BoardUtils.isCellFree(board, 2, 0));
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestPlaceShipWithInvalidBoardThrows".
+     * en: Responds to the "TestPlaceShipWithInvalidBoardThrows" event.
+     *
+     */
     @Test
     void testPlaceShipWithInvalidBoardThrows() {
         CellState[][] badBoard = new CellState[9][9];

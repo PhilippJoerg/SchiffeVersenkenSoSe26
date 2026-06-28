@@ -7,19 +7,43 @@ package models;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * de: Die Klasse BoardUtils.
+ * en: The BoardUtils class.
+ */
 public class BoardUtils {
 
+    /**
+     * de: Das Feld GRID_SIZE.
+     * en: The field GRID_SIZE.
+     */
     public static final int GRID_SIZE = 10;
+    /**
+     * de: Das Feld MAX_PLACEMENT_ATTEMPTS_PER_SHIP.
+     * en: The field MAX_PLACEMENT_ATTEMPTS_PER_SHIP.
+     */
     public static final int MAX_PLACEMENT_ATTEMPTS_PER_SHIP = 100;
+    /**
+     * de: Das Feld MAX_BOARD_RESTARTS.
+     * en: The field MAX_BOARD_RESTARTS.
+     */
     public static final int MAX_BOARD_RESTARTS = 100;
 
     /**
-     * Erzeugt ein leeres 10x10-Spielfeld mit dem Zustand EMPTY.
+     * de: Erzeugt ein leeres 10x10-Spielfeld mit dem Zustand EMPTY.
+     * en: Creates an empty 10x10 board with the state EMPTY.
      */
     public static CellState[][] createEmptyCellBoard() {
         return createEmptyCellBoard(GRID_SIZE);
     }
 
+    /**
+     * de: Erzeugt ein leeres Spielfeld mit der angegebenen Größe und dem Zustand EMPTY.
+     * en: Creates an empty board with the specified size and the state EMPTY.
+     *
+     * @param boardSize de: Parameter boardSize. en: Parameter boardSize.
+     * @return de: Rueckgabewert der Methode. en: Method return value.
+     */
     public static CellState[][] createEmptyCellBoard(int boardSize) {
         CellState[][] board = new CellState[boardSize][boardSize];
 
@@ -33,7 +57,8 @@ public class BoardUtils {
     }
 
     /**
-     * Setzt ein Board auf den Zustand EMPTY zurück.
+     * de: Setzt ein Board auf den Zustand EMPTY zurück.
+     * en: Resets a board to the EMPTY state.
      */
     public static void clearBoard(CellState[][] board) {
         int boardSize = board.length;
@@ -46,7 +71,8 @@ public class BoardUtils {
     }
 
     /**
-     * Prüft, ob ein Feld innerhalb des gültigen Spielfeldbereichs liegt.
+     * de: Prüft, ob ein Feld innerhalb des gültigen Spielfeldbereichs liegt.
+     * en: Checks if a cell is within the valid board boundaries.
      */
     public static boolean isInsideBoard(CellState[][] board, int col, int row) {
         int boardSize = board.length;
@@ -54,8 +80,15 @@ public class BoardUtils {
     }
 
     /**
-     * Prüft, ob ein Schiff an der angegebenen Position und Ausrichtung
-     * platziert werden kann.
+     * de: Prueft, ob ein Schiff an der angegebenen Position mit der Ausrichtung platziert werden kann.
+     * en: Checks whether a ship can be placed at the given position and orientation.
+     *
+     * @param board de: Spielfeld, das geprueft wird. en: Board to validate placement on.
+     * @param shipType de: Zu platzierender Schiffstyp. en: Ship type to place.
+     * @param startCol de: Startspalte des Schiffs. en: Start column of the ship.
+     * @param startRow de: Startzeile des Schiffs. en: Start row of the ship.
+     * @param orientation de: Ausrichtung des Schiffs. en: Orientation of the ship.
+     * @return de: true bei gueltiger Platzierung, sonst false. en: true if placement is valid, otherwise false.
      */
     public static boolean canPlaceShip(CellState[][] board, ShipType shipType, int startCol, int startRow,
             ShipOrientation orientation) {
@@ -75,7 +108,14 @@ public class BoardUtils {
     }
 
     /**
-     * Platziert ein Schiff auf dem Board an der angegebenen Position.
+     * de: Platziert ein Schiff auf dem Spielfeld an der angegebenen Position.
+     * en: Places a ship on the board at the given position.
+     *
+     * @param board de: Spielfeld, auf dem platziert wird. en: Board where the ship is placed.
+     * @param shipType de: Zu platzierender Schiffstyp. en: Ship type to place.
+     * @param startCol de: Startspalte des Schiffs. en: Start column of the ship.
+     * @param startRow de: Startzeile des Schiffs. en: Start row of the ship.
+     * @param orientation de: Ausrichtung des Schiffs. en: Orientation of the ship.
      */
     public static void placeShip(CellState[][] board, ShipType shipType, int startCol, int startRow,
             ShipOrientation orientation) {
@@ -91,6 +131,13 @@ public class BoardUtils {
         }
     }
 
+    /**
+     * de: Platziert Schiffe zufällig auf dem Spielfeld basierend auf den angegebenen Schiffszahlen.
+     * en: Places ships randomly on the board based on the specified ship counts.
+     *
+     * @param board de: Parameter board. en: Parameter board.
+     * @param shipCounts de: Parameter shipCounts. en: Parameter shipCounts.
+     */
     public static void placeRandomShips(CellState[][] board, Map<ShipType, Integer> shipCounts) {
         Random random = new Random();
         int restartCount = 0;
@@ -144,7 +191,8 @@ public class BoardUtils {
     }
 
     /**
-     * Prüft, ob ein Feld und seine Nachbarfelder frei von Schiffen sind.
+     * de: Prüft, ob ein Feld und seine Nachbarfelder frei von Schiffen sind.
+     * en: Checks if a cell and its neighboring cells are free of ships.
      */
     public static boolean isCellFree(CellState[][] board, int x, int y) {
         for (int i = -1; i <= 1; i++) {
@@ -162,9 +210,8 @@ public class BoardUtils {
     }
 
     /**
-     * Prüft, ob das Schiff, zu dem die Zelle (col,row) gehört, bereits
-     * vollständig versenkt ist. Akzeptiert Zellen mit Zustand HIT oder SHIP
-     * (z.B. vor/ nach Auswertung).
+     * de: Prüft, ob das Schiff, zu dem die Zelle (col,row) gehört, bereits vollständig versenkt ist. Akzeptiert Zellen mit Zustand HIT oder SHIP (z.B. vor/ nach Auswertung).
+     * en: Checks if the ship at the specified cell (col,row) is completely sunk. Accepts cells with state HIT or SHIP (e.g., before/after evaluation).
      */
     public static boolean isShipSunkAt(CellState[][] board, int col, int row) {
         int boardSize = board.length;

@@ -14,6 +14,10 @@ import models.CellState;
 import models.GameDifficulty;
 import models.GameModel;
 
+/**
+ * de: Kapselt die Schuss-Logik für den Computergegner.
+ * en: Encapsulates the shooting logic for the computer opponent.
+ */
 public class ShootController {
 
     private final GameModel gameModel;
@@ -22,6 +26,12 @@ public class ShootController {
     private final List<int[]> targetQueue;
     private final GameDifficulty difficulty;
 
+    /**
+     * de: Konstruktor für ShootController.
+     * en: Constructor for ShootController.
+     *
+     * @param gameModel de: Parameter gameModel. en: Parameter gameModel.
+     */
     public ShootController(GameModel gameModel) {
         this.gameModel = gameModel;
         this.random = new Random();
@@ -31,6 +41,11 @@ public class ShootController {
         initAvailableCells();
     }
 
+    /**
+     * de: Initialisiert die Liste der verfügbaren Zellen für den Computergegner.
+     * en: Initializes the list of available cells for the computer opponent.
+     *
+     */
     private void initAvailableCells() {
         int boardSize = gameModel.getOwnBoard().length;
 
@@ -42,8 +57,8 @@ public class ShootController {
     }
 
     /**
-     * Wertet einen Schuss auf das gegnerische Board aus und markiert Treffer
-     * oder Fehlschuss.
+     * de: Wertet einen Schuss auf das gegnerische Board aus und markiert Treffer oder Fehlschuss.
+     * en: Evaluates a shot on the enemy board and marks a hit or miss.
      */
     public boolean shoot(int col, int row) {
         CellState[][] enemyBoard = gameModel.getEnemyBoard();
@@ -64,7 +79,8 @@ public class ShootController {
     }
 
     /**
-     * Überprüft, ob auf dem angegebenen Board noch Schiffe vorhanden sind.
+     * de: Überprüft, ob auf dem angegebenen Board noch Schiffe vorhanden sind.
+     * en: Checks if there are any ships remaining on the given board.
      */
     private boolean isBoardSunk(CellState[][] board) {
         int boardSize = board.length;
@@ -80,8 +96,8 @@ public class ShootController {
     }
 
     /**
-     * Bestimmt den nächsten Schuss des Computers abhängig von der
-     * Schwierigkeit.
+     * de: Bestimmt den nächsten Schuss des Computers abhängig von der Schwierigkeit.
+     * en: Determines the next shot of the computer based on the difficulty.
      */
     public int[] computerShoot() {
         switch (difficulty) {
@@ -100,8 +116,8 @@ public class ShootController {
     }
 
     /**
-     * Wertet einen eingehenden Schuss vom Netzwerkgegner aus und liefert das
-     * Ergebnis zurück. 0 = Wasser, 1 = Treffer, 2 = Versenkt
+     * de: Wertet einen eingehenden Schuss vom Netzwerkgegner aus und liefert das Ergebnis zurück. 0 = Wasser, 1 = Treffer, 2 = Versenkt
+     * en: Evaluates an incoming shot from the network opponent and returns the result. 0 = water, 1 = hit, 2 = sunk
      */
     public int evaluateIncomingShot(int col, int row) {
         CellState[][] enemyBoard = gameModel.getEnemyBoard();
@@ -127,8 +143,8 @@ public class ShootController {
     }
 
     /**
-     * Platzhalter für eine schwere KI-Strategie auf Basis von
-     * Wahrscheinlichkeitsdichte.
+     * de: Platzhalter für eine schwere KI-Strategie auf Basis von Wahrscheinlichkeitsdichte.
+     * en: Placeholder for a hard AI strategy based on probability density.
      */
     private int[] shootProbabilityDensity() {
         // TODO: implement shootProbabilityDensity()
@@ -136,16 +152,15 @@ public class ShootController {
         // Dies ist die stärkste Strategie, die oft von Computer-KIs genutzt wird. 
         // - Vorgehensweise: Der Algorithmus berechnet für jedes Feld auf dem Gitter, wie viele Möglichkeiten es gibt, die noch übrigen Schiffe dort zu 
         //   platzieren.Felder in der Mitte haben anfangs eine höhere Wahrscheinlichkeit, da dort Schiffe in mehr Ausrichtungen (horizontal/vertikal) hinpassen 
-        //   als in den Ecken. Nach jedem Schuss (Treffer oder Fehlschuss) wird die „Heatmap“ neu berechnet. Ein Fehlschuss senkt die Wahrscheinlichkeit der 
+        //   als in den Ecken. Nach jedem Schuss (Treffer oder Fehlschuss) wird die â€žHeatmapâ€œ neu berechnet. Ein Fehlschuss senkt die Wahrscheinlichkeit der 
         //   umliegenden Felder drastisch, während ein Treffer sie massiv erhöht. 
         // - Effizienz: Extrem hoch. Erfahrene Algorithmen benötigen oft nur 30 bis 40 Schüsse, um die gesamte Flotte zu versenken.
         throw new UnsupportedOperationException("Unimplemented method 'shootProbabilityDensity'");
     }
 
     /**
-     * Platzhalter für eine mittlere KI-Strategie mit Schachbrett- und
-     * Jagd-Modus. TODO: add a sunk ship tracking to avoid shooting around
-     * already sunk ships
+     * de: Platzhalter für eine mittlere KI-Strategie mit Schachbrett- und Jagd-Modus. TODO: add a sunk ship tracking to avoid shooting around already sunk ships
+     * en: Placeholder for a medium AI strategy with checkerboard and hunt mode. 
      */
     private int[] shootCheckerboardAndHunt() {
         if (availableCells.isEmpty()) {
@@ -186,6 +201,12 @@ public class ShootController {
         return new int[]{col, row, result};
     }
 
+    /**
+     * de: Gibt die nächste Zielzelle aus der Zielwarteschlange zurück.
+     * en: Returns the next target cell from the target queue.
+     *
+     * @return de: Rueckgabewert der Methode. en: Method return value.
+     */
     private int[] pollNextTargetCell() {
         List<List<int[]>> clusters = getActiveHitClusters();
         clusters.sort((a, b) -> Integer.compare(b.size(), a.size()));
@@ -211,10 +232,20 @@ public class ShootController {
         return null;
     }
 
+    /**
+     * de: Enum für die Orientierung.
+     * en: Enum for the orientation.
+     */
     private enum Orientation {
         HORIZONTAL, VERTICAL, UNKNOWN
     }
 
+    /**
+     * de: Gibt die aktiven Treffercluster zurück.
+     * en: Returns the active hit clusters.
+     *
+     * @return de: Rueckgabewert der Methode. en: Method return value.
+     */
     private List<List<int[]>> getActiveHitClusters() {
         List<List<int[]>> clusters = new ArrayList<>();
         CellState[][] ownBoard = gameModel.getOwnBoard();
@@ -250,6 +281,13 @@ public class ShootController {
         return clusters;
     }
 
+    /**
+     * de: Schätzt die Orientierung eines Trefferclusters.
+     * en: Infers the orientation of a hit cluster.
+     *
+     * @param cluster de: Parameter cluster. en: Parameter cluster.
+     * @return de: Rueckgabewert der Methode. en: Method return value.
+     */
     private Orientation inferOrientation(List<int[]> cluster) {
         if (cluster.size() < 2) {
             return Orientation.UNKNOWN;
@@ -275,6 +313,14 @@ public class ShootController {
         return Orientation.UNKNOWN;
     }
 
+    /**
+     * de: Gibt die möglichen Zielzellen für ein Treffercluster zurück.
+     * en: Returns the possible target cells for a hit cluster.
+     *
+     * @param cluster de: Parameter cluster. en: Parameter cluster.
+     * @param ori de: Parameter ori. en: Parameter ori.
+     * @return de: Rueckgabewert der Methode. en: Method return value.
+     */
     private List<int[]> getClusterCandidates(List<int[]> cluster, Orientation ori) {
         List<int[]> candidates = new ArrayList<>();
         if (cluster.isEmpty()) {
@@ -312,6 +358,12 @@ public class ShootController {
         return candidates;
     }
 
+    /**
+     * de: Wählt eine Zelle basierend auf dem Paritätsmuster aus.
+     * en: Picks a cell based on the parity pattern.
+     *
+     * @return de: Rueckgabewert der Methode. en: Method return value.
+     */
     private int[] pickParityCell() {
         List<int[]> parityCells = new ArrayList<>();
         for (int[] cell : availableCells) {
@@ -325,6 +377,14 @@ public class ShootController {
         return availableCells.get(random.nextInt(availableCells.size()));
     }
 
+    /**
+     * de: Überprüft, ob eine Zelle verfügbar ist.
+     * en: Checks if a cell is available.
+     *
+     * @param col de: Parameter col. en: Parameter col.
+     * @param row de: Parameter row. en: Parameter row.
+     * @return de: Rueckgabewert der Methode. en: Method return value.
+     */
     private boolean isCellAvailable(int col, int row) {
         for (int[] cell : availableCells) {
             if (cell[0] == col && cell[1] == row) {
@@ -334,6 +394,13 @@ public class ShootController {
         return false;
     }
 
+    /**
+     * de: Entfernt eine Zelle aus der Liste der verfügbaren Zellen.
+     * en: Removes a cell from the list of available cells.
+     *
+     * @param col de: Parameter col. en: Parameter col.
+     * @param row de: Parameter row. en: Parameter row.
+     */
     private void removeAvailableCell(int col, int row) {
         for (int i = 0; i < availableCells.size(); i++) {
             int[] cell = availableCells.get(i);
@@ -344,6 +411,14 @@ public class ShootController {
         }
     }
 
+    /**
+     * de: Überprüft, ob eine Zelle in der Zielwarteschlange enthalten ist.
+     * en: Checks if a cell is in the target queue.
+     *
+     * @param col de: Parameter col. en: Parameter col.
+     * @param row de: Parameter row. en: Parameter row.
+     * @return de: Rueckgabewert der Methode. en: Method return value.
+     */
     private boolean containsTargetCell(int col, int row) {
         for (int[] cell : targetQueue) {
             if (cell[0] == col && cell[1] == row) {
@@ -353,6 +428,13 @@ public class ShootController {
         return false;
     }
 
+    /**
+     * de: Fügt die benachbarten Zellen eines getroffenen Schiffs zur Zielwarteschlange hinzu.
+     * en: Adds the neighboring cells of a hit ship to the target queue.
+     *
+     * @param col de: Parameter col. en: Parameter col.
+     * @param row de: Parameter row. en: Parameter row.
+     */
     private void enqueueTargetCells(int col, int row) {
         CellState[][] ownBoard = gameModel.getOwnBoard();
         int[][] offsets = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
@@ -368,6 +450,13 @@ public class ShootController {
         }
     }
 
+    /**
+     * de: Entfernt die Zellen eines versenkten Schiffs aus der Zielwarteschlange.
+     * en: Removes the cells of a sunk ship from the target queue.
+     *
+     * @param col de: Parameter col. en: Parameter col.
+     * @param row de: Parameter row. en: Parameter row.
+     */
     private void cleanupTargetQueueForSunkShip(int col, int row) {
         CellState[][] ownBoard = gameModel.getOwnBoard();
         for (int[] shipCell : getShipCells(col, row)) {
@@ -385,6 +474,13 @@ public class ShootController {
         }
     }
 
+    /**
+     * de: Entfernt eine Zelle aus der Zielwarteschlange.
+     * en: Removes a cell from the target queue.
+     *
+     * @param col de: Parameter col. en: Parameter col.
+     * @param row de: Parameter row. en: Parameter row.
+     */
     private void removeTargetQueueCell(int col, int row) {
         for (int i = targetQueue.size() - 1; i >= 0; i--) {
             int[] cell = targetQueue.get(i);
@@ -394,6 +490,14 @@ public class ShootController {
         }
     }
 
+    /**
+     * de: Überprüft, ob ein Schiff versenkt ist.
+     * en: Checks if a ship is sunk.
+     *
+     * @param col de: Parameter col. en: Parameter col.
+     * @param row de: Parameter row. en: Parameter row.
+     * @return de: Rueckgabewert der Methode. en: Method return value.
+     */
     private boolean isShipSunk(int col, int row) {
         List<int[]> shipCells = getShipCells(col, row);
         if (shipCells.isEmpty()) {
@@ -408,6 +512,14 @@ public class ShootController {
         return true;
     }
 
+    /**
+     * de: Liefert die Zellen eines Schiffs basierend auf einer gegebenen Zelle zurück.
+     * en: Returns the cells of a ship based on a given cell.
+     *
+     * @param col de: Parameter col. en: Parameter col.
+     * @param row de: Parameter row. en: Parameter row.
+     * @return de: Rueckgabewert der Methode. en: Method return value.
+     */
     private List<int[]> getShipCells(int col, int row) {
         List<int[]> shipCells = new ArrayList<>();
         CellState[][] ownBoard = gameModel.getOwnBoard();
@@ -450,13 +562,20 @@ public class ShootController {
         return shipCells;
     }
 
+    /**
+     * de: Überprüft, ob eine Zelle ein Schiffsegment ist.
+     * en: Checks if a cell is a ship segment.
+     *
+     * @param state de: Parameter state. en: Parameter state.
+     * @return de: Rueckgabewert der Methode. en: Method return value.
+     */
     private boolean isShipSegment(CellState state) {
         return state == CellState.HIT || state == CellState.SHIP;
     }
 
     /**
-     * Führt einen zufälligen Schuss des Computers aus und markiert das
-     * Ergebnis.
+     * de: Führt einen zufälligen Schuss des Computers aus und markiert das Ergebnis.
+     * en: Executes a random shot by the computer and marks the result.
      */
     private int[] shootRandom() {
         if (availableCells.isEmpty()) {

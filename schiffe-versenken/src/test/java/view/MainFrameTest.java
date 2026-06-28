@@ -7,8 +7,17 @@ import org.junit.jupiter.api.Test;
 
 import models.BoardUtils;
 
+/**
+ * de: Testet die Klasse MainFrame.
+ * en: Tests the MainFrame class.
+ */
 class MainFrameTest {
 
+    /**
+     * de: Reagiert auf das Ereignis "TestSettersAndActionsDoNotThrow".
+     * en: Reacts to the event "TestSettersAndActionsDoNotThrow".
+     *
+     */
     @Test
     void testSettersAndActionsDoNotThrow() {
         Assumptions.assumeFalse(

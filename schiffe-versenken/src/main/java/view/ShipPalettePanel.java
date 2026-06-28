@@ -28,6 +28,10 @@ import javax.swing.TransferHandler;
 import models.ShipOrientation;
 import models.ShipType;
 
+/**
+ * de: Die Klasse ShipPalettePanel.
+ * en: The class ShipPalettePanel.
+ */
 public class ShipPalettePanel extends JPanel {
 
     // Größen der Palette und einzelner Schiff-Karten
@@ -50,6 +54,10 @@ public class ShipPalettePanel extends JPanel {
     // Aktuelle Ausrichtung für neu gezogene Schiffe
     private ShipOrientation orientation;
 
+    /**
+     * de: Konstruktor für ShipPalettePanel.
+     * en: Constructor for ShipPalettePanel.
+     */
     public ShipPalettePanel() {
         this.remainingCounts = new EnumMap<>(ShipType.class);
         this.labels = new EnumMap<>(ShipType.class);
@@ -97,8 +105,11 @@ public class ShipPalettePanel extends JPanel {
     }
 
     /*
-     * Erstellt eine Schiff-Karte.
-     * Von dieser Karte kann ein Schiff per Drag-and-Drop gezogen werden.
+     * de: Erstellt eine Schiff-Karte. Von dieser Karte kann ein Schiff per Drag-and-Drop gezogen werden.
+     * en: Creates a ship card. A ship can be dragged and dropped from this card.
+     *
+     * @param shipType de: Der Schiffstyp. en: The ship type.
+     * @return de: Die erstellte Schiff-Karte. en: The created ship card.
      */
     private JComponent createShipSource(ShipType shipType) {
         JPanel panel = new JPanel();
@@ -136,10 +147,17 @@ public class ShipPalettePanel extends JPanel {
         panel.add(Box.createVerticalGlue());
 
         /*
-         * TransferHandler erzeugt die Daten für Drag-and-Drop.
-         * Ist kein Schiff dieses Typs mehr übrig, wird nichts gezogen.
+         * de: TransferHandler erzeugt die Daten für Drag-and-Drop. Ist kein Schiff dieses Typs mehr übrig, wird nichts gezogen.
+         * en: TransferHandler creates the data for drag-and-drop. If no ship of this type is left, nothing is dragged.
          */
         panel.setTransferHandler(new TransferHandler() {
+            /**
+             * de: Überschreibt die Methode createTransferable.
+             * en: Overrides the method createTransferable.
+             *
+             * @param c de: Parameter c. en: Parameter c.
+             * @return de: Das zu übertragende Objekt. en: The transferable object.
+             */
             @Override
             protected Transferable createTransferable(JComponent c) {
                 if (getRemainingCount(shipType) <= 0) {
@@ -149,6 +167,13 @@ public class ShipPalettePanel extends JPanel {
                 return new ShipTransferable(new ShipDragData(shipType, orientation));
             }
 
+            /**
+             * de: Überschreibt die Methode getSourceActions.
+             * en: Overrides the method getSourceActions.
+             *
+             * @param c de: Parameter c. en: Parameter c.
+             * @return de: Die zulässigen Aktionen. en: The allowed actions.
+             */
             @Override
             public int getSourceActions(JComponent c) {
                 return COPY;
@@ -157,6 +182,12 @@ public class ShipPalettePanel extends JPanel {
 
         // Startet Drag-and-Drop beim Drücken der Maustaste
         panel.addMouseListener(new MouseAdapter() {
+            /**
+             * de: Überschreibt die Methode mousePressed.
+             * en: Overrides the method mousePressed.
+             *
+             * @param e de: Parameter e. en: Parameter e.
+             */
             @Override
             public void mousePressed(MouseEvent e) {
                 if (getRemainingCount(shipType) <= 0) {
@@ -173,6 +204,12 @@ public class ShipPalettePanel extends JPanel {
     }
 
     // Aktualisiert die Restanzahl aller Schiffstypen
+    /**
+     * de: Setzt die verbleibenden Schiffszahlen.
+     * en: Sets the remaining ship counts.
+     *
+     * @param newRemainingCounts de: Die neuen verbleibenden Schiffszahlen. en: The new remaining ship counts.
+     */
     public void setRemainingCounts(Map<ShipType, Integer> newRemainingCounts) {
         for (ShipType type : ShipType.values()) {
             int value = newRemainingCounts.getOrDefault(type, 0);
@@ -183,17 +220,35 @@ public class ShipPalettePanel extends JPanel {
     }
 
     // Setzt die aktuelle Ausrichtung der Schiffe
+    /**
+     * de: Setzt die aktuelle Ausrichtung der Schiffe.
+     * en: Sets the current orientation of the ships.
+     *
+     * @param orientation de: Die neue Ausrichtung. en: The new orientation.
+     */
     public void setOrientation(ShipOrientation orientation) {
         this.orientation = orientation;
         refreshLabels();
     }
 
     // Gibt zurück, wie viele Schiffe eines Typs übrig sind
+    /**
+     * de: Gibt die verbleibende Anzahl eines Schiffstyps zurück.
+     * en: Returns the remaining count of a ship type.
+     *
+     * @param shipType de: Der Schiffstyp. en: The ship type.
+     * @return de: Die verbleibende Anzahl. en: The remaining count.
+     */
     private int getRemainingCount(ShipType shipType) {
         return remainingCounts.getOrDefault(shipType, 0);
     }
 
     // Aktualisiert Texte und Aktivierung der Labels
+    /**
+     * de: Aktualisiert die Texte und Aktivierung der Labels.
+     * en: Updates the texts and activation of the labels.
+     *
+     */
     private void refreshLabels() {
         for (ShipType type : ShipType.values()) {
             JLabel label = labels.get(type);
@@ -212,6 +267,12 @@ public class ShipPalettePanel extends JPanel {
     }
 
     // Wandelt die Ausrichtung in lesbaren Text um
+    /**
+     * de: Wandelt die Ausrichtung in lesbaren Text um.
+     * en: Converts the orientation to readable text.
+     *
+     * @return de: Der lesbare Text der Ausrichtung. en: The readable text of the orientation.
+     */
     private String orientationText() {
         return orientation == ShipOrientation.HORIZONTAL ? "waagrecht" : "senkrecht";
     }

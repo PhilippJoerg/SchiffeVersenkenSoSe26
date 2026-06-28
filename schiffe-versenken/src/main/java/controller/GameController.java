@@ -17,6 +17,10 @@ import models.GameModel;
 import models.SaveLoad;
 import view.GameView;
 
+/**
+ * de: Die Klasse GameController.
+ * en: The class GameController.
+ */
 public class GameController {
     private final GameView frame;
     private final GameModel model;
@@ -32,14 +36,16 @@ public class GameController {
     private int pendingShotRow = -1;
 
     /**
-     * Erstellt einen lokalen Spiel-Controller für ein Einzelspiel.
+     * de: Erstellt einen lokalen Spiel-Controller für ein Einzelspiel.
+     * en: Creates a local game controller for a single-player game.
      */
     public GameController(GameView frame, GameModel model, Runnable backToMainMenuAction) {
     this(frame, model, null, false, backToMainMenuAction);
 }
 
     /**
-     * Erstellt einen Spiel-Controller für ein Netzwerkspiel mit Verbindungsobjekt und Startreihenfolge.
+     * de: Erstellt einen Spiel-Controller für ein Netzwerkspiel mit Verbindungsobjekt und Startreihenfolge.
+     * en: Creates a network game controller with a connection object and starting order.
      */
     public GameController(GameView frame, GameModel model, Com com, boolean iStart, Runnable backToMainMenuAction) {
         this.frame = frame;
@@ -72,6 +78,11 @@ public class GameController {
         }
     }
 
+    /**
+     * de: Führt die Speicheraktion aus.
+     * en: Handles the save action.
+     *
+     */
     private void handleSave() {
         JFileChooser chooser = new JFileChooser();
         int res = chooser.showSaveDialog(null);
@@ -90,6 +101,11 @@ public class GameController {
         }
     }
 
+    /**
+     * de: Führt die Ladeaktion aus.
+     * en: Handles the load action.
+     *
+     */
     private void handleLoad() {
         JFileChooser chooser = new JFileChooser();
         int res = chooser.showOpenDialog(null);
@@ -108,7 +124,8 @@ public class GameController {
     }
 
     /**
-     * Verarbeitet einen Schuss auf das Gegnerfeld und aktualisiert den Spielstatus.
+     * de: Verarbeitet einen Schuss auf das Gegnerfeld und aktualisiert den Spielstatus.
+     * en: Handles a shot on the enemy board and updates the game status.
      */
     private void handleShoot(int col, int row) {
         // Schuss ignorieren, wenn das Spiel bereits vorbei ist oder der Computer gerade am Zug ist
@@ -129,7 +146,7 @@ public class GameController {
                 // dem richtigen Feld zuordnen zu können
                 pendingShotCol = col;
                 pendingShotRow = row;
-                // Spieler über den gesendeten Schuss informieren und auf Rückmeldung vertrösten
+                // Spieler über den gesendeten Schuss informieren und auf Rückmeldung vertörsten
                 frame.setStatus("Schuss gesendet: " + (char) ('A' + col) + (row + 1) + " — warte auf Antwort...");
             } catch (Exception e) {
                 // Netzwerkfehler anzeigen; der Spielzug gilt als nicht ausgeführt
@@ -152,7 +169,7 @@ public class GameController {
         // Treffer: Schiff getroffen
         if (result == CellState.HIT) {
             if (model.isGameOver()) {
-                // Letztes Schiff versenkt → Spieler hat gewonnen
+                // Letztes Schiff versenkt -> Spieler hat gewonnen
                 frame.setStatus("Du hast gewonnen!");
                 showEndScreen("Spiel beendet", "Du hast gewonnen!");
             } else {
@@ -164,7 +181,7 @@ public class GameController {
             }
             return;
         }
-        // Daneben: kein Schiff getroffen → Zug geht an den Computer
+        // Daneben: kein Schiff getroffen -> Zug geht an den Computer
         if (result == CellState.MISS) {
             frame.setStatus("Daneben. Computer denkt...");
             startComputerShootLoop(); // Computerlogik asynchron starten
@@ -172,7 +189,8 @@ public class GameController {
     }
 
     /**
-     * Startet die Schusschleife für den Computergegner, damit dieser schießt bis er nicht getroffen hat.
+     * de: Startet die Schusschleife für den Computergegner, damit dieser schießt bis er nicht getroffen hat.
+     * en: Start the firing loop for the computer opponent so that it continues to fire until it misses.
      */
     private void startComputerShootLoop() {
         computerTurn = true;
@@ -219,7 +237,8 @@ public class GameController {
     }
 
     /**
-     * Beendet den Zug des Computers und stoppt den zugehörigen Timer.
+     * de: Beendet den Zug des Computers und stoppt den zugehörigen Timer.
+     * en: Ends the computer's turn and stops the associated timer.
      */
     private void stopComputerTurn() {
         computerTurn = false;
@@ -230,7 +249,8 @@ public class GameController {
     }
 
     /**
-     * Zeigt das Endbildschirm-Dialogfenster mit Titel und Nachricht an.
+     * de: Zeigt das Endbildschirm-Dialogfenster mit Titel und Nachricht an.
+     * en: Shows the end screen dialog with a title and message.
      */
     private void showEndScreen(String title, String message) {
     Object[] options = {"Hauptmenü"};
@@ -250,15 +270,29 @@ public class GameController {
 }
 
     /**
-     * Richtet die Netzwerkereignisse für den Spielverlauf (Schuss, Antwort, Pass) ein.
+     * de: Richtet die Netzwerkereignisse für den Spielverlauf (Schuss, Antwort, Pass) ein.
+     * en: Sets up the network event handlers for the game flow (shot, answer, pass).
      */
     private void setupNetworkHandlers() {
         com.setListener(new Com.Listener() {
+            /**
+             * de: Die Methode onCoin.
+             * en: The method onCoin.
+             *
+             * @param coin de: Parameter coin. en: Parameter coin.
+             */
             @Override
             public void onCoin(int coin) {
                 // not used here
             }
 
+            /**
+             * de: Die Methode onShot.
+             * en: The method onShot.
+             *
+             * @param col de: Parameter col. en: Parameter col.
+             * @param row de: Parameter row. en: Parameter row.
+             */
             @Override
             public void onShot(int col, int row) {
                 int answer = model.evaluateIncomingShot(col, row);
@@ -280,6 +314,12 @@ public class GameController {
                 }
             }
 
+            /**
+             * de: Die Methode onAnswer.
+             * en: The method onAnswer.
+             *
+             * @param answer de: Parameter answer. en: Parameter answer.
+             */
             @Override
             public void onAnswer(int answer) {
                 if (pendingShotCol >= 0 && pendingShotRow >= 0) {
@@ -315,17 +355,32 @@ public class GameController {
                 }
             }
 
+            /**
+             * de: Die Methode onPass.
+             * en: The method onPass.
+             *
+             */
             @Override
             public void onPass() {
                 myTurnNetwork = true;
                 frame.setStatus("Gegner hat nicht getroffen. Dein Zug.");
             }
 
+            /**
+             * de: Die Methode onConnected.
+             * en: The method onConnected.
+             *
+             */
             @Override
             public void onConnected() {
                 // ignore
             }
 
+            /**
+             * de: Die Methode onDisconnected.
+             * en: The method onDisconnected.
+             *
+             */
             @Override
             public void onDisconnected() {
                 frame.setStatus("Verbindung getrennt.");

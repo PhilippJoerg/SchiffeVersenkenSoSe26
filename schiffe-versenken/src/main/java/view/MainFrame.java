@@ -41,7 +41,10 @@ import models.ShipOrientation;
 import models.ShipType;
 import models.GameSettings;
 
-// Linke Drag-and-Drop-Palette für verfügbare Schiffe
+/**
+ * de: Die Klasse MainFrame ist das Hauptfenster der Anwendung und setzt die Views zusammen.
+ * en: The MainFrame class is the main window of the application and assembles the views.
+ */
 public class MainFrame extends JFrame implements view.GameView, view.PlacementView, view.ConnectionView {
 
     // Namen der Screens im CardLayout
@@ -51,6 +54,10 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
     // Mindestgröße des Fensters
     private static final Dimension MINIMUM_WINDOW_SIZE = new Dimension(950, 650);
 
+    /**
+     * de: Das Enum ScreenMode.
+     * en: The enum ScreenMode.
+     */
     private enum ScreenMode {
         START,
         GAME
@@ -101,6 +108,10 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
     private JMenuItem saveMenuItem;
     private JMenuItem loadMenuItem;
 
+    /**
+     * de: Konstruktor der Klasse MainFrame.
+     * en: Constructor of the MainFrame class.
+     */
     public MainFrame() {
         super("Schiffe versenken");
 
@@ -163,6 +174,12 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         setJMenuBar(createMenuBar());
     }
 
+    /**
+     * de: Erstellt die Menüleiste.
+     * en: Creates the menu bar.
+     *
+     * @return de: Die erstellte Menüleiste. en: The created menu bar.
+     */
     private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         JMenu file = new JMenu("Datei");
@@ -234,8 +251,20 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         return panel;
     }
 
+    /**
+     * de: Erstellt ein Panel mit Hintergrundbild.
+     * en: Creates a panel with a background image.
+     *
+     * @return de: Das erstellte Panel. en: The created panel.
+     */
     private JPanel createBackgroundPanel() {
         return new JPanel(new BorderLayout()) {
+            /**
+             * de: Überschreibt die Methode paintComponent, um das Hintergrundbild zu zeichnen.
+             * en: Overrides the paintComponent method to draw the background image.
+             *
+             * @param g de: Der Graphics-Kontext. en: The graphics context.
+             */
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -276,6 +305,13 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         };
     }
 
+    /**
+     * de: Lädt ein Hintergrundbild.
+     * en: Loads a background image.
+     *
+     * @param path de: Der Pfad zum Bild. en: The path to the image.
+     * @return de: Das geladene Bild. en: The loaded image.
+     */
     private BufferedImage loadBackgroundImage(String path) {
         try {
             URL imageUrl = getClass().getResource(path);
@@ -290,6 +326,15 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         }
     }
 
+    /**
+     * de: Erstellt ein Panel für ein Spielbrett.
+     * en: Creates a panel for a game board.
+     *
+     * @param title de: Der Titel des Panels. en: The title of the panel.
+     * @param boardPanel de: Das Spielbrett-Panel. en: The game board panel.
+     * @param actionComponents de: Die Aktionskomponenten. en: The action components.
+     * @return de: Das erstellte Panel. en: The created panel.
+     */
     private JPanel createBoardPanel(String title, BoardPanel boardPanel, Component... actionComponents) {
         JPanel panel = new JPanel(new BorderLayout(8, 8));
         panel.setOpaque(false);
@@ -312,42 +357,85 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         return panel;
     }
 
+    /**
+     * de: Erstellt einen Abstandshalter basierend auf der Größe eines Buttons.
+     * en: Creates a spacer based on the size of a button.
+     *
+     * @param templateButton de: Der Button, dessen Größe als Vorlage dient. en: The button whose size is used as a template.
+     * @return de: Der erstellte Abstandshalter. en: The created spacer.
+     */
     private Component createActionSpacer(JButton templateButton) {
         return Box.createRigidArea(templateButton.getPreferredSize());
     }
 
-    // Zeigt den Startscreen
+    /**
+     * de: Zeigt den Startscreen an.
+     * en: Shows the start screen.
+     *
+     */
     public final void showStartScreen() {
         currentScreen = ScreenMode.START;
         screenLayout.show(screenPanel, START_SCREEN);
         backgroundPanel.repaint();
     }
 
-    // Zeigt den Spielscreen
+    /**
+     * de: Zeigt den Spielscreen an.
+     * en: Shows the game screen.
+     *
+     */
     public void showGameScreen() {
         currentScreen = ScreenMode.GAME;
         screenLayout.show(screenPanel, GAME_SCREEN);
         backgroundPanel.repaint();
     }
 
-    // Setzt die Aktion des Start-Buttons
+    /**
+     * de: Setzt die Aktion des Start-Buttons.
+     * en: Sets the action of the start button.
+     *
+     * @param action de: Die Aktion, die beim Klicken des Start-Buttons ausgeführt wird. en: The action to be performed when the start button is clicked.
+     */
     public void setStartAction(Runnable action) {
         startScreenPanel.setStartAction(action);
     }
 
-    // Gibt den Text aus dem Startscreen zurück
+    /**
+     * de: Gibt den Text aus dem Startscreen zurück.
+     * en: Returns the text from the start screen.
+     *
+     * @return de: Der Text aus dem Startscreen. en: The text from the start screen.
+     */
     public String getStartScreenText() {
         return startScreenPanel.getTextFieldValue();
     }
 
+    /**
+     * de: Gibt den ausgewählten Gegner zurück.
+     * en: Returns the selected opponent.
+     *
+     * @return de: Der ausgewählte Gegner. en: The selected opponent.
+     */
     public String getSelectedOpponent() {
         return startScreenPanel.getOpponentSelection();
     }
 
+    /**
+     * de: Gibt die ausgewählte Schwierigkeit zurück.
+     * en: Returns the selected difficulty.
+     *
+     * @return de: Die ausgewählte Schwierigkeit. en: The selected difficulty.
+     */
     public models.GameDifficulty getSelectedDifficulty() {
         return startScreenPanel.getSelectedDifficulty();
     }
 
+    /**
+     * de: Gibt die Spiel-Einstellungen zurück.
+     * en: Returns the game settings.
+     *
+     * @return de: Die Spiel-Einstellungen. en: The game settings.
+     */
     public GameSettings getGameSettings() {
         EnumMap<ShipType, Integer> shipCounts = new EnumMap<>(ShipType.class);
 
@@ -359,23 +447,52 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         return new GameSettings(startScreenPanel.getBoardSize(), shipCounts);
     }
 
+    /**
+     * de: Gibt die IP-Adresse des Hosts zurück.
+     * en: Returns the host's IP address.
+     *
+     * @return de: Die IP-Adresse des Hosts. en: The host's IP address.
+     */
     public String getHostIpAddress() {
         return startScreenPanel.getHostIpAddress();
     }
 
-    // Setzt den Text der Statusleiste
+    /**
+     * de: Setzt den Text der Statusleiste.
+     * en: Sets the text of the status bar.
+     *
+     * @param text de: Der Text, der in der Statusleiste angezeigt werden soll. en: The text to be displayed in the status bar.
+     */
     public void setStatus(String text) {
         statusLabel.setText(text);
     }
 
+    /**
+     * de: Setzt den Text des Verbindungsstatus.
+     * en: Sets the text of the connection status.
+     *
+     * @param text de: Der Text, der im Verbindungsstatus angezeigt werden soll. en: The text to be displayed in the connection status.
+     */
     public void setConnectionStatus(String text) {
         connectionLabel.setText(text);
     }
 
+    /**
+     * de: Setzt die lokale IP-Adresse.
+     * en: Sets the local IP address.
+     *
+     * @param text de: Die lokale IP-Adresse. en: The local IP address.
+     */
     public void setLocalIpAddress(String text) {
         localIpLabel.setText(text);
     }
 
+    /**
+     * de: Setzt den Ladezustand.
+     * en: Sets the loading state.
+     *
+     * @param loading de: Der Ladezustand. en: The loading state.
+     */
     public void setLoading(boolean loading) {
         loadingBar.setVisible(loading);
         if (loading) {
@@ -387,47 +504,92 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         }
     }
 
-    // Aktualisiert das eigene Spielfeld
+    /**
+     * de: Setzt das eigene Spielfeld.
+     * en: Sets the own board.
+     *
+     * @param cells de: Die Zellen des eigenen Spielfelds. en: The cells of the own board.
+     */
     public void setOwnBoard(CellState[][] cells) {
         ownBoard.setCells(cells);
     }
 
-    // Aktualisiert das gegnerische Spielfeld
+    /**
+     * de: Setzt das gegnerische Spielfeld.
+     * en: Sets the enemy board.
+     *
+     * @param cells de: Die Zellen des gegnerischen Spielfelds. en: The cells of the enemy board.
+     */
     public void setEnemyBoard(CellState[][] cells) {
         enemyBoard.setCells(cells);
     }
 
-    // Setzt den Klick-Listener für das eigene Feld
+    /**
+     * de: Setzt den Klick-Listener für das eigene Spielfeld.
+     * en: Sets the click listener for the own board.
+     *
+     * @param listener de: Der Klick-Listener für das eigene Spielfeld. en: The click listener for the own board.
+     */
     public void setOwnBoardClickListener(BoardClickListener listener) {
         ownBoard.setBoardClickListener(listener);
     }
 
-    // Setzt den Klick-Listener für das Gegnerfeld
+    /**
+     * de: Setzt den Klick-Listener für das Gegnerfeld.
+     * en: Sets the click listener for the enemy board.
+     *
+     * @param listener de: Der Klick-Listener für das Gegnerfeld. en: The click listener for the enemy board.
+     */
     public void setEnemyBoardClickListener(BoardClickListener listener) {
         enemyBoard.setBoardClickListener(listener);
     }
 
-    // Aktiviert Drag-and-Drop auf dem eigenen Feld
+    /**
+     * de: Setzt den Transfer-Handler für das eigene Spielfeld. Aktiviert Drag-and-Drop auf dem eigenen Feld
+     * en: Sets the transfer handler for the own board. Enables drag-and-drop on the own board.
+     *
+     * @param transferHandler de: Der Transfer-Handler für das eigene Spielfeld. en: The transfer handler for the own board.
+     */
     public void setOwnBoardTransferHandler(TransferHandler transferHandler) {
         ownBoard.setTransferHandler(transferHandler);
     }
 
-    // Setzt die Aktion für den Drehen-Button
+    /**
+     * de: Setzt die Aktion für den Drehen-Button.
+     * en: Sets the action for the rotate button.
+     *
+     * @param action de: Die Aktion für den Drehen-Button. en: The action for the rotate button.
+     */
     public void setRotateAction(Runnable action) {
         rotateButton.addActionListener(e -> action.run());
     }
 
-    // Setzt die Aktion für den Auto-Platzieren-Button
+    /**
+     * de: Setzt die Aktion für den Auto-Platzieren-Button.
+     * en: Sets the action for the auto-place button.
+     *
+     * @param action de: Die Aktion für den Auto-Platzieren-Button. en: The action for the auto-place button.
+     */
     public void setAutoPlaceAction(Runnable action) {
         autoPlaceButton.addActionListener(e -> action.run());
     }
 
-    // Setzt die Aktion für den Schießen-Button
+    /**
+     * de: Setzt die Aktion für den Schießen-Button.
+     * en: Sets the action for the shoot button.
+     *
+     * @param action de: Die Aktion für den Schießen-Button. en: The action for the shoot button.
+     */
     public void setShootAction(Runnable action) {
         shootButton.addActionListener(e -> action.run());
     }
 
-    // Bindet die Save-Action (aus dem Controller)
+    /**
+     * de: Setzt die Aktion für den Speichern-Button.
+     * en: Sets the action for the save button.
+     *
+     * @param action de: Die Aktion für den Speichern-Button. en: The action for the save button.
+     */
     public void setSaveAction(Runnable action) {
         if (saveMenuItem != null) {
             for (var listener : saveMenuItem.getActionListeners()) {
@@ -437,7 +599,12 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         }
     }
 
-    // Bindet die Load-Action (aus dem Controller)
+    /**
+     * de: Setzt die Aktion für den Laden-Button.
+     * en: Sets the action for the load button.
+     *
+     * @param action de: Die Aktion für den Laden-Button. en: The action for the load button.
+     */
     public void setLoadAction(Runnable action) {
         if (loadMenuItem != null) {
             for (var listener : loadMenuItem.getActionListeners()) {
@@ -447,41 +614,82 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         }
     }
 
-    // Aktiviert oder deaktiviert den Drehen-Button
+    /**
+     * de: Setzt, ob der Drehen-Button aktiviert ist.
+     * en: Sets whether the rotate button is enabled.
+     *
+     * @param enabled de: Gibt an, ob der Button aktiviert ist. en: Indicates whether the button is enabled.
+     */
     public void setRotateButtonEnabled(boolean enabled) {
         rotateButton.setEnabled(enabled);
     }
 
+    /**
+     * de: Setzt, ob der Auto-Platzieren-Button aktiviert ist.
+     * en: Sets whether the auto-place button is enabled.
+     *
+     * @param enabled de: Gibt an, ob der Button aktiviert ist. en: Indicates whether the button is enabled.
+     */
     public void setAutoPlaceButtonEnabled(boolean enabled) {
         autoPlaceButton.setEnabled(enabled);
     }
 
-    // Aktiviert oder deaktiviert den Schießen-Button
+    /**
+     * de: Setzt, ob der Schießen-Button aktiviert ist.
+     * en: Sets whether the shoot button is enabled.
+     *
+     * @param enabled de: Gibt an, ob der Button aktiviert ist. en: Indicates whether the button is enabled.
+     */
     public void setShootButtonEnabled(boolean enabled) {
         shootButton.setEnabled(enabled);
     }
 
-    // Aktualisiert die Restanzahl der Schiffe
+    /**
+     * de: Setzt die verbleibenden Schiffszahlen in der Palette.
+     * en: Sets the remaining ship counts in the palette.
+     *
+     * @param remainingCounts de: Die verbleibenden Schiffszahlen. en: The remaining ship counts.
+     */
     public void setShipPaletteRemainingCounts(Map<ShipType, Integer> remainingCounts) {
         shipPalettePanel.setRemainingCounts(remainingCounts);
     }
 
-    // Aktualisiert die Ausrichtung der Schiffe in der Palette
+    /**
+     * de: Setzt die Ausrichtung der Schiffe in der Palette.
+     * en: Sets the orientation of the ships in the palette.
+     *
+     * @param orientation de: Die Ausrichtung der Schiffe. en: The orientation of the ships.
+     */
     public void setShipPaletteOrientation(ShipOrientation orientation) {
         shipPalettePanel.setOrientation(orientation);
     }
 
-    // Gibt das eigene Board zurück
+    /**
+     * de: Gibt das eigene Board zurück.
+     * en: Returns the own board.
+     *
+     * @return de: Das eigene Board. en: The own board.
+     */
     public BoardPanel getOwnBoard() {
         return ownBoard;
     }
 
-    // Gibt das Gegnerboard zurück
+    /**
+     * de: Gibt das Gegnerboard zurück.
+     * en: Returns the enemy board.
+     *
+     * @return de: Das Gegnerboard. en: The enemy board.
+     */
     public BoardPanel getEnemyBoard() {
         return enemyBoard;
     }
 
-    // Gibt die Schiffspalette zurück
+    /**
+     * de: Gibt die Schiffspalette zurück.
+     * en: Returns the ship palette.
+     *
+     * @return de: Die Schiffspalette. en: The ship palette.
+     */
     public ShipPalettePanel getShipPalettePanel() {
         return shipPalettePanel;
     }
