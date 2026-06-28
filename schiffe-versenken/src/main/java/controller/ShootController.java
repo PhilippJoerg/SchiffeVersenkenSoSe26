@@ -51,7 +51,7 @@ public class ShootController {
 
         for (int col = 0; col < boardSize; col++) {
             for (int row = 0; row < boardSize; row++) {
-                availableCells.add(new int[]{col, row});
+                availableCells.add(new int[] { col, row });
             }
         }
     }
@@ -143,24 +143,150 @@ public class ShootController {
     }
 
     /**
-     * de: Platzhalter für eine schwere KI-Strategie auf Basis von Wahrscheinlichkeitsdichte.
-     * en: Placeholder for a hard AI strategy based on probability density.
+     * de: Schwere KI-Strategie mit Wahrscheinlichkeitsdichte.
+     * en: Hard AI strategy with probability density.
      */
     private int[] shootProbabilityDensity() {
-        // TODO: implement shootProbabilityDensity()
-        // 3. Schwer: Wahrscheinlichkeitsdichte-Algorithmus (Probability Density Function)
-        // Dies ist die stärkste Strategie, die oft von Computer-KIs genutzt wird. 
-        // - Vorgehensweise: Der Algorithmus berechnet für jedes Feld auf dem Gitter, wie viele Möglichkeiten es gibt, die noch übrigen Schiffe dort zu 
-        //   platzieren.Felder in der Mitte haben anfangs eine höhere Wahrscheinlichkeit, da dort Schiffe in mehr Ausrichtungen (horizontal/vertikal) hinpassen 
-        //   als in den Ecken. Nach jedem Schuss (Treffer oder Fehlschuss) wird die â€žHeatmapâ€œ neu berechnet. Ein Fehlschuss senkt die Wahrscheinlichkeit der 
-        //   umliegenden Felder drastisch, während ein Treffer sie massiv erhöht. 
-        // - Effizienz: Extrem hoch. Erfahrene Algorithmen benötigen oft nur 30 bis 40 Schüsse, um die gesamte Flotte zu versenken.
-        throw new UnsupportedOperationException("Unimplemented method 'shootProbabilityDensity'");
+        int[] huntResult = pollNextTargetCell();
+        if (huntResult != null) {
+            int col = huntResult[0];
+            int row = huntResult[1];
+            removeAvailableCell(col, row);
+            return shootAndEvaluate(col, row);
+        }
+
+        CellState[][] ownBoard = gameModel.getOwnBoard();
+        int boardSize = ownBoard.length;
+        double[][] probabilityMap = new double[boardSize][boardSize];
+
+        for (int col = 0; col < boardSize; col++) {
+            for (int row = 0; row < boardSize; row++) {
+                if (isCellAvailable(col, row)) {
+                    probabilityMap[col][row] = calculateCellProbability(col, row, ownBoard);
+                } else {
+                    probabilityMap[col][row] = -1;
+                }
+            }
+        }
+
+        double maxProbability = -1;
+        int[] bestCell = null;
+        for (int col = 0; col < boardSize; col++) {
+            for (int row = 0; row < boardSize; row++) {
+                if (probabilityMap[col][row] > maxProbability) {
+                    maxProbability = probabilityMap[col][row];
+                    bestCell = new int[] { col, row };
+                }
+            }
+        }
+
+        if (bestCell == null) {
+            return null;
+        }
+
+        removeAvailableCell(bestCell[0], bestCell[1]);
+        return shootAndEvaluate(bestCell[0], bestCell[1]);
     }
 
     /**
-     * de: Platzhalter für eine mittlere KI-Strategie mit Schachbrett- und Jagd-Modus. TODO: add a sunk ship tracking to avoid shooting around already sunk ships
-     * en: Placeholder for a medium AI strategy with checkerboard and hunt mode. 
+     * de: Berechnet die Wahrscheinlichkeit, dass ein Schiff auf einem Feld platziert ist.
+     * en: Calculates the probability that a ship is placed on a cell.
+     */
+    private double calculateCellProbability(int col, int row, CellState[][] board) {
+        double probability = 0.0;
+        int boardSize = board.length;
+
+        double positionWeight = 1.0
+                - (Math.abs(col - boardSize / 2.0) + Math.abs(row - boardSize / 2.0)) / (boardSize * 1.5);
+
+        // Horizontal
+        for (int shipLen = 2; shipLen <= 4; shipLen++) {
+            for (int startCol = Math.max(0, col - shipLen + 1); startCol <= Math.min(boardSize - shipLen,
+                    col); startCol++) {
+                if (canPlaceShip(startCol, row, startCol + shipLen - 1, row, board)) {
+                    probability += 1.0 / shipLen;
+                }
+            }
+        }
+
+        // Vertikal
+        for (int shipLen = 2; shipLen <= 4; shipLen++) {
+            for (int startRow = Math.max(0, row - shipLen + 1); startRow <= Math.min(boardSize - shipLen,
+                    row); startRow++) {
+                if (canPlaceShip(col, startRow, col, startRow + shipLen - 1, board)) {
+                    probability += 1.0 / shipLen;
+                }
+            }
+        }
+
+        probability *= Math.max(0.5, positionWeight);
+
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                int nearCol = col + dx;
+                int nearRow = row + dy;
+                if (BoardUtils.isInsideBoard(board, nearCol, nearRow) && board[nearCol][nearRow] == CellState.HIT) {
+                    probability *= 3.0;
+                }
+            }
+        }
+
+        return probability;
+    }
+
+    /**
+     * de: Prüft, ob ein Schiff auf dem Board platziert werden kann.
+     * en: Checks if a ship can be placed on the board.
+     */
+    private boolean canPlaceShip(int col1, int row1, int col2, int row2, CellState[][] board) {
+        if (col1 == col2) {
+            // Vertikal
+            for (int r = Math.min(row1, row2); r <= Math.max(row1, row2); r++) {
+                if (board[col1][r] == CellState.MISS) {
+                    return false;
+                }
+            }
+        } else if (row1 == row2) {
+            // Horizontal
+            for (int c = Math.min(col1, col2); c <= Math.max(col1, col2); c++) {
+                if (board[c][row1] == CellState.MISS) {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * de: Führt einen Schuss aus und evaluiert das Ergebnis.
+     * en: Executes a shot and evaluates the result.
+     */
+    private int[] shootAndEvaluate(int col, int row) {
+        CellState[][] ownBoard = gameModel.getOwnBoard();
+        int result = 0;
+        if (ownBoard[col][row] == CellState.SHIP) {
+            ownBoard[col][row] = CellState.HIT;
+            result = 1;
+            enqueueTargetCells(col, row);
+            if (isShipSunk(col, row)) {
+                cleanupTargetQueueForSunkShip(col, row);
+                result = 2;
+            }
+            if (isBoardSunk(ownBoard)) {
+                gameModel.setGameOver(true);
+                gameModel.setPlayerWon(false);
+            }
+        } else {
+            ownBoard[col][row] = CellState.MISS;
+        }
+        return new int[] { col, row, result };
+    }
+
+    /**
+     * de: Mittlere KI-Strategie mit Schachbrett- und Jagd-Modus.
+     * en: Medium AI strategy with checkerboard and hunt mode.
      */
     private int[] shootCheckerboardAndHunt() {
         if (availableCells.isEmpty()) {
@@ -198,7 +324,7 @@ public class ShootController {
             ownBoard[col][row] = CellState.MISS;
         }
 
-        return new int[]{col, row, result};
+        return new int[] { col, row, result };
     }
 
     /**
@@ -218,7 +344,7 @@ public class ShootController {
                 int r = cand[1];
                 if (BoardUtils.isInsideBoard(gameModel.getOwnBoard(), c, r) && isCellAvailable(c, r)) {
                     removeTargetQueueCell(c, r);
-                    return new int[]{c, r};
+                    return new int[] { c, r };
                 }
             }
         }
@@ -257,20 +383,21 @@ public class ShootController {
                 if (!visited[col][row] && ownBoard[col][row] == CellState.HIT) {
                     List<int[]> cluster = new ArrayList<>();
                     List<int[]> stack = new ArrayList<>();
-                    stack.add(new int[]{col, row});
+                    stack.add(new int[] { col, row });
                     visited[col][row] = true;
                     while (!stack.isEmpty()) {
                         int[] cur = stack.remove(stack.size() - 1);
                         cluster.add(cur);
                         int cx = cur[0];
                         int cy = cur[1];
-                        int[][] nbrs = {{cx - 1, cy}, {cx + 1, cy}, {cx, cy - 1}, {cx, cy + 1}};
+                        int[][] nbrs = { { cx - 1, cy }, { cx + 1, cy }, { cx, cy - 1 }, { cx, cy + 1 } };
                         for (int[] n : nbrs) {
                             int nx = n[0];
                             int ny = n[1];
-                            if (BoardUtils.isInsideBoard(ownBoard, nx, ny) && !visited[nx][ny] && ownBoard[nx][ny] == CellState.HIT) {
+                            if (BoardUtils.isInsideBoard(ownBoard, nx, ny) && !visited[nx][ny]
+                                    && ownBoard[nx][ny] == CellState.HIT) {
                                 visited[nx][ny] = true;
-                                stack.add(new int[]{nx, ny});
+                                stack.add(new int[] { nx, ny });
                             }
                         }
                     }
@@ -334,8 +461,8 @@ public class ShootController {
                 minCol = Math.min(minCol, c[0]);
                 maxCol = Math.max(maxCol, c[0]);
             }
-            candidates.add(new int[]{minCol - 1, row});
-            candidates.add(new int[]{maxCol + 1, row});
+            candidates.add(new int[] { minCol - 1, row });
+            candidates.add(new int[] { maxCol + 1, row });
             return candidates;
         } else if (ori == Orientation.VERTICAL) {
             int col = cluster.get(0)[0];
@@ -345,15 +472,15 @@ public class ShootController {
                 minRow = Math.min(minRow, c[1]);
                 maxRow = Math.max(maxRow, c[1]);
             }
-            candidates.add(new int[]{col, minRow - 1});
-            candidates.add(new int[]{col, maxRow + 1});
+            candidates.add(new int[] { col, minRow - 1 });
+            candidates.add(new int[] { col, maxRow + 1 });
             return candidates;
         }
         int col = cluster.get(0)[0];
         int row = cluster.get(0)[1];
-        int[][] offsets = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+        int[][] offsets = { { 0, -1 }, { 0, 1 }, { -1, 0 }, { 1, 0 } };
         for (int[] off : offsets) {
-            candidates.add(new int[]{col + off[0], row + off[1]});
+            candidates.add(new int[] { col + off[0], row + off[1] });
         }
         return candidates;
     }
@@ -437,7 +564,7 @@ public class ShootController {
      */
     private void enqueueTargetCells(int col, int row) {
         CellState[][] ownBoard = gameModel.getOwnBoard();
-        int[][] offsets = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+        int[][] offsets = { { 0, -1 }, { 0, 1 }, { -1, 0 }, { 1, 0 } };
 
         for (int[] offset : offsets) {
             int nextCol = col + offset[0];
@@ -445,7 +572,7 @@ public class ShootController {
 
             if (BoardUtils.isInsideBoard(ownBoard, nextCol, nextRow) && isCellAvailable(nextCol, nextRow)
                     && !containsTargetCell(nextCol, nextRow)) {
-                targetQueue.add(new int[]{nextCol, nextRow});
+                targetQueue.add(new int[] { nextCol, nextRow });
             }
         }
     }
@@ -543,7 +670,7 @@ public class ShootController {
         }
         if (right > left) {
             for (int current = left; current <= right; current++) {
-                shipCells.add(new int[]{current, row});
+                shipCells.add(new int[] { current, row });
             }
             return shipCells;
         }
@@ -557,7 +684,7 @@ public class ShootController {
             down++;
         }
         for (int current = up; current <= down; current++) {
-            shipCells.add(new int[]{col, current});
+            shipCells.add(new int[] { col, current });
         }
         return shipCells;
     }
@@ -574,8 +701,8 @@ public class ShootController {
     }
 
     /**
-     * de: Führt einen zufälligen Schuss des Computers aus und markiert das Ergebnis.
-     * en: Executes a random shot by the computer and marks the result.
+     * de: Einfache KI-Strategie, die einen zufälligen Schuss ausführt und das Ergebnis markiert.
+     * en: Simple AI strategy that executes a random shot and marks the result.
      */
     private int[] shootRandom() {
         if (availableCells.isEmpty()) {
@@ -602,6 +729,6 @@ public class ShootController {
         } else {
             ownBoard[col][row] = CellState.MISS;
         }
-        return new int[]{col, row, result};
+        return new int[] { col, row, result };
     }
 }

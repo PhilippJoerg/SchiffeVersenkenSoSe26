@@ -21,8 +21,8 @@ class GameDifficultyTest {
         assertEquals("Einfach", GameDifficulty.EASY.toString());
         assertEquals("Mittel", GameDifficulty.MEDIUM.getDisplayName());
         assertEquals("Mittel", GameDifficulty.MEDIUM.toString());
-        assertEquals("Schwer (not implemented)", GameDifficulty.HARD.getDisplayName());
-        assertEquals("Schwer (not implemented)", GameDifficulty.HARD.toString());
+        assertEquals("Schwer", GameDifficulty.HARD.getDisplayName());
+        assertEquals("Schwer", GameDifficulty.HARD.toString());
     }
 
     /**
