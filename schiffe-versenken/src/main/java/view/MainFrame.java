@@ -121,7 +121,8 @@ public class MainFrame extends JFrame implements view.GameView, view.PlacementVi
         rotateButton = new JButton("Drehen");
         autoPlaceButton = new JButton("Auto-Platzieren");
         // TODO: refactor: shootButton logic should be removed completely, since i disabled it. Broader refactoring across view/controller is needed
-
+        shootButton = new JButton("Schießen");
+        
         startBackground = loadBackgroundImage(START_BACKGROUND_PATH);
         gameBackground = loadBackgroundImage(GAME_BACKGROUND_PATH);
 
