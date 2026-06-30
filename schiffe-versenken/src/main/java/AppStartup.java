@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Datei: AppStartup.java
  * Startklasse: Initialisiert die Benutzeroberfläche, fragt Gegner und Schwierigkeit ab
  * und startet das Spiel entweder lokal oder im Netzwerk.
