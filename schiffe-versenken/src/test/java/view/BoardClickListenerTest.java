@@ -4,8 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * de: Testet die Klasse BoardClickListener.
+ * en: Tests the BoardClickListener class.
+ */
 class BoardClickListenerTest {
 
+    /**
+     * de: Reagiert auf das Ereignis "TestLambdaImplementationReceivesCoordinates".
+     * en: Responds to the "TestLambdaImplementationReceivesCoordinates" event.
+     *
+     */
     @Test
     void testLambdaImplementationReceivesCoordinates() {
         int[] hit = new int[2];

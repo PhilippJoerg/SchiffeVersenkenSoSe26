@@ -10,8 +10,17 @@ import org.junit.jupiter.api.Test;
 import models.BoardUtils;
 import models.CellState;
 
+/**
+ * de: Testet die Klasse BoardPanel.
+ * en: Tests the BoardPanel class.
+ */
 class BoardPanelTest {
 
+    /**
+     * de: Testet die Methode cellAt innerhalb des Spielfelds.
+     * en: Tests the cellAt method inside the field.
+     *
+     */
     @Test
     void testCellAtInsideField() {
         BoardPanel panel = new BoardPanel(true);
@@ -19,6 +28,11 @@ class BoardPanelTest {
         assertEquals(new Point(0, 0), cell);
     }
 
+    /**
+     * de: Testet die Methode cellAt außerhalb des Spielfelds.
+     * en: Tests the cellAt method outside the field.
+     *
+     */
     @Test
     void testCellAtOutsideFieldReturnsNull() {
         BoardPanel panel = new BoardPanel(true);
@@ -27,6 +41,11 @@ class BoardPanelTest {
                 BoardPanel.LABEL_SPACE + BoardPanel.GRID_SIZE * BoardPanel.CELL_SIZE + 10)));
     }
 
+    /**
+     * de: Testet die Methode setCells mit einem ungültigen Spielfeld.
+     * en: Tests the setCells method with an invalid board.
+     *
+     */
     @Test
     void testSetCellsWithInvalidBoardThrows() {
         BoardPanel panel = new BoardPanel(false);
@@ -36,6 +55,11 @@ class BoardPanelTest {
         assertThrows(IllegalArgumentException.class, () -> panel.setCells(invalidBoard));
     }
 
+    /**
+     * de: Testet die Methode setCells mit einem gültigen Spielfeld.
+     * en: Tests the setCells method with a valid board.
+     *
+     */
     @Test
     void testSetCellsWithValidBoardSucceeds() {
         BoardPanel panel = new BoardPanel(false);

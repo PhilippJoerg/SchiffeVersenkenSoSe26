@@ -4,6 +4,10 @@
  */
 package models;
 
+/**
+ * de: Enum ShipType definiert die verschiedenen Schiffstypen im Spiel.
+ * en: Enum ShipType defines the different types of ships in the game.
+ */
 public enum ShipType {
     BATTLESHIP("Schlachtschiff", 1, 5),
     CRUISER("Kreuzer", 2, 4),
@@ -15,7 +19,12 @@ public enum ShipType {
     private final int size;
 
     /**
-     * Erzeugt einen Schiffstyp mit Anzeige-Name, Anzahl und Größe.
+     * de: Erzeugt einen Schiffstyp mit Anzeigename, Anzahl und Groesse.
+     * en: Creates a ship type with display name, amount, and size.
+     *
+     * @param displayName de: Anzeigename des Schiffstyps. en: Display name of the ship type.
+     * @param amount de: Anzahl dieses Schiffstyps. en: Number of ships of this type.
+     * @param size de: Laenge des Schiffs in Feldern. en: Ship length in cells.
      */
     ShipType(String displayName, int amount, int size) {
         this.displayName = displayName;
@@ -24,21 +33,24 @@ public enum ShipType {
     }
 
     /**
-     * Liefert den deutschen Anzeigenamen des Schiffstyps.
+     * de: Liefert den deutschen Anzeigenamen des Schiffstyps.
+     * en: Returns the display name of the ship type.
      */
     public String getDisplayName() {
         return displayName;
     }
 
     /**
-     * Gibt die Anzahl der Schiffe dieses Typs im Spiel an.
+     * de: Gibt die Anzahl der Schiffe dieses Typs im Spiel an.
+     * en: Returns the number of ships of this type in the game.
      */
     public int getAmount() {
         return amount;
     }
 
     /**
-     * Liefert die Schiffslänge in Feldern.
+     * de: Liefert die Schiffslänge in Feldern.
+     * en: Returns the length of the ship in cells.
      */
     public int getSize() {
         return size;

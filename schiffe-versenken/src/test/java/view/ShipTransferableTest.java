@@ -12,8 +12,18 @@ import org.junit.jupiter.api.Test;
 import models.ShipOrientation;
 import models.ShipType;
 
+/**
+ * de: Testet die Klasse ShipTransferable.
+ * en: Tests the ShipTransferable class.
+ */
 class ShipTransferableTest {
 
+    /**
+     * de: Reagiert auf das Ereignis "TestSupportedFlavorAndDataRetrieval".
+     * en: Reacts to the event "TestSupportedFlavorAndDataRetrieval".
+     *
+     * @throws Exception de: Bei Fehler waehrend der Ausfuehrung. en: If an error occurs during execution.
+     */
     @Test
     void testSupportedFlavorAndDataRetrieval() throws Exception {
         ShipDragData data = new ShipDragData(ShipType.SUBMARINE, ShipOrientation.HORIZONTAL);
@@ -24,6 +34,11 @@ class ShipTransferableTest {
         assertEquals(data, transferable.getTransferData(flavor));
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "TestUnsupportedFlavorThrows".
+     * en: Reacts to the event "TestUnsupportedFlavorThrows".
+     *
+     */
     @Test
     void testUnsupportedFlavorThrows() {
         ShipDragData data = new ShipDragData(ShipType.SUBMARINE, ShipOrientation.HORIZONTAL);

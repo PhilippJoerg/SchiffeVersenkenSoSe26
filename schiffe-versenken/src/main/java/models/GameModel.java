@@ -8,99 +8,147 @@ package models;
 
 import controller.ShootController;
 
+/**
+ * de: Das GameModel repräsentiert das zentrale Modell des Spiels, einschließlich Spielfelder, Spielstatus und Logik zur Auswertung von Schüssen.
+ * en: The GameModel represents the central model of the game, including game boards, game status, and logic for evaluating shots.
+ */
 public class GameModel {
-    private final CellState[][] ownBoard;
-    private final CellState[][] enemyBoard;
+
+    private CellState[][] ownBoard;
+    private CellState[][] enemyBoard;
     private boolean gameOver = false;
     private boolean playerWon = false;
     private GameDifficulty difficulty;
     private ShootController shootController;
 
     /**
-     * Erzeugt das Spielmodell und platziert die Gegner-Schiffe zufällig.
+     * de: Erzeugt das Spielmodell und platziert die Gegner-Schiffe zufällig.
+     * en: Creates the game model and places the enemy ships randomly.
      */
-    public GameModel(CellState[][] ownBoard, GameDifficulty difficulty) {
+    public GameModel(CellState[][] ownBoard, GameDifficulty difficulty, GameSettings settings) {
         this.ownBoard = ownBoard;
-        this.enemyBoard = BoardUtils.createEmptyCellBoard();
+        this.enemyBoard = BoardUtils.createEmptyCellBoard(settings.getBoardSize());
         this.difficulty = difficulty;
-        placeEnemyShips();
+        placeEnemyShips(settings);
         this.shootController = new ShootController(this);
     }
 
     /**
-     * Platziert die Schiffe des Gegners zufällig auf dem gegnerischen Board.
+     * de: Konstruktor zum Wiederherstellen eines gespeicherten Spielzustands.
+     * en: Constructor for restoring a saved game state.
      */
-    private void placeEnemyShips() {
-        BoardUtils.placeRandomShips(enemyBoard);
+    public GameModel(CellState[][] ownBoard, CellState[][] enemyBoard, GameDifficulty difficulty,
+            boolean gameOver, boolean playerWon) {
+        this.ownBoard = ownBoard;
+        this.enemyBoard = enemyBoard;
+        this.difficulty = difficulty;
+        this.gameOver = gameOver;
+        this.playerWon = playerWon;
+        this.shootController = new ShootController(this);
     }
 
     /**
-     * Liefert das eigene Spielfeld zurück.
+     * de: Platziert die Schiffe des Gegners zufällig auf dem gegnerischen Board.
+     * en: Places the enemy ships randomly on the enemy board.
+     */
+    private void placeEnemyShips(GameSettings settings) {
+        BoardUtils.placeRandomShips(enemyBoard, settings.getShipCounts());
+    }
+
+    /**
+     * de: Liefert das eigene Spielfeld zurück.
+     * en: Returns the player's own game board.
      */
     public CellState[][] getOwnBoard() {
         return ownBoard;
     }
 
     /**
-     * Liefert das gegnerische Spielfeld zurück.
+     * de: Liefert das gegnerische Spielfeld zurück.
+     * en: Returns the enemy's game board.
      */
     public CellState[][] getEnemyBoard() {
         return enemyBoard;
     }
 
     /**
-     * Gibt die Schwierigkeit des Spiels zurück.
+     * de: Gibt die Schwierigkeit des Spiels zurück.
+     * en: Returns the game's difficulty level.
      */
     public GameDifficulty getDifficulty() {
         return difficulty;
     }
 
     /**
-     * Setzt den Spielzustand auf beendet oder nicht.
+     * de: Setzt den Spielzustand auf beendet oder nicht.
+     * en: Sets the game over state.
      */
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
     }
 
     /**
-     * Setzt, ob der Spieler das Spiel gewonnen hat.
+     * de: Setzt, ob der Spieler das Spiel gewonnen hat.
+     * en: Sets whether the player has won the game.
      */
     public void setPlayerWon(boolean playerWon) {
         this.playerWon = playerWon;
     }
 
     /**
-     * Führt den Computer-Schuss aus und liefert die Schusskoordinaten zurück.
+     * de: Führt den Computer-Schuss aus und liefert die Schusskoordinaten zurück.
+     * en: Executes the computer's shot and returns the shot coordinates.
      */
     public int[] computerShoot() {
         return shootController.computerShoot();
     }
 
     /**
-     * Führt einen Spieler-Schuss auf das Gegnerfeld aus.
+     * de: Führt einen Spieler-Schuss auf das Gegnerfeld aus.
+     * en: Executes a player's shot on the enemy board.
      */
     public boolean shoot(int col, int row) {
         return shootController.shoot(col, row);
     }
 
     /**
-     * Wertet einen eingehenden Schuss des Netzwerkgegners aus.
+     * de: Wertet einen eingehenden Schuss des Netzwerkgegners aus.
+     * en: Evaluates an incoming shot from the network opponent.
      */
     public int evaluateIncomingShot(int col, int row) {
         return shootController.evaluateIncomingShot(col, row);
     }
 
     /**
-     * Gibt zurück, ob das Spiel beendet ist.
+     * de: Gibt zurück, ob das Spiel beendet ist.
+     * en: Returns whether the game is over.
      */
     public boolean isGameOver() {
         return gameOver;
     }
 
     /**
-     * Gibt zurück, ob der Spieler gewonnen hat.
+     * de: Gibt zurück, ob der Spieler gewonnen hat.
+     * en: Returns whether the player has won the game.
      */
     public boolean didPlayerWin() {
         return playerWon;
     }
+
+    /**
+     * de: Überschreibt den aktuellen Spielzustand mit einem geladenen Modell.
+     * en: Restores the current game state from a loaded model.
+     */
+    public void restoreFrom(GameModel other) {
+    if (other == null) {
+        return;
+    }
+
+    this.ownBoard = other.getOwnBoard();
+    this.enemyBoard = other.getEnemyBoard();
+    this.difficulty = other.getDifficulty();
+    this.gameOver = other.isGameOver();
+    this.playerWon = other.didPlayerWin();
+    this.shootController = new ShootController(this);
+}
 }

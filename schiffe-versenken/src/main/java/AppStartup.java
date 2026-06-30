@@ -3,42 +3,41 @@
  * Startklasse: Initialisiert die Benutzeroberfläche, fragt Gegner und Schwierigkeit ab
  * und startet das Spiel entweder lokal oder im Netzwerk.
  */
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.util.Arrays;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import java.io.File;
+import java.io.IOException;
+
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import controller.Com;
 import controller.GameController;
 import controller.NetworkHandshakeController;
 import controller.ShipPlacementController;
+import models.BoardUtils;
 import models.GameDifficulty;
 import models.GameModel;
+import models.GameSettings;
+import models.SaveLoad;
 import view.MainFrame;
 
+/**
+ * de: Die Klasse AppStartup.
+ * en: The class AppStartup.
+ */
 public class AppStartup {
 
-    private static enum OpponentType {
-        COMPUTER, HOST, JOIN
-    }
-
-    private static OpponentType opponentType = OpponentType.COMPUTER;
     private static GameDifficulty difficulty = GameDifficulty.EASY;
     private static ShipPlacementController placementController;
     private static GameController gameController;
 
     /**
-     * Programmstartpunkt: erzeugt das Hauptfenster und startet den Spielauswahl-Dialog.
+     * de: Programmstartpunkt: erzeugt das Hauptfenster und startet den Spielauswahl-Dialog.
+     * en: Program startup: Opens the main window and launches the game selection dialog.
      */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             MainFrame frame = new MainFrame();
-            askOpponent(frame);
 
             frame.setRotateAction(() -> {
                 if (placementController != null) {
@@ -52,157 +51,199 @@ public class AppStartup {
                 }
             });
 
+            frame.setStartAction(() -> {
+                GameSettings settings = frame.getGameSettings();
+
+                String opponent = frame.getSelectedOpponent();
+                if ("COMPUTER".equals(opponent)) {
+                    difficulty = frame.getSelectedDifficulty();
+                    startPlacement(frame, null, false, false, settings);
+                } else {
+                    startNetworkConnection(frame, settings);
+                }
+            });
+
+            frame.setLoadAction(() -> handleGlobalLoad(frame));
             frame.setVisible(true);
-
-            if (opponentType == OpponentType.COMPUTER) {
-                difficulty = askDifficulty(frame);
-                startPlacement(frame, null, false, false);
-            } else {
-                startNetworkConnection(frame);
-            }
         });
     }
 
     /**
-     * Zeigt einen Dialog zur Auswahl des Spielgegners an (Computer / Host / Join).
+     * de: Initialisiert die Schiffplatzierung und zeigt den Status für den aktuellen Spielmodus an.
+     * en: Initializes ship placement and displays the status for the current game mode.
      */
-    private static void askOpponent(MainFrame frame) {
-        JDialog dialog = new JDialog(frame, "Startbildschirm", true);
-        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-
-        JPanel content = new JPanel(new BorderLayout(12, 12));
-        JLabel title = new JLabel("Wähle deinen Gegner", JLabel.CENTER);
-        title.setFont(title.getFont().deriveFont(18f));
-        content.add(title, BorderLayout.NORTH);
-
-        JLabel info = new JLabel("Bitte wähle, gegen wen du spielen möchtest.", JLabel.CENTER);
-        content.add(info, BorderLayout.CENTER);
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton computerBtn = new JButton("Computer");
-        JButton hostBtn = new JButton("Host (Netzwerk)");
-        JButton joinBtn = new JButton("Beitreten (Netzwerk)");
-
-        computerBtn.addActionListener(e -> {
-            opponentType = OpponentType.COMPUTER;
-            dialog.dispose();
-        });
-        hostBtn.addActionListener(e -> {
-            opponentType = OpponentType.HOST;
-            dialog.dispose();
-        });
-        joinBtn.addActionListener(e -> {
-            opponentType = OpponentType.JOIN;
-            dialog.dispose();
-        });
-
-        buttonPanel.add(computerBtn);
-        buttonPanel.add(hostBtn);
-        buttonPanel.add(joinBtn);
-        content.add(buttonPanel, BorderLayout.SOUTH);
-
-        dialog.setContentPane(content);
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setVisible(true);
+    private static void startPlacement(MainFrame frame, Com com, boolean networkMode, boolean iStart, GameSettings settings) {
+        String playerName = getPlayerName(frame);
+        frame.showGameScreen();
+        frame.setEnemyBoard(BoardUtils.createEmptyCellBoard(settings.getBoardSize()));
+        placementController = new ShipPlacementController(frame, () -> startGame(frame, com, networkMode, iStart, settings), settings);
+        frame.setStatus(networkMode
+                ? playerName + ", Verbindung hergestellt. Platziere deine Schiffe."
+                : playerName + ", platziere deine Schiffe.");
     }
 
     /**
-     * Initialisiert die Schiffplatzierung und zeigt den Status für den aktuellen Spielmodus an.
+     * de: Holt den Namen des Spielers vom Startbildschirm.
+     * en: Gets the player's name from the start screen.
+     *
+     * @param frame de: Parameter frame. en: Parameter frame.
+     * @return de: Rückgabewert der Methode. en: Method return value.
      */
-    private static void startPlacement(MainFrame frame, Com com, boolean networkMode, boolean iStart) {
-        placementController = new ShipPlacementController(frame, () -> startGame(frame, com, networkMode, iStart));
-        frame.setStatus(networkMode ? "Verbindung hergestellt. Platziere deine Schiffe." : "Platziere deine Schiffe.");
+    private static String getPlayerName(MainFrame frame) {
+        String playerName = frame.getStartScreenText();
+        return (playerName == null || playerName.isEmpty()) ? "Spieler" : playerName;
     }
 
     /**
-     * Baut die Netzwerkverbindung auf und startet Host- oder Client-Handshake.
+     * de: Baut die Netzwerkverbindung auf und startet Host- oder Client-Handshake.
+     * en: Establishes the network connection and starts the host or client handshake.
      */
-    private static void startNetworkConnection(MainFrame frame) {
+    private static void startNetworkConnection(MainFrame frame, GameSettings settings) {
         final int port = 50000;
 
-        if (opponentType == OpponentType.HOST) {
+        String opponent = frame.getSelectedOpponent();
+        if ("HOST".equals(opponent)) {
             NetworkHandshakeController.startHost(frame, port, new NetworkHandshakeController.ReadyCallback() {
+                /**
+                 * de: Wird aufgerufen, wenn die Netzwerkverbindung bereit ist.
+                 * en: Called when the network connection is ready.
+                 *
+                 * @param com de: Parameter com. en: Parameter com.
+                 * @param iStart de: Parameter iStart. en: Parameter iStart.
+                 */
                 @Override
                 public void onReady(Com com, boolean iStart) {
-                    startPlacement(frame, com, true, iStart);
+                    startPlacement(frame, com, true, iStart, settings);
                 }
 
+                /**
+                 * de: Wird aufgerufen, wenn ein Fehler bei der Netzwerkverbindung auftritt.
+                 * en: Called when an error occurs in the network connection.
+                 *
+                 * @param message de: Parameter message. en: Parameter message.
+                 * @param e de: Parameter e. en: Parameter e.
+                 */
                 @Override
                 public void onError(String message, Exception e) {
                     e.printStackTrace();
                     JOptionPane.showMessageDialog(frame, message + ": " + e.getMessage());
-                    opponentType = OpponentType.COMPUTER;
                     frame.setConnectionStatus("Starte lokales Spiel.");
                     frame.setLocalIpAddress("");
-                    startPlacement(frame, null, false, false);
+                    startPlacement(frame, null, false, false, settings);
                 }
             });
-        } else if (opponentType == OpponentType.JOIN) {
-            String host = JOptionPane.showInputDialog(frame, "Host IP:", Com.getLocalIpAddresses());
+        } else if ("JOIN".equals(opponent)) {
+            String host = frame.getHostIpAddress();
             if (host == null || host.trim().isEmpty()) {
-                opponentType = OpponentType.COMPUTER;
-                frame.setConnectionStatus("Kein Host ausgewählt. Starte lokales Spiel.");
+                frame.setConnectionStatus("Keine Host-IP angegeben. Starte lokales Spiel.");
                 frame.setLocalIpAddress("");
-                startPlacement(frame, null, false, false);
+                startPlacement(frame, null, false, false, settings);
                 return;
             }
-            NetworkHandshakeController.startClient(frame, host, port, new NetworkHandshakeController.ReadyCallback() {
+            NetworkHandshakeController.startClient(frame, host.trim(), port, new NetworkHandshakeController.ReadyCallback() {
+                /**
+                 * de: Wird aufgerufen, wenn die Netzwerkverbindung bereit ist.
+                 * en: Called when the network connection is ready.
+                 *
+                 * @param com de: Parameter com. en: Parameter com.
+                 * @param iStart de: Parameter iStart. en: Parameter iStart.
+                 */
                 @Override
                 public void onReady(Com com, boolean iStart) {
-                    startPlacement(frame, com, true, iStart);
+                    startPlacement(frame, com, true, iStart, settings);
                 }
 
+                /**
+                 * de: Wird aufgerufen, wenn ein Fehler bei der Netzwerkverbindung auftritt.
+                 * en: Called when an error occurs in the network connection.
+                 *
+                 * @param message de: Parameter message. en: Parameter message.
+                 * @param e de: Parameter e. en: Parameter e.
+                 */
                 @Override
                 public void onError(String message, Exception e) {
                     e.printStackTrace();
                     JOptionPane.showMessageDialog(frame, message + ": " + e.getMessage());
-                    opponentType = OpponentType.COMPUTER;
                     frame.setConnectionStatus("Starte lokales Spiel.");
                     frame.setLocalIpAddress("");
-                    startPlacement(frame, null, false, false);
+                    startPlacement(frame, null, false, false, settings);
                 }
             });
         }
     }
 
     /**
-     * Fragt die gewünschte Schwierigkeitsstufe für das Spiel gegen den Computer ab.
+     * de: Kehrt zum Hauptmenü zurück und setzt die Spielsteuerung zurück.
+     * en: Returns to the main menu and resets the game controller.
+     *
+     * @param frame de: Parameter frame. en: Parameter frame.
      */
-    private static GameDifficulty askDifficulty(MainFrame frame) {
-        GameDifficulty[] options = GameDifficulty.values();
-        String[] labels = Arrays.stream(options)
-                .map(GameDifficulty::getDisplayName)
-                .toArray(String[]::new);
-        int choice = JOptionPane.showOptionDialog(
-                frame,
-                "Wähle die Schwierigkeit für das Spiel gegen den Computer.",
-                "Schwierigkeit wählen",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                labels,
-                labels[0]);
-
-        if (choice >= 0 && choice < options.length) {
-            return options[choice];
-        }
-        return GameDifficulty.EASY;
-    }
+    private static void returnToMainMenu(MainFrame frame) {
+    placementController = null;
+    gameController = null;
+    frame.setConnectionStatus("Nicht verbunden");
+    frame.setLocalIpAddress("");
+    frame.setStatus("Bereit.");
+    frame.showStartScreen();
+}
 
     /**
-     * Startet das eigentliche Spiel und erstellt den passenden GameController.
+     * de: Startet das eigentliche Spiel und erstellt den passenden GameController.
+     * en: Starts the actual game and creates the appropriate GameController.
      */
-    private static void startGame(MainFrame frame, Com com, boolean networkMode, boolean iStart) {
-        GameModel gameModel = new GameModel(placementController.getOwnBoard(), networkMode ? GameDifficulty.EASY : difficulty);
+    private static void startGame(MainFrame frame, Com com, boolean networkMode, boolean iStart, GameSettings settings) {
+        GameModel gameModel = new GameModel(
+                placementController.getOwnBoard(),
+                networkMode ? GameDifficulty.EASY : difficulty,
+                settings
+        );
 
         if (networkMode) {
             frame.setConnectionStatus("Netzwerkspiel gestartet");
-            gameController = new GameController(frame, gameModel, com, iStart);
+            gameController = new GameController(frame, gameModel, com, iStart, () -> returnToMainMenu(frame));
         } else {
             frame.setConnectionStatus("Lokales Spiel gegen Computer");
             frame.setLocalIpAddress("");
-            gameController = new GameController(frame, gameModel);
+            gameController = new GameController(frame, gameModel, () -> returnToMainMenu(frame));
         }
     }
+
+    /**
+     * de: Lädt ein gespeichertes Spiel und startet es.
+     * en: Loads a saved game and starts it.
+     *
+     * @param frame de: Parameter frame. en: Parameter frame.
+     */
+    private static void handleGlobalLoad(MainFrame frame) {
+        JFileChooser chooser = new JFileChooser();
+        int result = chooser.showOpenDialog(frame);
+        if (result != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File file = chooser.getSelectedFile();
+        try {
+            GameModel loaded = SaveLoad.loadGame(file);
+            startLoadedGame(frame, loaded);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(frame, "Fehler beim Laden: " + e.getMessage(), "Fehler",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * de: Startet ein geladenes Spiel.
+     * en: Starts a loaded game.
+     *
+     * @param frame de: Parameter frame. en: Parameter frame.
+     * @param loadedModel de: Parameter loadedModel. en: Parameter loadedModel.
+     */
+    private static void startLoadedGame(MainFrame frame, GameModel loadedModel) {
+        frame.showGameScreen();
+        frame.setConnectionStatus("Lokales Spiel geladen");
+        frame.setLocalIpAddress("");
+        gameController = new GameController(frame, loadedModel, () -> returnToMainMenu(frame));
+        frame.setStatus("Geladenes Spiel gestartet.");
+    }
+
 }

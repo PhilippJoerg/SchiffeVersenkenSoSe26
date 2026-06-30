@@ -8,23 +8,30 @@ package controller;
 import java.util.Map;
 
 import models.CellState;
+import models.GameSettings;
 import models.ShipOrientation;
 import models.ShipPlacementModel;
 import models.ShipType;
 import view.BoardDropListener;
 import view.PlacementView;
 
+/**
+ * de: Verwaltet die Logik zur Platzierung von Schiffen.
+ * en: Manages the logic for ship placement.
+ */
 public class ShipPlacementController {
+
     private final PlacementView frame;
     private final ShipPlacementModel model;
     private final Runnable onFinished;
 
     /**
-     * Initialisiert den Platzierungs-Controller mit View und Fertigstellungs-Callback.
+     * de: Initialisiert den Platzierungs-Controller mit View und Fertigstellungs-Callback.
+     * en: Initializes the ship placement controller with view and completion callback.
      */
-    public ShipPlacementController(PlacementView frame, Runnable onFinished) {
+    public ShipPlacementController(PlacementView frame, Runnable onFinished, GameSettings settings) {
         this.frame = frame;
-        this.model = new ShipPlacementModel();
+        this.model = new ShipPlacementModel(settings);
         this.onFinished = onFinished;
 
         frame.setOwnBoard(model.getOwnBoard());
@@ -38,6 +45,11 @@ public class ShipPlacementController {
     }
 
     // Wechselt zwischen waagrecht und senkrecht
+    /**
+     * de: Dreht das aktuell ausgewählte Schiff.
+     * en: Rotates the currently selected ship.
+     *
+     */
     public void rotateCurrentShip() {
         model.rotateCurrentShip();
         frame.setShipPaletteRemainingCounts(model.getRemainingShips());
@@ -46,7 +58,8 @@ public class ShipPlacementController {
     }
 
     /**
-     * Platziert alle Schiffe automatisch zufällig auf dem eigenen Board.
+     * de: Platziert alle Schiffe automatisch zufällig auf dem eigenen Board.
+     * en: Automatically places all ships randomly on the player's board.
      */
     public void autoPlaceShips() {
         if (model.isPlacementFinished()) {
@@ -62,14 +75,16 @@ public class ShipPlacementController {
     }
 
     /**
-     * Prüft, ob alle Schiffe bereits gesetzt wurden.
+     * de: Prüft, ob alle Schiffe bereits gesetzt wurden.
+     * en: Checks if all ships have been placed.
      */
     public boolean isPlacementFinished() {
         return model.isPlacementFinished();
     }
 
     /**
-     * Versucht, ein Schiff per Drag-and-Drop auf dem Board zu platzieren.
+     * de: Versucht, ein Schiff per Drag-and-Drop auf dem Board zu platzieren.
+     * en: Attempts to place a ship on the board via drag-and-drop.
      */
     public boolean placeShipFromDrag(ShipType shipType, int col, int row, ShipOrientation orientation) {
         boolean placed = model.placeShipFromDrag(shipType, col, row, orientation);
@@ -84,7 +99,8 @@ public class ShipPlacementController {
     }
 
     /**
-     * Versucht das nächste verfügbare Schiff an der geklickten Position zu platzieren.
+     * de: Versucht das nächste verfügbare Schiff an der geklickten Position zu platzieren.
+     * en: Attempts to place the next available ship at the clicked position.
      */
     private void placeCurrentShip(int col, int row) {
         if (model.isPlacementFinished()) {
@@ -120,7 +136,8 @@ public class ShipPlacementController {
     }
 
     /**
-     * Aktualisiert Board und Schiffspalette in der View nach einer Änderung.
+     * de: Aktualisiert Board und Schiffspalette in der View nach einer Änderung.
+     * en: Updates the board and ship palette in the view after a change.
      */
     private void refreshView() {
         frame.setOwnBoard(model.getOwnBoard());
@@ -129,7 +146,8 @@ public class ShipPlacementController {
     }
 
     /**
-     * Aktualisiert den Statustext mit dem nächsten zu platzierenden Schiff und seiner Ausrichtung.
+     * de: Aktualisiert den Statustext mit dem nächsten zu platzierenden Schiff und seiner Ausrichtung.
+     * en: Updates the status text with the next ship to be placed and its orientation.
      */
     private void updateStatus() {
         if (model.isPlacementFinished()) {
@@ -140,25 +158,28 @@ public class ShipPlacementController {
         ShipType shipType = model.getNextShipType();
         frame.setStatus(
                 "Platziere: " + shipType.getDisplayName() + " (" + shipType.getSize() + ")"
-                        + " - Ausrichtung: " + orientationText());
+                + " - Ausrichtung: " + orientationText());
     }
 
     /**
-     * Wandelt die aktuelle Schiffsausrichtung in einen lesbaren Text um.
+     * de: Wandelt die aktuelle Schiffsausrichtung in einen lesbaren Text um.
+     * en: Converts the current ship orientation to a readable text.
      */
     private String orientationText() {
         return model.getCurrentOrientation() == ShipOrientation.HORIZONTAL ? "waagrecht" : "senkrecht";
     }
 
     /**
-     * Gibt die verbleibenden Schiffsmengen für die View zurück.
+     * de: Gibt die verbleibenden Schiffsmengen für die View zurück.
+     * en: Returns the remaining ship counts for the view.
      */
     public Map<ShipType, Integer> getRemainingShips() {
         return model.getRemainingShips();
     }
 
     /**
-     * Gibt das eigene Board für die Drag-and-Drop-Logik zurück.
+     * de: Gibt das eigene Board für die Drag-and-Drop-Logik zurück.
+     * en: Returns the player's own board for drag-and-drop logic.
      */
     public CellState[][] getOwnBoard() {
         return model.getOwnBoard();

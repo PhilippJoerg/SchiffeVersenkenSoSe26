@@ -11,8 +11,17 @@ import org.junit.jupiter.api.Test;
 import models.ShipOrientation;
 import models.ShipType;
 
+/**
+ * de: Testet die Klasse ShipPalettePanel.
+ * en: Tests the ShipPalettePanel class.
+ */
 class ShipPalettePanelTest {
 
+    /**
+     * de: Reagiert auf das Ereignis "TestSetRemainingCountsAndOrientationDoesNotThrow".
+     * en: Reacts to the event "TestSetRemainingCountsAndOrientationDoesNotThrow".
+     *
+     */
     @Test
     void testSetRemainingCountsAndOrientationDoesNotThrow() {
         ShipPalettePanel panel = new ShipPalettePanel();

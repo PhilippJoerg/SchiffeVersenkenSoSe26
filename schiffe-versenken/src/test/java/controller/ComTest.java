@@ -12,6 +12,10 @@ import java.lang.reflect.Method;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * de: Testet die Klasse Com.
+ * en: Tests the Com class.
+ */
 class ComTest {
 
     private Com com;
@@ -28,43 +32,88 @@ class ComTest {
         boolean pass;
         boolean ok;
 
+        /**
+         * de: Reagiert auf das Ereignis "Coin".
+         * en: Responds to the "Coin" event.
+         *
+         * @param coin de: Parameter coin. en: Parameter coin.
+         */
         @Override
         public void onCoin(int coin) {
             this.coin = coin;
         }
 
+        /**
+         * de: Reagiert auf das Ereignis "Size".
+         * en: Responds to the "Size" event.
+         *
+         * @param rows de: Parameter rows. en: Parameter rows.
+         * @param cols de: Parameter cols. en: Parameter cols.
+         */
         @Override
         public void onSize(int rows, int cols) {
             this.sizeRows = rows;
             this.sizeCols = cols;
         }
 
+        /**
+         * de: Reagiert auf das Ereignis "Ships".
+         * en: Responds to the "Ships" event.
+         *
+         * @param lengths de: Parameter lengths. en: Parameter lengths.
+         */
         @Override
         public void onShips(int[] lengths) {
             this.ships = lengths;
         }
 
+        /**
+         * de: Reagiert auf das Ereignis "Done".
+         * en: Responds to the "Done" event.
+         *
+         */
         @Override
         public void onDone() {
             done = true;
         }
 
+        /**
+         * de: Reagiert auf das Ereignis "Ready".
+         * en: Responds to the "Ready" event.
+         *
+         */
         @Override
         public void onReady() {
             ready = true;
         }
 
+        /**
+         * de: Reagiert auf das Ereignis "Pass".
+         * en: Responds to the "Pass" event.
+         *
+         */
         @Override
         public void onPass() {
             pass = true;
         }
 
+        /**
+         * de: Reagiert auf das Ereignis "Ok".
+         * en: Responds to the "Ok" event.
+         *
+         */
         @Override
         public void onOk() {
             ok = true;
         }
     }
 
+    /**
+     * de: Reagiert auf das Ereignis "SetUp".
+     * en: Responds to the "SetUp" event.
+     *
+     * @throws Exception de: Bei Fehler waehrend der Ausfuehrung. en: If an error occurs during execution.
+     */
     @BeforeEach
     void setUp() throws Exception {
         listener = new TestListener();
@@ -75,6 +124,12 @@ class ComTest {
         outField.set(com, writer);
     }
 
+    /**
+     * de: Testet, ob die Methode sendCommands die erwarteten Protokollzeilen schreibt.
+     * en: Tests if the sendCommands method writes the expected protocol lines.
+     *
+     * @throws IOException de: Bei Fehler waehrend der Ausfuehrung. en: If an error occurs during execution.
+     */
     @Test
     void testSendCommandsWriteExpectedProtocolLines() throws IOException {
         com.sendShot(1, 2);
@@ -103,6 +158,12 @@ class ComTest {
         assertTrue(output.contains("save 42\n") || output.contains("load 13\n"));
     }
 
+    /**
+     * de: Testet, ob die Methode handleLine eingehende Protokollzeilen korrekt parst.
+     * en: Tests if the handleLine method correctly parses incoming protocol lines.
+     *
+     * @throws Exception de: Bei Fehler waehrend der Ausfuehrung. en: If an error occurs during execution.
+     */
     @Test
     void testHandleLineParsesIncomingProtocol() throws Exception {
         Method method = Com.class.getDeclaredMethod("handleLine", String.class);
@@ -128,6 +189,12 @@ class ComTest {
         assertEquals(true, listener.ok);
     }
 
+    /**
+     * de: Testet, ob die Methode saveGame und fireShot den Steuerzustand korrekt aktualisieren.
+     * en: Tests if the saveGame and fireShot methods correctly update the control state.
+     *
+     * @throws Exception de: Bei Fehler waehrend der Ausfuehrung. en: If an error occurs during execution.
+     */
     @Test
     void testSaveGameAndFireShotControlState() throws Exception {
         com.setCurrentState(Com.State.MY_TURN);

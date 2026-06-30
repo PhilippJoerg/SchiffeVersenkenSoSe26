@@ -8,41 +8,57 @@ package models;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * de: Die Klasse ShipPlacementModel verwaltet die Platzierung der Schiffe auf dem eigenen Spielfeld.
+ * en: The class ShipPlacementModel manages the placement of ships on the player's own board.
+ */
 public class ShipPlacementModel {
 
     private final CellState[][] ownBoard;
     private final EnumMap<ShipType, Integer> remainingShips;
+    private final GameSettings settings;
     private ShipOrientation currentOrientation;
 
-    public ShipPlacementModel() {
-        ownBoard = BoardUtils.createEmptyCellBoard();
+    /**
+     * de: Konstruktor für das ShipPlacementModel.
+     * en: Constructor for the ShipPlacementModel.
+     *
+     * @param settings de: Parameter settings. en: Parameter settings.
+     */
+    public ShipPlacementModel(GameSettings settings) {
+        this.settings = settings;
+        ownBoard = BoardUtils.createEmptyCellBoard(settings.getBoardSize());
         remainingShips = createRemainingShips();
         currentOrientation = ShipOrientation.HORIZONTAL;
     }
 
     /**
-     * Liefert das eigene Spielfeld des Platzierungsmodells.
+     * de: Liefert das eigene Spielfeld des Platzierungsmodells.
+     * en: Returns the player's own board from the placement model.
      */
     public CellState[][] getOwnBoard() {
         return ownBoard;
     }
 
     /**
-     * Liefert die verbleibenden Schiffsmengen für jedes Schiffstyp.
+     * de: Liefert die verbleibenden Schiffsmengen für jedes Schiffstyp.
+     * en: Returns the remaining ship counts for each ship type.
      */
     public Map<ShipType, Integer> getRemainingShips() {
         return new EnumMap<>(remainingShips);
     }
 
     /**
-     * Gibt die aktuell ausgewählte Schiffsausrichtung zurück.
+     * de: Gibt die aktuell ausgewählte Schiffsausrichtung zurück.
+     * en: Returns the currently selected ship orientation.
      */
     public ShipOrientation getCurrentOrientation() {
         return currentOrientation;
     }
 
     /**
-     * Dreht das aktuell zu platzierende Schiff zwischen horizontal und vertikal.
+     * de: Dreht das aktuell zu platzierende Schiff zwischen horizontal und vertikal.
+     * en: Rotates the currently selected ship between horizontal and vertical.
      */
     public void rotateCurrentShip() {
         currentOrientation = currentOrientation == ShipOrientation.HORIZONTAL
@@ -51,7 +67,9 @@ public class ShipPlacementModel {
     }
 
     /**
-     * Prüft, ob alle Schiffe bereits platziert wurden.
+     * de: Prüft, ob alle Schiffe bereits platziert wurden.
+     * en: Checks if all ships have been placed.
+
      */
     public boolean isPlacementFinished() {
         for (Integer remaining : remainingShips.values()) {
@@ -63,14 +81,16 @@ public class ShipPlacementModel {
     }
 
     /**
-     * Platziert ein Schiff über Drag-and-Drop an der angegebenen Position.
+     * de: Platziert ein Schiff über Drag-and-Drop an der angegebenen Position.
+     * en: Places a ship using drag-and-drop at the specified position.
      */
     public boolean placeShipFromDrag(ShipType shipType, int col, int row, ShipOrientation orientation) {
         return placeShip(shipType, col, row, orientation);
     }
 
     /**
-     * Platziert das nächste verfügbare Schiff an der angegebenen Position.
+     * de: Platziert das nächste verfügbare Schiff an der angegebenen Position.
+     * en: Places the next available ship at the specified position.
      */
     public boolean placeCurrentShip(int col, int row) {
         if (isPlacementFinished()) {
@@ -86,11 +106,12 @@ public class ShipPlacementModel {
     }
 
     /**
-     * Platziert alle Schiffe zufällig und setzt die Ausrichtung zurück.
+     * de: Platziert alle Schiffe zufällig und setzt die Ausrichtung zurück.
+     * en: Randomly places all ships and resets the orientation.
      */
     public void autoPlaceShips() {
         resetBoard();
-        BoardUtils.placeRandomShips(ownBoard);
+        BoardUtils.placeRandomShips(ownBoard, settings.getShipCounts());
         for (ShipType shipType : ShipType.values()) {
             remainingShips.put(shipType, 0);
         }
@@ -98,7 +119,8 @@ public class ShipPlacementModel {
     }
 
     /**
-     * Platziert ein Schiff eines bestimmten Typs, wenn dies möglich ist.
+     * de: Platziert ein Schiff eines bestimmten Typs, wenn dies möglich ist.
+     * en: Places a ship of a specific type if possible.
      */
     public boolean placeShip(ShipType shipType, int col, int row, ShipOrientation orientation) {
         if (shipType == null) {
@@ -119,14 +141,16 @@ public class ShipPlacementModel {
     }
 
     /**
-     * Prüft, ob ein Schiff an der angegebenen Position platziert werden kann.
+     * de: Prüft, ob ein Schiff an der angegebenen Position platziert werden kann.
+     * en: Checks if a ship can be placed at the specified position.
      */
     public boolean canPlaceShip(ShipType shipType, int startCol, int startRow, ShipOrientation orientation) {
         return BoardUtils.canPlaceShip(ownBoard, shipType, startCol, startRow, orientation);
     }
 
     /**
-     * Liefert den nächsten Schiffstyp, der noch platziert werden muss.
+     * de: Liefert den nächsten Schiffstyp, der noch platziert werden muss.
+     * en: Returns the next ship type that still needs to be placed.
      */
     public ShipType getNextShipType() {
         for (ShipType type : ShipType.values()) {
@@ -138,41 +162,41 @@ public class ShipPlacementModel {
     }
 
     /**
-     * Gibt die verbleibende Anzahl eines Schiffstyps zurück.
+     * de: Gibt die verbleibende Anzahl eines Schiffstyps zurück.
+     * en: Returns the remaining count of a specific ship type.
      */
     public int getRemainingCount(ShipType shipType) {
         return remainingShips.getOrDefault(shipType, 0);
     }
 
     /**
-     * Verringert die verbleibende Anzahl eines Schiffstyps nach Platzierung.
+     * de: Verringert die verbleibende Anzahl eines Schiffstyps nach Platzierung.
+     * en: Decrements the remaining count of a specific ship type after placement.
      */
     private void decrementRemaining(ShipType shipType) {
         remainingShips.put(shipType, getRemainingCount(shipType) - 1);
     }
 
     /**
-     * Setzt das eigene Board und die verbleibenden Schiffe auf den Ausgangszustand zurück.
+     * de: Setzt das eigene Board und die verbleibenden Schiffe auf den Ausgangszustand zurück.
+     * en: Resets the own board and the remaining ships to the initial state.
      */
     private void resetBoard() {
-        for (int col = 0; col < BoardUtils.GRID_SIZE; col++) {
-            for (int row = 0; row < BoardUtils.GRID_SIZE; row++) {
-                ownBoard[col][row] = CellState.EMPTY;
-            }
-        }
+        BoardUtils.clearBoard(ownBoard);
         for (ShipType type : ShipType.values()) {
-            remainingShips.put(type, type.getAmount());
+            remainingShips.put(type, settings.getShipCount(type));
         }
     }
 
     /**
-     * Erstellt die Map mit der Ausgangsanzahl jedes Schiffstyps.
+     * de: Erstellt die Map mit der Ausgangsanzahl jedes Schiffstyps.
+     * en: Creates the map with the initial count of each ship type.
      */
     private EnumMap<ShipType, Integer> createRemainingShips() {
         EnumMap<ShipType, Integer> result = new EnumMap<>(ShipType.class);
         for (ShipType type : ShipType.values()) {
-            result.put(type, type.getAmount());
+            result.put(type, settings.getShipCount(type));
         }
         return result;
     }
-} 
+}
