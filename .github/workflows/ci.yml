@@ -31,6 +31,33 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Ensure version was bumped for PRs to main
+      if: github.event_name == 'pull_request'
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        BASE_REF="${{ github.event.pull_request.base.ref }}"
+        git fetch --no-tags --depth=1 origin "${BASE_REF}"
+
+        extract_version() {
+          sed -n '0,/<version>/s:.*<version>\([^<]*\)</version>.*:\1:p'
+        }
+
+        BASE_VERSION=$(git show "origin/${BASE_REF}:schiffe-versenken/pom.xml" | extract_version)
+        HEAD_VERSION=$(extract_version < schiffe-versenken/pom.xml)
+
+        if [ -z "${BASE_VERSION}" ] || [ -z "${HEAD_VERSION}" ]; then
+          echo "Could not read project version from pom.xml"
+          exit 1
+        fi
+
+        if [ "${BASE_VERSION}" = "${HEAD_VERSION}" ]; then
+          echo "Version must be changed before merge. Current PR version: ${HEAD_VERSION}"
+          exit 1
+        fi
+
+        echo "Version bump detected: ${BASE_VERSION} -> ${HEAD_VERSION}"
     - name: Set up JDK 25
       uses: actions/setup-java@v4
       with:
