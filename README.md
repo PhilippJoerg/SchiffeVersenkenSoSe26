@@ -9,7 +9,7 @@ Dieses Projekt wurde im Rahmen des Programmierpraktikums im Sommersemester 2026 
 - Spiellogik für Schiffsplatzierung, Spielzüge und Siegbedingungen
 - Netzwerk-Multiplayer über TCP-Sockets
 - Speichern und Laden von Spielständen
-- Generierte Javadoc-Dokumentation für die Hauptklassen
+- Javadoc-Dokumentation für die Hauptklassen
 
 ### Technologien
 - Java
@@ -19,11 +19,11 @@ Dieses Projekt wurde im Rahmen des Programmierpraktikums im Sommersemester 2026 
 
 ### Projektstruktur
 - `schiffe-versenken/` enthält den Java-Quellcode und die Tests
-- `doc/` enthält die generierte Javadoc-Dokumentation
+- `doc/` enthält die  Javadoc-Dokumentation
 - `README.md` enthält die Projektübersicht
 
 ### Dokumentation
-Um die generierte Javadoc-Dokumentation anzusehen, muss zuerst das gesamte Repository lokal heruntergeladen oder geklont werden. Anschließend kann die Datei `doc/index.html` im Browser geöffnet werden.
+Um die Javadoc-Dokumentation anzusehen, muss zuerst das gesamte Repository lokal heruntergeladen oder geklont werden. Anschließend kann die Datei `doc/index.html` im Browser geöffnet werden.
 
 ### Termine
 - Zwischenpräsentation: 20. Mai 2026
@@ -43,7 +43,7 @@ This project was developed as part of the programming practical course in the su
 - Game logic for ship placement, turns, and win conditions
 - Network multiplayer via TCP sockets
 - Save and load support for game states
-- Generated Javadoc documentation for the main classes
+- Javadoc documentation for the main classes
 
 ### Technologies
 - Java
@@ -53,11 +53,11 @@ This project was developed as part of the programming practical course in the su
 
 ### Project Structure
 - `schiffe-versenken/` contains the Java source code and tests
-- `doc/` contains the generated Javadoc documentation
+- `doc/` contains the Javadoc documentation
 - `README.md` contains the project overview
 
 ### Documentation
-To view the generated Javadoc documentation, the complete repository must first be downloaded or cloned locally. After that, open the file `doc/index.html` in a web browser.
+To view the Javadoc documentation, the complete repository must first be downloaded or cloned locally. After that, open the file `doc/index.html` in a web browser.
 
 ### Milestones
 - Midterm presentation: May 20, 2026
