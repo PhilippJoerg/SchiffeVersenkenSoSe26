@@ -20,6 +20,7 @@ Dieses Projekt wurde im Rahmen des Programmierpraktikums im Sommersemester 2026 
 ### Projektstruktur
 - `schiffe-versenken/` enthält den Java-Quellcode und die Tests
 - `doc/` enthält die  Javadoc-Dokumentation
+- `mermaid/` enthällt die Klassendiagramme
 - `README.md` enthält die Projektübersicht
 
 ### Dokumentation
@@ -54,6 +55,7 @@ This project was developed as part of the programming practical course in the su
 ### Project Structure
 - `schiffe-versenken/` contains the Java source code and tests
 - `doc/` contains the Javadoc documentation
+- `mermaid/` contains the class diagrams
 - `README.md` contains the project overview
 
 ### Documentation
